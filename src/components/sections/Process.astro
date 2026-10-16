@@ -28,7 +28,7 @@ const t = useTranslations(locale);
       {
         t.process.steps.map((step, position) => (
           <li class="step" data-reveal>
-            <span class="dot" aria-hidden="true">
+            <span class="marker" aria-hidden="true">
               {String(position + 1).padStart(2, '0')}
             </span>
             <h3>{step.title}</h3>
@@ -52,7 +52,7 @@ const t = useTranslations(locale);
   .process {
     border-block: 1px solid var(--line);
     background:
-      radial-gradient(60% 80% at 100% 0%, rgb(17 17 17 / 0.04), transparent 70%),
+      linear-gradient(to bottom left, rgb(17 17 17 / 0.04), transparent 45%),
       var(--bg);
   }
 
@@ -64,7 +64,7 @@ const t = useTranslations(locale);
     margin: 0;
   }
 
-  /* Line joining the numbered dots; it draws itself when the list is revealed. */
+  /* Line joining the numbered squares; it draws itself when the list is revealed. */
   .steps::before {
     content: '';
     position: absolute;
@@ -94,14 +94,13 @@ const t = useTranslations(locale);
     gap: 10px;
   }
 
-  .dot {
+  .marker {
     display: grid;
     place-items: center;
     width: 44px;
     height: 44px;
     margin-bottom: 10px;
     border: 1.5px solid var(--ink);
-    border-radius: 50%;
     background: var(--bg);
     font-family: var(--font-mono);
     font-size: 0.8rem;
@@ -111,7 +110,7 @@ const t = useTranslations(locale);
       color 0.3s var(--ease);
   }
 
-  .step:hover .dot {
+  .step:hover .marker {
     background: var(--ink);
     color: #fff;
   }

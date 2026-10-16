@@ -6,6 +6,7 @@ import SectionHeader from '@/components/ui/SectionHeader.astro';
 import { useTranslations } from '@/i18n';
 import type { Locale } from '@/i18n/locales';
 import { cvPdfPath } from '@/lib/cv';
+import { whatsappUrl } from '@/lib/whatsapp';
 
 interface Props {
   locale: Locale;
@@ -50,6 +51,21 @@ const mailto = `mailto:${site.email}?subject=${encodeURIComponent(t.contact.mail
           <li>
             <a
               class="link-arrow"
+              href={whatsappUrl(t.contact.whatsappMessage)}
+              target="_blank"
+              rel="noopener"
+              data-track="contact_click"
+              data-track-method="whatsapp"
+            >
+              <Icon name="whatsapp" size={18} />
+              <span class="visually-hidden">WhatsApp: </span>
+              {site.whatsapp.display}
+              <span class="visually-hidden"> {t.a11y.newTab}</span>
+            </a>
+          </li>
+          <li>
+            <a
+              class="link-arrow"
               href={site.socials.linkedin}
               target="_blank"
               rel="noopener"
@@ -62,7 +78,14 @@ const mailto = `mailto:${site.email}?subject=${encodeURIComponent(t.contact.mail
             </a>
           </li>
           <li>
-            <a class="link-arrow" href={cvPdfPath(locale)} download type="application/pdf" data-track="cv_download">
+            <a
+              class="link-arrow"
+              href={cvPdfPath(locale)}
+              download
+              type="application/pdf"
+              data-track="cv_download"
+              data-track-location="contact"
+            >
               <Icon name="download" size={18} />
               {t.contact.ctaCv}
             </a>
@@ -79,7 +102,7 @@ const mailto = `mailto:${site.email}?subject=${encodeURIComponent(t.contact.mail
   .contact {
     position: relative;
     background:
-      radial-gradient(50% 60% at 0% 100%, rgb(17 17 17 / 0.05), transparent 70%),
+      linear-gradient(to top right, rgb(17 17 17 / 0.05), transparent 45%),
       var(--bg);
   }
 
@@ -129,7 +152,6 @@ const mailto = `mailto:${site.email}?subject=${encodeURIComponent(t.contact.mail
     place-items: center;
     width: 26px;
     height: 26px;
-    border-radius: 50%;
     background: var(--ink);
     color: #fff;
     font-family: var(--font-mono);

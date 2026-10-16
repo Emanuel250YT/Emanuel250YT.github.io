@@ -5,8 +5,8 @@ Portfolio of **Emanuel Guzman** — full stack developer, product manager and fo
 
 - Site: **https://emanuel250.dev.ar** — in Español, English, Português, Français,
   Deutsch, 中文 and हिन्दी (`/`, `/en/`, `/pt/`, `/fr/`, `/de/`, `/zh/`, `/hi/`)
-- CV: [/en/cv/](https://emanuel250.dev.ar/en/cv/) · [PDF](https://emanuel250.dev.ar/en/cv/emanuel-guzman-cv.pdf)
-  (one HTML page and one PDF per language)
+- CV: [PDF](https://emanuel250.dev.ar/cv/emanuel-guzman-cv.pdf) (`/<locale>/cv/emanuel-guzman-cv.pdf`
+  per language), uploaded by hand at stable URLs that other sites can link to or fetch
 
 Built with [Astro](https://astro.build) as a fully static site on GitHub Pages and
 designed to turn visitors into leads: services with their own calls to action, a
@@ -14,9 +14,12 @@ clear process, proof (projects and achievements) and a short contact form. No UI
 CSS framework, seven languages, motion that respects reduced-motion preferences, and
 SEO + accessibility checks in CI.
 
-| Lighthouse (mobile) | `/` | `/zh/` | `/hi/` | `/en/cv/` | `/privacy/` |
-| --- | --- | --- | --- | --- | --- |
-| Performance · Accessibility · Best practices · SEO | 99 · 100 · 100 · 100 | 99 · 100 · 100 · 100 | 98 · 100 · 100 · 100 | 100 · 100 · 100 · 100 | 100 · 100 · 100 · 100 |
+| Lighthouse (mobile) | `/` | `/zh/` | `/hi/` | `/privacy/` |
+| --- | --- | --- | --- | --- |
+| Performance · Accessibility · Best practices · SEO | 99–100 · 100 · 100 · 100 | 95–97 · 100 · 100 · 100 | 93–98 · 100 · 100 · 100 | 100 · 100 · 100 · 100 |
+
+Lab runs with Lighthouse 13.5.0 and the Chrome flags listed in `CLAUDE.md` §15 (without
+them, headless Chrome on Windows inflates the score). Desktop: 100 on every page.
 
 ## Development
 
@@ -27,14 +30,15 @@ npm ci            # installs exactly what the lockfile says (no install scripts)
 npm run dev       # http://localhost:4321
 npm run verify    # types + build + static SEO/accessibility checks
 npm run preview   # serves dist/ as production does
-npm run assets    # regenerates portraits, icons, Open Graph images and CV PDFs (needs Chrome)
+npm run assets    # regenerates portraits, icons and Open Graph images (needs Chrome)
 ```
 
 ## Page structure
 
 Hero (rotating roles, primary CTA) → About → Services (4, each with its own CTA that
 preselects the service in the form) → Process (4 steps) → Projects → Achievements and
-ecosystems → Contact (form + what happens next + direct channels) → Footer.
+ecosystems → Contact (form by email or WhatsApp + what happens next + direct channels) →
+Footer. Every page has floating WhatsApp and back-to-top buttons at the bottom right.
 
 ## Editing content
 
@@ -44,14 +48,17 @@ ecosystems → Contact (form + what happens next + direct channels) → Footer.
 | Rotating roles in the hero | `hero.roles` in each dictionary |
 | Services | `src/data/services.ts` |
 | Projects / achievements | `src/data/projects.ts`, `src/data/achievements.ts` |
-| Experience, education, certifications, skills | `src/data/resume.ts` |
+| Experience, education, certifications, skills (JSON-LD) | `src/data/resume.ts` |
+| CV PDF | upload `public/cv/emanuel-guzman-cv.pdf` (required) and, optionally, `public/<locale>/cv/emanuel-guzman-cv.pdf` |
 | Form options (budget ranges, extra services), ecosystems strip | `src/data/contact.ts` |
-| Name, email, socials, domain, form endpoint, GA4, search-console tokens | `src/config/site.ts` |
+| Name, email, WhatsApp, socials, domain, form endpoint, GA4, search-console tokens | `src/config/site.ts` |
 | Portrait | `assets-src/portrait.png` (colour cut-out, transparent background) |
 
 Every translatable field is typed as `Record<Locale, …>`, so `npm run check` fails if a
-language is missing. After changing the CV, the portrait or the identity, run
-`npm run assets` and commit `public/` and `src/assets/`. Rules for design,
+language is missing. After changing the portrait or the identity, run
+`npm run assets` and commit `public/` and `src/assets/`. The CV PDFs are never
+generated: replace the files above (a language without its own PDF links to the
+Spanish one). Rules for design,
 accessibility, SEO, motion, i18n and analytics live in [`CLAUDE.md`](./CLAUDE.md).
 
 ## Owner setup (one-time)
@@ -72,7 +79,9 @@ Already configured in `src/config/site.ts`: GA4 `G-GJVKXV08PC` and GTM `GTM-5BT3
 Both load only after a visitor accepts analytics cookies.
 
 1. In GA4 → Admin → Events, mark **`generate_lead`** as a key event (conversion) once
-   it appears. Other events sent: `cta_click`, `select_service`, `contact_click`,
+   it appears; its `method` parameter says whether the lead came by `email` or
+   `whatsapp` (the WhatsApp one fires when the chat opens with the message ready).
+   Other events sent: `cta_click`, `select_service`, `contact_click` (with `method`),
    `cv_download`.
 2. In GTM, **do not add a Google tag / GA4 tag for `G-GJVKXV08PC`**: GA4 is already
    loaded directly and would count everything twice. Use GTM for other tags; the events
@@ -89,7 +98,8 @@ Both load only after a visitor accepts analytics cookies.
 ## Publishing (GitHub Pages + dev.ar)
 
 Every push to `main` runs `.github/workflows/deploy.yml`: install, audit, type check,
-build, SEO/accessibility checks, and publish `dist/` to GitHub Pages.
+build, SEO/accessibility checks, and publish `dist/` to GitHub Pages. It also runs once a
+day, so the npm download count baked into the HTML stays current.
 
 - **GitHub Pages**: Settings → Pages → Source **GitHub Actions**, custom domain
   `emanuel250.dev.ar` (declared by `public/CNAME`), **Enforce HTTPS** on. Settings →

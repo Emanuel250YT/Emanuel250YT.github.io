@@ -31,6 +31,16 @@ const links = [
       {site.logo}<span class="visually-hidden"> {site.name}</span>
     </a>
 
+    <!-- Below 1024 px the nav collapses: this keeps "Let's talk" in the bar (the nav's own CTA hides). -->
+    <a
+      class="btn btn--solid btn--sm bar-cta"
+      href={target('contact')}
+      data-track="cta_click"
+      data-track-location="header_mobile"
+    >
+      {t.nav.cta}
+    </a>
+
     <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav" data-menu-toggle>
       <span class="visually-hidden" data-label-open>{t.a11y.menu}</span>
       <span class="visually-hidden" data-label-close hidden>{t.a11y.closeMenu}</span>
@@ -104,7 +114,8 @@ const links = [
     });
 
     const onScroll = () => header.classList.toggle('is-scrolled', window.scrollY > 8);
-    onScroll();
+    // First check on the next frame: reading scrollY during parse forces a layout.
+    requestAnimationFrame(onScroll);
     window.addEventListener('scroll', onScroll, { passive: true });
   }
 
@@ -226,6 +237,10 @@ const links = [
     gap: 12px;
   }
 
+  .bar-cta {
+    display: none;
+  }
+
   .menu-toggle {
     display: none;
     place-items: center;
@@ -251,7 +266,6 @@ const links = [
     left: 0;
     width: 100%;
     height: 1.75px;
-    border-radius: 2px;
     background: currentColor;
     transition:
       transform 0.35s var(--ease),
@@ -286,8 +300,23 @@ const links = [
   }
 
   @media (max-width: 1024px) {
+    .bar {
+      gap: 12px;
+    }
+
     .menu-toggle {
       display: grid;
+    }
+
+    /* Primary action: 44 px tall, pushed next to the burger. */
+    .bar-cta {
+      --btn-h: 44px;
+      display: inline-flex;
+      margin-left: auto;
+    }
+
+    .nav-cta {
+      display: none;
     }
 
     .nav {
@@ -342,9 +371,13 @@ const links = [
       flex-direction: column;
       align-items: stretch;
     }
+  }
 
-    .nav-cta {
-      --btn-h: 48px;
+  /* The longest labels ("Vamos conversar") still fit next to the logo at 320 px. */
+  @media (max-width: 380px) {
+    .bar-cta {
+      padding-inline: 12px;
+      font-size: 0.8rem;
     }
   }
 

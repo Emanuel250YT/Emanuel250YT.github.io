@@ -16,12 +16,3 @@ export function formatMonth(iso: string, locale: Locale): string {
   // Spanish and Portuguese render "sept. de 2025": keep it compact ("sept 2025").
   return formatted.replace('.', '').replace(' de ', ' ');
 }
-
-export function formatRange(start: string, end: string | undefined, locale: Locale, present: string): string {
-  return `${formatMonth(start, locale)} – ${end ? formatMonth(end, locale) : present}`;
-}
-
-/** Strips the protocol and trailing slash for display. */
-export function displayUrl(url: string): string {
-  return url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
-}

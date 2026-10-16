@@ -1,4 +1,5 @@
-# Build + checks on every pull request; deploy to GitHub Pages on every push to main.
+# Build + checks on every pull request; deploy to GitHub Pages on every push to main
+# and once a day (the static HTML carries the npm download count of that build).
 # Actions are pinned by commit SHA (supply chain); Dependabot keeps them up to date.
 name: Deploy
 
@@ -7,6 +8,8 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  schedule:
+    - cron: '17 9 * * *'
   workflow_dispatch:
 
 permissions:
@@ -26,6 +29,8 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          # Full history: sitemap <lastmod> and JSON-LD dates come from git (astro.config.mjs).
+          fetch-depth: 0
 
       - name: Set up Node
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0

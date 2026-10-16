@@ -1,7 +1,4 @@
 ---
-import { getImage } from 'astro:assets';
-import portrait from '@/assets/portrait.png';
-import { site } from '@/config/site';
 import About from '@/components/sections/About.astro';
 import Achievements from '@/components/sections/Achievements.astro';
 import Contact from '@/components/sections/Contact.astro';
@@ -21,6 +18,7 @@ import {
   serviceCatalogNode,
   websiteNode,
 } from '@/lib/schema';
+import { portraitRef } from '@/lib/portrait';
 
 interface Props {
   locale: Locale;
@@ -29,12 +27,11 @@ interface Props {
 const { locale } = Astro.props;
 const t = useTranslations(locale);
 
-const portraitImage = await getImage({ src: portrait, width: 744, format: 'webp' });
-const portraitUrl = new URL(portraitImage.src, Astro.site ?? site.url).href;
+const portrait = await portraitRef();
 
 const jsonLd = graph([
-  personNode(locale, portraitUrl),
-  ...organizationNodes(),
+  personNode(locale, portrait, { offers: true }),
+  ...organizationNodes(locale),
   websiteNode(),
   ...pageNode({
     locale,
@@ -42,7 +39,7 @@ const jsonLd = graph([
     title: t.meta.title,
     description: t.meta.description,
     type: 'ProfilePage',
-    imageUrl: portraitUrl,
+    image: portrait,
   }),
   projectListNode(locale),
   serviceCatalogNode(locale),

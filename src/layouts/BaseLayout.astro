@@ -1,18 +1,18 @@
 ---
-import '@fontsource-variable/space-grotesk/wght.css';
 import '@/styles/global.css';
-import fontLatin from '@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2?url';
 import { site } from '@/config/site';
 import ConsentBanner from '@/components/analytics/ConsentBanner.astro';
 import Footer from '@/components/sections/Footer.astro';
 import Header from '@/components/sections/Header.astro';
+import FloatingActions from '@/components/ui/FloatingActions.astro';
 import { useTranslations } from '@/i18n';
 import { fallbackLocale, localeMeta, localePath, locales, type Locale } from '@/i18n/locales';
+import { fontFaceCss, latinFontUrl } from '@/lib/fonts';
 import type { JsonLd } from '@/lib/schema';
 
 interface Props {
   locale: Locale;
-  /** Route without the locale prefix: '' for home, 'cv' for /cv/. */
+  /** Route without the locale prefix: '' for home, 'privacy' for /privacy/. */
   path: string;
   title: string;
   description: string;
@@ -113,7 +113,8 @@ const alternateLocales = locales.filter((code) => code !== locale);
     <link rel="manifest" href="/site.webmanifest" />
     <link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
 
-    <link rel="preload" href={fontLatin} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={latinFontUrl} as="font" type="font/woff2" crossorigin />
+    <style is:inline set:html={fontFaceCss}></style>
 
     {site.googleSiteVerification && <meta name="google-site-verification" content={site.googleSiteVerification} />}
     {site.bingSiteVerification && <meta name="msvalidate.01" content={site.bingSiteVerification} />}
@@ -128,9 +129,11 @@ const alternateLocales = locales.filter((code) => code !== locale);
       <slot />
     </main>
     <Footer locale={locale} />
+    <FloatingActions locale={locale} />
     <ConsentBanner locale={locale} />
     <script>
       import '@/scripts/motion';
+      import '@/scripts/cursor';
     </script>
   </body>
 </html>

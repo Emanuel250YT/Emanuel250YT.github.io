@@ -1,13 +1,13 @@
 # Emanuel Guzman
 
-> Full stack developer, product manager and founder of Cosmos / Cosmos Pay, based in Salta, Argentina. Designs and builds custom software, payment integrations and blockchain products for companies and startups across Latin America.
+> Full stack developer, product manager and founder of Cosmos / Cosmos Pay, based in Salta, Argentina. Designs and builds custom software, payment integrations and blockchain products for companies and startups in any country, working remotely.
 
 The site is available in Spanish (default), English, Portuguese, French, German, Chinese and Hindi. Every page links to its translations with hreflang.
 
 ## Pages
 
 - [Portfolio](https://emanuel250.dev.ar/en/): projects, achievements and contact (English)
-- [CV](https://emanuel250.dev.ar/en/cv/): experience, education and certifications ([PDF](https://emanuel250.dev.ar/en/cv/emanuel-guzman-cv.pdf))
+- [CV (PDF)](https://emanuel250.dev.ar/en/cv/emanuel-guzman-cv.pdf): experience, education and certifications; Spanish at https://emanuel250.dev.ar/cv/emanuel-guzman-cv.pdf
 - [Privacy policy](https://emanuel250.dev.ar/en/privacy/)
 - Other languages: [Español](https://emanuel250.dev.ar/), [Português](https://emanuel250.dev.ar/pt/), [Français](https://emanuel250.dev.ar/fr/), [Deutsch](https://emanuel250.dev.ar/de/), [中文](https://emanuel250.dev.ar/zh/), [हिन्दी](https://emanuel250.dev.ar/hi/)
 
@@ -18,26 +18,41 @@ The site is available in Spanish (default), English, Portuguese, French, German,
 - Blockchain products: wallets, smart contracts and dApps on Stellar, Solana and EVM chains
 - SDKs and APIs for developers: libraries, docs and developer platforms
 
-How to hire: use the contact form at https://emanuel250.dev.ar/en/#contact (reply within 48 hours) or email emanuel@cloudycoding.com.
+How to hire: use the contact form at https://emanuel250.dev.ar/en/#contact (by email or WhatsApp, reply within 48 hours), email emanuel@cloudycoding.com or message https://wa.me/5493874732727.
+
+How a project runs: a 30-minute diagnosis call, a written proposal with scope, timeline and budget before any code, weekly deliveries you can try, then launch with documentation and follow-up.
 
 ## Roles
 
 - Founder — Cosmos · Cosmos Pay (2026 – present): https://cosmospay.lat
 - CEO — CloudyCoding (2018 – present): https://cloudycoding.com
 - Full Stack Developer — SaltaDev (2025 – present): https://salta.dev.ar
+- Independent developer — Freelance (2018 – present)
 
 ## Projects
 
 - [Cosmos Pay](https://cosmospay.lat): payment gateway for developers in Latin America (payment intents, webhooks, stablecoins, fiat ramps)
 - [Cosmos Pay Wallet](https://github.com/CosmosPay/CosmosPay-Wallet): non-custodial Stellar wallet (browser extension, Android, web, desktop)
-- BancaSDK: multi-bank TypeScript SDK, the evolution of MacroClickJS (15,000+ downloads in its first week)
+- BancaSDK: multi-bank TypeScript SDK, the evolution of MacroClickJS (2,586 npm downloads in its first week)
 - [SolaDB](https://github.com/Emanuel250YT/SolaDB) and [MonaDB](https://github.com/Emanuel250YT/MonaDB): private, replicated storage on Solana and Monad
-- [ASide](https://github.com/Emanuel250YT/ASide) and [ArkaCDN](https://github.com/Emanuel250YT/arka-cdn): SDKs to build on Arkiv
+- [ASide](https://github.com/Emanuel250YT/ASide) and [ArkaCDN](https://github.com/Emanuel250YT/arka-cdn): SDKs to build on Arkiv (912 npm downloads in their first 3 days)
 - [StellarOrchestra](https://github.com/Emanuel250YT/StellarOrchestra): AI agent orchestrator with x402 payments on Stellar
+
+## Achievements
+
+- Selected for the Scale Track of Código Alebrije 2026 (Mexico City) with Cosmos — Stellar Development Foundation, BAF
+- Builder at ImpactaBootcamp 2026: Soroban and trustless escrow — Trustless Work, BAF
+- Speaker at Blockchain Salta 2025 (DESAFIA, SaltaDev)
+- Sponsor of Hackathon del Milagro 2025 with CloudyCoding: free hosting for the winning projects
+- Hacker at a global Ethereum hackathon and at ETH Argentina (2025)
+- NASA Open Science certificate (2024)
+
+Download numbers come from npm's public API; the home page shows the live total of every package (https://www.npmjs.com/~emanuel250dev).
 
 ## Contact
 
 - Email: emanuel@cloudycoding.com
+- WhatsApp: https://wa.me/5493874732727 (+54 9 387 473-2727)
 - GitHub: https://github.com/Emanuel250YT
 - LinkedIn: https://www.linkedin.com/in/emanuel250/
 - npm: https://www.npmjs.com/~emanuel250dev

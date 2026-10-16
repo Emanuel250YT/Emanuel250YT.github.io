@@ -3,7 +3,8 @@ import { coreStack, roles } from '@/data/resume';
 import Icon from '@/components/ui/Icon.astro';
 import RichHeading from '@/components/ui/RichHeading.astro';
 import { useTranslations } from '@/i18n';
-import { localePath, type Locale } from '@/i18n/locales';
+import type { Locale } from '@/i18n/locales';
+import { cvPdfPath } from '@/lib/cv';
 
 interface Props {
   locale: Locale;
@@ -52,9 +53,19 @@ const currentRoles = roles.filter((role) => !role.end && role.id !== 'freelance'
           </ul>
         </div>
 
-        <a class="btn btn--light btn--sm cv-cta" href={localePath(locale, 'cv')} data-reveal data-track="cta_click" data-track-location="about_cv">
+        <a
+          class="btn btn--light btn--sm cv-cta"
+          href={cvPdfPath(locale)}
+          type="application/pdf"
+          target="_blank"
+          rel="noopener"
+          data-reveal
+          data-track="cv_download"
+          data-track-location="about"
+        >
           {t.about.cvCta}
-          <Icon name="arrow-right" size={16} class="btn-arrow" />
+          <span class="visually-hidden"> {t.a11y.newTab}</span>
+          <Icon name="arrow-up-right" size={16} class="btn-arrow" />
         </a>
       </div>
 
@@ -180,7 +191,6 @@ pay.uri; <span class="tk-c">{t.about.editorResult}</span></code></pre>
   /* Editor window (stands in for the Figma screenshot of the design) */
   .editor {
     overflow: hidden;
-    border-radius: 10px;
     background: #0b0b0b;
     border: 1px solid var(--on-dark-line);
     box-shadow: 0 40px 80px -30px rgb(0 0 0 / 0.8);
@@ -203,13 +213,11 @@ pay.uri; <span class="tk-c">{t.about.editorResult}</span></code></pre>
   .lights i {
     width: 10px;
     height: 10px;
-    border-radius: 50%;
     background: #3a3a3a;
   }
 
   .tab {
     padding: 4px 10px;
-    border-radius: 4px;
     background: #222;
     font-family: var(--font-mono);
     font-size: 0.72rem;

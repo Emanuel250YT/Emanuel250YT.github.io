@@ -167,7 +167,7 @@ export interface Certification {
 
 export const certifications: Certification[] = [
   { name: 'Checkout Pro', issuer: 'Mercado Libre', date: '2025-06' },
-  { name: 'TypeScript, JavaScript, Node.js, Express.js, React, Python', issuer: 'Talently (verified)', date: '2025-02' },
+  { name: 'TypeScript, JavaScript, Node.js, Express.js, React, Python', issuer: 'Talently', date: '2025-02' },
   { name: 'NASA Open Science', issuer: 'NASA', date: '2024-10' },
   { name: 'Taller Alta Ciencia Abierta', issuer: 'MetaDocencia', date: '2024-08' },
   { name: 'Full Modern React', issuer: 'MindLuster', date: '2023-07' },

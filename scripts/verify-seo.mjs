@@ -24,7 +24,9 @@ const LOCALES = {
   zh: { hreflang: 'zh-CN', prefix: 'zh/' },
   hi: { hreflang: 'hi', prefix: 'hi/' },
 };
-const ROUTES = ['', 'cv/', 'privacy/'];
+const ROUTES = ['', 'privacy/'];
+/** CV PDF uploaded by the owner (never generated); other languages fall back to it. */
+const CV_PDF = 'cv/emanuel-guzman-cv.pdf';
 
 const errors = [];
 const warnings = [];
@@ -56,6 +58,21 @@ const text = (html) =>
     .trim();
 /** Approximate rendered width: CJK characters take about two Latin ones in a SERP. */
 const visualLength = (value) => [...value].reduce((sum, char) => sum + (/[　-鿿＀-￯]/.test(char) ? 2 : 1), 0);
+
+/** JSON-LD references ({ "@id": ... } with nothing else) whose node is not in the graph. */
+function danglingIds(data) {
+  const defined = new Set();
+  const referenced = new Set();
+  const walk = (value) => {
+    if (Array.isArray(value)) return value.forEach(walk);
+    if (!value || typeof value !== 'object') return;
+    const keys = Object.keys(value);
+    if (typeof value['@id'] === 'string') (keys.length === 1 ? referenced : defined).add(value['@id']);
+    keys.forEach((key) => walk(value[key]));
+  };
+  walk(data);
+  return [...referenced].filter((id) => !defined.has(id));
+}
 
 if (!existsSync(dist)) {
   console.error('dist/ does not exist. Run `npm run build` first.');
@@ -160,6 +177,7 @@ for (const file of files) {
       const data = JSON.parse(json);
       const types = (data['@graph'] ?? [data]).map((node) => node['@type']);
       if (!types.includes('Person')) fail(rel, 'JSON-LD without Person');
+      for (const id of danglingIds(data)) fail(rel, `JSON-LD references ${id}, which is not in the graph`);
     } catch (error) {
       fail(rel, `invalid JSON-LD: ${error.message}`);
     }
@@ -167,14 +185,13 @@ for (const file of files) {
 }
 
 // Site-level files
-for (const required of ['CNAME', 'robots.txt', 'sitemap-index.xml', 'favicon.ico', 'favicon.svg', 'site.webmanifest', '404.html', 'llms.txt', SEARCH_CONSOLE_FILE]) {
+for (const required of ['CNAME', 'robots.txt', 'sitemap-index.xml', 'favicon.ico', 'favicon.svg', 'site.webmanifest', '404.html', 'llms.txt', SEARCH_CONSOLE_FILE, CV_PDF]) {
   if (!existsSync(path.join(dist, required))) fail('dist', `missing ${required}`);
 }
 for (const [locale, { prefix }] of Object.entries(LOCALES)) {
   for (const route of ROUTES) {
     if (!existsSync(path.join(dist, prefix, route, 'index.html'))) fail('dist', `missing /${prefix}${route}`);
   }
-  if (!existsSync(path.join(dist, prefix, 'cv/emanuel-guzman-cv.pdf'))) fail('dist', `missing /${prefix}cv/emanuel-guzman-cv.pdf (npm run assets)`);
   if (!existsSync(path.join(dist, `og/og-${locale}.png`))) fail('dist', `missing og/og-${locale}.png (npm run assets)`);
 }
 if (existsSync(path.join(dist, 'CNAME'))) {
@@ -190,7 +207,10 @@ for (const { prefix } of Object.values(LOCALES)) {
   }
 }
 if (sitemap.includes('404')) fail('sitemap-0.xml', 'includes the 404 page');
-if (!sitemap.includes('<lastmod>')) fail('sitemap-0.xml', 'URLs have no <lastmod>');
+const sitemapUrls = sitemap.match(/<url>/g)?.length ?? 0;
+// <lastmod> is the page's last content commit (astro.config.mjs): it needs the git history.
+if ((sitemap.match(/<lastmod>/g)?.length ?? 0) !== sitemapUrls) fail('sitemap-0.xml', 'every URL needs a <lastmod> (is this a git checkout?)');
+if ((sitemap.match(/hreflang="x-default"/g)?.length ?? 0) !== sitemapUrls) fail('sitemap-0.xml', 'every URL needs an x-default alternate');
 
 // Conversion essentials on every home page
 for (const { prefix } of Object.values(LOCALES)) {
@@ -201,6 +221,9 @@ for (const { prefix } of Object.values(LOCALES)) {
     if (!html.includes(`id="${id}"`)) fail(`/${prefix}`, `missing section #${id}`);
   }
   if (!/<form[^>]*data-contact-form/.test(html)) fail(`/${prefix}`, 'missing contact form');
+  // The npm stat is fetched at build time: a page without the number means the API failed.
+  const npmStat = html.match(/<span[^>]*data-npm-total[^>]*>([^<]*)</)?.[1];
+  if (!npmStat || !/\d/.test(npmStat)) fail(`/${prefix}`, 'hero npm downloads stat has no number (npm API unreachable at build time?)');
   for (const field of ['name', 'email', 'service', 'message']) {
     const control = html.match(new RegExp(`<(input|select|textarea)[^>]*name="${field}"[^>]*>`))?.[0];
     if (!control) fail(`/${prefix}`, `contact form has no "${field}" field`);

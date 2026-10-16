@@ -35,11 +35,14 @@ const t = useTranslations(locale);
               <div class="head">
                 <h3 id={`project-${project.id}`} class="name">
                   {project.url ? (
-                    <a href={project.url} target="_blank" rel="noopener" class="stretched">
+                    <a
+                      href={project.url}
+                      target="_blank"
+                      rel="noopener"
+                      class="stretched"
+                      aria-describedby={`project-${project.id}-link`}
+                    >
                       {project.name}
-                      <span class="visually-hidden">
-                        — {t.projects.visit} {t.a11y.newTab}
-                      </span>
                     </a>
                   ) : (
                     project.name
@@ -47,6 +50,12 @@ const t = useTranslations(locale);
                 </h3>
                 <p class="tagline">{project.tagline[locale]}</p>
               </div>
+              {/* Kept out of the <h3> so the heading reads as the project name only. */}
+              {project.url && (
+                <span id={`project-${project.id}-link`} class="visually-hidden">
+                  {t.projects.visit} {t.a11y.newTab}
+                </span>
+              )}
               <ul class="tags" role="list">
                 {project.tags[locale].map((tag) => (
                   <li>{tag}</li>
@@ -79,7 +88,6 @@ const t = useTranslations(locale);
     margin-top: clamp(48px, 6vw, 72px);
     padding: clamp(20px, 3vw, 28px) clamp(20px, 3vw, 32px);
     border: 1px solid var(--line);
-    border-radius: var(--radius-lg);
     background: var(--surface);
   }
 
@@ -105,7 +113,6 @@ const t = useTranslations(locale);
   .media {
     position: relative;
     overflow: hidden;
-    border-radius: 4px;
   }
 
   .go {
@@ -116,7 +123,6 @@ const t = useTranslations(locale);
     place-items: center;
     width: 34px;
     height: 34px;
-    border-radius: 50%;
     background: #fff;
     color: var(--ink);
     box-shadow: var(--shadow-card);
@@ -171,7 +177,6 @@ const t = useTranslations(locale);
   .card:has(.stretched:focus-visible) {
     outline: 2px solid var(--ink);
     outline-offset: 6px;
-    border-radius: 4px;
   }
 
   .tagline {

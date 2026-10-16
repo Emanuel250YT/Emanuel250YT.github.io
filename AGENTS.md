@@ -19,7 +19,7 @@ npm run build     # static build into dist/
 npm run preview   # serves dist/ exactly as GitHub Pages will
 npm run check     # astro check (types in .astro and .ts files)
 npm run verify    # check + build + scripts/verify-seo.mjs  <- run before every commit
-npm run assets    # regenerates portraits, icons, OG images and CV PDFs (needs Chrome)
+npm run assets    # regenerates portraits, icons and OG images (needs Chrome)
 ```
 
 ## Code map
@@ -27,22 +27,24 @@ npm run assets    # regenerates portraits, icons, OG images and CV PDFs (needs C
 ```
 assets-src/portrait.png   colour cut-out photo (source of truth for every portrait)
 src/
-  config/site.ts          identity, contact form endpoint, GA4 ID, search-engine verification
+  config/site.ts          identity, WhatsApp, contact form endpoint, GA4/GTM IDs, search-engine verification
   i18n/                   locales.ts (languages, URLs, flags), types.ts (Dictionary), one file per locale
-  data/                   services.ts, projects.ts, achievements.ts, resume.ts, contact.ts (form values, ecosystems)
-  lib/                    schema.ts (JSON-LD), format.ts (dates), cv.ts (PDF paths)
-  scripts/                motion.ts (reveal + count-up), analytics.ts (consent + GA4 events)
-  layouts/BaseLayout.astro  full <head>, js flag, header/footer, consent banner, motion script
+  data/                   services.ts, projects.ts, achievements.ts, resume.ts, contact.ts (form values, ecosystems),
+                          npm.ts (published packages whose downloads are counted)
+  lib/                    schema.ts (JSON-LD), portrait.ts (JSON-LD image), npm.ts (npm downloads API), fonts.ts (@font-face), format.ts (dates),
+                          cv.ts (uploaded PDF paths), whatsapp.ts (wa.me links)
+  scripts/                motion.ts (reveal + count-up), cursor.ts (animated cursor), analytics.ts (consent + GA4 events)
+  layouts/BaseLayout.astro  full <head>, js flag, header/footer, floating actions, consent banner, motion + cursor scripts
   components/
     sections/             Header, Hero, About, Services, Process, Projects, Achievements, Contact, Footer
-    contact/ContactForm.astro    the lead form (validation, AJAX, no-JS fallback)
+    contact/ContactForm.astro    the lead form (email or WhatsApp, validation, AJAX, no-JS fallback)
     analytics/ConsentBanner.astro GA4 consent banner (rendered only when an ID is set)
     projects/ProjectCover.astro  HTML/CSS illustrated covers (decorative)
-    pages/                HomePage, CvPage, PrivacyPage: real pages, parameterised by locale
-    ui/                   Icon, Flag, LanguageSwitcher, RichHeading, SectionHeader
-  pages/                  index, cv, privacy, 404 (default locale) and [lang]/{index,cv,privacy}
+    pages/                HomePage, PrivacyPage: real pages, parameterised by locale
+    ui/                   Icon, Flag, LanguageSwitcher, RichHeading, SectionHeader, FloatingActions
+  pages/                  index, privacy, 404 (default locale) and [lang]/{index,privacy}
   styles/global.css       tokens, reset, buttons, motion, cursor, per-script typography
-public/                   CNAME, robots.txt, llms.txt, humans.txt, manifest, icons, cursors/, og/, [locale/]cv/*.pdf
+public/                   CNAME, robots.txt, llms.txt, humans.txt, manifest, icons, cursors/, og/, [locale/]cv/*.pdf (uploaded)
 scripts/                  generate-assets.mjs, verify-seo.mjs
 .github/                  workflows/deploy.yml (build + verify + Pages), dependabot.yml
 ```
@@ -68,19 +70,32 @@ honoured by Astro/Vite). Type imports too: `import type { Locale } from '@/i18n/
   words drawn inside the project covers (`projects.cover`).
 - **Data** (services, projects, achievements, experience, education, certifications,
   skills) lives in `src/data/*.ts` as `Localized` fields (`Record<Locale, T>`), so every
-  translation is mandatory. The home page, the CV, the JSON-LD and `llms.txt` derive
-  from it: update it once.
-- **Identity and integrations** (name, email, socials, domain, form endpoint, GA4 ID,
-  verification tokens) live in `src/config/site.ts`.
+  translation is mandatory. The home page, the JSON-LD and `llms.txt` derive from it:
+  update it once.
+- **Identity and integrations** (name, email, WhatsApp, socials, domain, form endpoint,
+  GA4 ID, verification tokens) live in `src/config/site.ts`.
 - **Nothing made up.** Facts come from the owner's real sources (LinkedIn, GitHub,
   cosmospay.lat, posts). When unsure, prefer less precision (year only) over a false
-  date. **Never** publish the phone number or the home address. Commitments in the
-  copy (48 h reply, 30-minute call, written proposal, weekly deliveries) were approved
-  as marketing promises: change them only together with the owner.
+  date. **Never** publish the home address. The only phone number on the site is the
+  WhatsApp in `site.whatsapp`, published on purpose by the owner (October 2026): do not
+  add any other. Commitments in the copy (48 h reply, 30-minute call, written proposal,
+  weekly deliveries) were approved as marketing promises: change them only together
+  with the owner.
 - The hero badge never shows a single fixed title: `hero.roles` rotates (full stack
   developer, product manager, blockchain developer, founder, CEO). Do not put
   "Founder of Cosmos Pay" back as the main title; it lives in the description.
-- After changing CV data: `npm run assets` (regenerates the 7 PDFs) and commit `public/`.
+- **The CV is a PDF the owner uploads, never generated**: `public/cv/emanuel-guzman-cv.pdf`
+  (default locale, required: `verify-seo.mjs` fails without it) and optionally
+  `public/<locale>/cv/emanuel-guzman-cv.pdf`; a language without its own file links to the
+  default one (`src/lib/cv.ts`, resolved at build time). Keep those URLs stable: other
+  sites link to and fetch them. There is no HTML CV page; `src/data/resume.ts` only
+  feeds the JSON-LD and the About section.
+- **Download numbers come from npm, never by hand.** The hero stat whose value is
+  `{npmDownloads}` shows the total of the packages in `src/data/npm.ts`, fetched from
+  npm's public API at build time (the daily deploy refreshes it) and again in the browser
+  (`src/lib/npm.ts`). Past claims ("2,586 downloads in its first week") quote npm's own
+  numbers and link their npm-stat chart through `Achievement.url`. Publish a new package →
+  add it to `src/data/npm.ts`.
 - After changing services, projects or roles: update `public/llms.txt` as well.
 
 ## 4 · Page structure and conversion
@@ -90,11 +105,16 @@ Home sections, in this order (the number feeds the `01 —` eyebrow):
 About stays right after the hero because the cut-out portrait "stands" on its dark band.
 
 - Every section ends with (or contains) a call to action to `#contact`; the header
-  always shows the "Let's talk" button.
+  always shows the "Let's talk" button (below 1024 px it sits in the bar, next to the
+  burger; the copy inside the menu is hidden).
 - Service cards link to `#contact` with `data-service="<id>"`: the form preselects that
   service. Keep `ServiceId` and the form's `data-service-id` in sync.
 - The contact section pairs the form with "what happens next" (3 steps) and direct
-  channels (email, LinkedIn, CV) to reduce friction.
+  channels (email, WhatsApp, LinkedIn, CV) to reduce friction.
+- Floating actions on every page, bottom right (`ui/FloatingActions.astro`): WhatsApp and
+  back to top (shown after scrolling, `href="#top"` so it works without JS). They step
+  aside while they would cover the form's buttons (narrow screens), while the mobile menu
+  is open and, under 540 px, while the consent banner waits for an answer.
 - Keep the form short: name, email, service and message are required; company,
   website and budget are optional. Do not add required fields without a reason.
 
@@ -103,16 +123,22 @@ About stays right after the hero because the cut-out portrait "stands" on its da
 - Backend: **FormSubmit** (`site.contactForm`). The first submission ever sends an
   activation email to the address in the URL; until the owner clicks it, nothing is
   delivered. After activation the address can be replaced by FormSubmit's alias.
+- Two channels. **Send by email** is the first submit button in the DOM, so Enter in a
+  field always submits by email. **Send via WhatsApp** exists only with JavaScript: same
+  validation except that the email becomes optional (a typed one must be valid), then it
+  opens `wa.me` with a message composed in the visitor's language from the fields and
+  leaves a status with a link to open it again.
 - With JavaScript: inline validation (`aria-invalid`, messages linked through
   `aria-describedby`, focus on the first invalid field), JSON POST to the AJAX
   endpoint, in-place success panel that receives focus, error message with a
-  mailto fallback, `generate_lead` analytics event.
+  mailto fallback, `generate_lead` analytics event with `method` (`email` / `whatsapp`).
 - Without JavaScript: native validation and a classic POST; FormSubmit redirects to
   `#contact-sent`, where a `:target` success panel appears.
 - Spam: `_honey` honeypot (hidden off-screen, `tabindex="-1"`). Values sent for
   service/budget are English constants (`src/data/contact.ts`, `formValue`) so every
   inquiry reads the same whatever the visitor's language; `language` carries the locale.
-- Never submit the real form while testing: stub `window.fetch` in the page instead.
+- Never submit the real form while testing: stub `window.fetch` (and `window.open` for
+  WhatsApp) in the page instead.
 
 ## 6 · Analytics and consent
 
@@ -126,14 +152,16 @@ About stays right after the hero because the cut-out portrait "stands" on its da
   `consent default` pushed first. The banner renders only when an ID is set; reject and accept weigh the same;
   the choice lives in `localStorage` (`consent.analytics`); "Cookie preferences" in the
   footer reopens it. Declining removes `_ga*` cookies.
-- Events: `cta_click` (with `location`), `select_service`, `contact_click`,
-  `cv_download`, `generate_lead`. Add events declaratively with
+- Events: `cta_click` (with `location`), `select_service`, `contact_click` (with `method`:
+  `email`, `whatsapp`, `linkedin`, `email_footer`, `whatsapp_footer`, `whatsapp_floating`),
+  `cv_download` (with `location`), `generate_lead` (with `method`). Add events declaratively with
   `data-track="<event>" data-track-<param>="<value>"`, or dispatch
   `new CustomEvent('analytics:event', { detail: { name, params } })`.
 - Mark `generate_lead` as a key event (conversion) in GA4.
 - Test consent locally by stubbing `HTMLHeadElement.prototype.append`: accepting on
   localhost with the real IDs would send test traffic to the live property.
-- The privacy page (`/privacy/` per locale) documents the form processor and GA4.
+- The privacy page (`/privacy/` per locale) documents the form processor, WhatsApp, GA4
+  and the npm API request behind the live download counter.
   Update it (and its `UPDATED` date) whenever data handling changes.
 
 ## 7 · Languages and URLs
@@ -167,16 +195,23 @@ Every indexable page has, and `scripts/verify-seo.mjs` enforces:
 - An absolute `canonical` with trailing slash equal to the route; `hreflang` for the 7
   locales + `x-default`; 6 `og:locale:alternate`; complete Open Graph (1200×630 per
   locale) and a Twitter card.
-- JSON-LD: one `@graph` from `src/lib/schema.ts` — `Person` (with `contactPoint` and
-  `makesOffer`), `Organization`s, `WebSite`, `ProfilePage`/`WebPage`, `BreadcrumbList`,
-  an `ItemList` of projects and an `OfferCatalog` of services. `@id`s are stable.
+- JSON-LD: one `@graph` from `src/lib/schema.ts` — `Person` (with `contactPoint`,
+  `disambiguatingDescription` and, on home pages, `hasOfferCatalog`), `Organization`s,
+  `WebSite`, `ProfilePage`/`WebPage` (with `dateCreated`/`dateModified` from git),
+  `BreadcrumbList`, an `ItemList` of projects and an `OfferCatalog` of services. `@id`s
+  are stable, and every `{ "@id" }` reference must be defined in the same graph.
 - Exactly one `<h1>`, no skipped heading levels, images with `alt` and dimensions,
   every form control with a `<label for>`, and on each home page all sections + the form.
-- Sitemap: every URL with `<lastmod>` (build date), alternates per language, home
-  pages at priority 1, privacy at 0.3; the 404 is `noindex` and excluded.
+- Sitemap: every URL with `<lastmod>` = the last commit that touched the page's content
+  (`astro.config.mjs` reads git; never the build clock, so a deploy that changes nothing
+  keeps every date), alternates per language plus `x-default`, home pages at priority 1,
+  privacy at 0.3; the 404 is `noindex` and excluded.
 - Google Search Console is verified with the **HTML file**
   `public/google4180448db7220be0.html`: never delete or rename it (Google re-checks it);
-  `verify-seo.mjs` fails if it is missing. Bing can use the meta tag in `site.ts`.
+  `verify-seo.mjs` fails if it is missing. Bing: import the site from Search Console in
+  Bing Webmaster Tools (no tag needed), or paste its meta token in `site.ts`.
+- `robots.txt` allows everything and says so for AI too (`Content-Signal: search=yes,
+  ai-input=yes, ai-train=yes`): change that only with the owner.
   The sitemap to submit is `https://emanuel250.dev.ar/sitemap-index.xml`.
 
 ## 9 · Accessibility (WCAG 2.2 AA, also non-negotiable)
@@ -210,10 +245,19 @@ Every indexable page has, and `scripts/verify-seo.mjs` enforces:
 - Hero entrance animations start at `opacity: 0.01`, not 0, so LCP is not delayed.
 - Cross-page navigation uses native view transitions (`@view-transition`); the header
   keeps `view-transition-name: site-header`.
-- Print and the CV PDFs force every reveal visible and hide the consent banner.
+- **Cursor** (`src/scripts/cursor.ts`) animates every change: hover on interactive
+  elements (inverted arrow + square mark), press, a square pulse where a click lands, a
+  spinning mark over `[aria-busy="true"]`, fade-out over text fields. With reduced motion
+  these cross-fade (no scaling, spinning or growing pulse).
+- Print forces every reveal visible and hides the fixed overlays (consent banner,
+  floating actions, cursor).
 
 ## 11 · Design
 
+- **Square design**: no `border-radius`, no circles, no radial "halo" shapes anywhere,
+  covers and icons included (stroke icons use square caps and miter joins). Only flags,
+  letterforms and third-party logos (WhatsApp, GitHub…) keep their own curves. No
+  decorative glows or gradient bands either: the footer is plain black.
 - Tokens in `:root` of `global.css`; components use tokens (loose colours only in
   `ProjectCover.astro` and the flags). Space Grotesk Variable (Latin subset preloaded);
   Chinese and Devanagari use platform fonts via `:lang()`, which also reset the display
@@ -223,15 +267,20 @@ Every indexable page has, and `scripts/verify-seo.mjs` enforces:
   (`{ br: true, space: false }` for languages without spaces).
 - Buttons: `.btn` + `.btn--solid` (primary), `.btn--frame` (secondary, corner frame),
   `.btn--light` (on dark), `.btn--sm`; trailing arrows use `.btn-arrow`. Text links
-  with an arrow use `.link-arrow`.
-- **Cursor**: on fine pointers the site uses the Figma-style arrow from the hero
-  (`public/cursors/arrow.svg`, hotspot 4 4) and its inverted variant for interactive
-  elements. Use `cursor: var(--cursor-pointer)`, never a literal `pointer`; text
-  fields keep the I-beam.
+  with an arrow use `.link-arrow`. Under 400 px a label that does not fit wraps to a
+  second line instead of overflowing.
+- **Cursor**: on fine pointers `src/scripts/cursor.ts` replaces the native cursor with a
+  square-cornered arrow (see §10) and adds `html.has-cursor`. Without JS, on touch
+  screens and in forced-colors mode the CSS cursors apply (`public/cursors/arrow.svg` and
+  its inverted `pointer.svg`, hotspot 3 3). Still use `cursor: var(--cursor-pointer)`,
+  never a literal `pointer`; text fields keep the I-beam. No decorative "example"
+  cursors drawn in the page.
 - Scoped styles do not reach child components (`RichHeading`, `Icon`, `Flag`,
   `<Image>`): style them with `.section :global(.class)`.
 - Portrait: every portrait derives from `assets-src/portrait.png` through
-  `npm run assets` (black & white). Replace the source, never the derived files.
+  `npm run assets` (black & white). Replace the source, never the derived files. In the
+  hero it stands on a square `--backdrop` block (the head rises above it) with a short
+  drop shadow, for contrast against the light grid.
 - Responsive: 1200 px container; hamburger menu < 1024 px; services 2 → 1 columns
   (≤ 760); process 4 → 2 → 1; projects 3 → 2 → 1; contact 2 → 1 (≤ 960).
   Test 1440, 390 and 320 px.
@@ -239,15 +288,24 @@ Every indexable page has, and `scripts/verify-seo.mjs` enforces:
 ## 12 · Performance
 
 - Baseline: **Lighthouse ≥ 98 / 100 / 100 / 100** (mobile and desktop) on `/`, `/zh/`,
-  `/hi/`, a CV page and a privacy page. CLS 0, TBT 0.
-- The LCP is the hero portrait (`fetchpriority="high"`, WebP `srcset` 340/460/600/744).
+  `/hi/` and a privacy page. CLS 0, TBT 0. Measured as §15 says (October 2026): `/` and
+  privacy 99–100, desktop 100; `/zh/` and `/hi/` 93–98 (TBT 140–300 ms, laying out
+  CJK/Devanagari text).
+- LCP: the hero portrait on desktop and `/zh/` (`fetchpriority="high"`, WebP `srcset`
+  340/460/600/744); on mobile `es`/`hi` it is the hero lead paragraph, painted with FCP.
+- Space Grotesk loads with `font-display: optional` (`src/lib/fonts.ts`, same files and
+  ranges as fontsource): with `swap` the late font forced a second full layout (~300 ms
+  of blocking on phones). Off-screen project covers use `content-visibility: auto`; never
+  whole sections (anchor landings such as `#contact` end up in the wrong place).
 - No third-party script runs before consent; GA4 and GTM load async afterwards.
 
 ## 13 · Deploy and domain (dev.ar → GitHub Pages)
 
 - `.github/workflows/deploy.yml` runs `npm ci`, `npm audit signatures`, `npm audit`,
   `astro check`, the build and `verify-seo.mjs` on every PR and push; on `main` it also
-  publishes `dist/` to Pages. The `github-pages` environment must allow `main`.
+  publishes `dist/` to Pages, and again every day at 09:17 UTC (fresh npm count). It
+  checks out the full history (`fetch-depth: 0`): the page dates come from git. The
+  `github-pages` environment must allow `main`.
 - Domain `emanuel250.dev.ar` (panel https://home.dev.ar, Pragmore): **DNS** field =
   `emanuel250yt.github.io` (CNAME; no `https://`, no slashes), **Redirect** empty — only
   one may be active. TXT records only by email to albo@pragmore.com, done by the owner.
@@ -265,12 +323,16 @@ Every indexable page has, and `scripts/verify-seo.mjs` enforces:
 
 ## 15 · Definition of done
 
-1. `npm run verify` passes (types, build, static SEO/a11y on all 22 pages).
+1. `npm run verify` passes (types, build, static SEO/a11y on all 15 pages).
 2. Visual review at 1440, 390 and 320 px in at least `es`, `zh` and `hi`, with and
    without reduced motion. Chrome will not shrink a window below ~500 px: use
    390/320 px `<iframe>`s.
-3. Lighthouse mobile on the pages listed in §12:
-   `npx lighthouse@13.5.0 http://127.0.0.1:4321/ --form-factor=mobile` (with `npm run preview`).
-4. Form flow tested with a stubbed `fetch` (validation, preselected service, success, event).
-5. If the CV, the portrait or the identity changed: `npm run assets` and commit `public/` and `src/assets/`.
+3. Lighthouse mobile on the pages listed in §12 (with `npm run preview`):
+   `npx lighthouse@13.5.0 http://127.0.0.1:4321/ --form-factor=mobile --chrome-flags="--headless=new --disable-backgrounding-occluded-windows --disable-renderer-backgrounding --disable-background-timer-throttling --disable-features=CalculateNativeWinOcclusion"`.
+   Without those flags headless Chrome on Windows throttles frames to 1 Hz: FCP jumps to
+   ~2.4 s and the score is inflated (the long task lands before FCP, outside TBT).
+4. Form flow tested with stubbed `fetch` and `window.open` (validation, preselected service,
+   email success, WhatsApp message, events).
+5. If the portrait or the identity changed: `npm run assets` and commit `public/` and
+   `src/assets/`. If the CV changed: upload the PDFs to `public/[<locale>/]cv/`.
 6. No private data and no unsourced facts.

@@ -1,3 +1,4 @@
+import { npmStatUrl } from '@/data/npm';
 import type { Localized } from '@/i18n/locales';
 
 export interface Achievement {
@@ -7,8 +8,9 @@ export interface Achievement {
   title: Localized;
   detail: Localized;
   org: string;
-  /** Initials shown in the card's round badge. */
+  /** Initials shown in the card's square badge. */
   mark: string;
+  /** Public source that proves the achievement, shown as a link on its card. */
   url?: string;
 }
 
@@ -41,13 +43,13 @@ export const achievements: Achievement[] = [
     id: 'arkiv-sdks',
     date: '2026-03',
     title: {
-      es: '1.000+ descargas en 3 días',
-      en: '1,000+ downloads in 3 days',
-      pt: '1.000+ downloads em 3 dias',
-      fr: '1 000+ téléchargements en 3 jours',
-      de: '1.000+ Downloads in 3 Tagen',
-      zh: '3 天下载量破 1,000',
-      hi: '3 दिनों में 1,000+ डाउनलोड',
+      es: '912 descargas en sus primeros 3 días',
+      en: '912 downloads in their first 3 days',
+      pt: '912 downloads nos primeiros 3 dias',
+      fr: '912 téléchargements en 3 jours',
+      de: '912 Downloads in den ersten 3 Tagen',
+      zh: '前 3 天下载 912 次',
+      hi: 'पहले 3 दिनों में 912 डाउनलोड',
     },
     detail: {
       es: 'ArkaCDN y ASide, SDKs open source para Arkiv',
@@ -60,7 +62,8 @@ export const achievements: Achievement[] = [
     },
     org: 'npm · Arkiv Network',
     mark: 'npm',
-    url: 'https://github.com/Emanuel250YT/arka-cdn',
+    // npm's own numbers: 912 downloads from 2026-03-05 to 2026-03-07.
+    url: npmStatUrl(['arka-cdn', '@emanuel250dev/aside'], '2026-03-05', '2026-03-07'),
   },
   {
     id: 'impacta-bootcamp',
@@ -90,13 +93,13 @@ export const achievements: Achievement[] = [
     id: 'macroclickjs',
     date: '2025-10',
     title: {
-      es: '15.000+ descargas en una semana',
-      en: '15,000+ downloads in one week',
-      pt: '15.000+ downloads em uma semana',
-      fr: '15 000+ téléchargements en une semaine',
-      de: '15.000+ Downloads in einer Woche',
-      zh: '一周下载量破 15,000',
-      hi: 'एक हफ़्ते में 15,000+ डाउनलोड',
+      es: '2.586 descargas en su primera semana',
+      en: '2,586 downloads in its first week',
+      pt: '2.586 downloads na primeira semana',
+      fr: '2 586 téléchargements la première semaine',
+      de: '2.586 Downloads in der ersten Woche',
+      zh: '首周下载 2,586 次',
+      hi: 'पहले हफ़्ते में 2,586 डाउनलोड',
     },
     detail: {
       es: 'MacroClickJS, integración con la pasarela de Banco Macro',
@@ -109,6 +112,8 @@ export const achievements: Achievement[] = [
     },
     org: 'npm · Open source',
     mark: 'JS',
+    // npm's own numbers: 2,586 downloads from 2025-10-18 to 2025-10-24.
+    url: npmStatUrl(['macroclickjs'], '2025-10-18', '2025-10-24'),
   },
   {
     id: 'blockchain-salta',

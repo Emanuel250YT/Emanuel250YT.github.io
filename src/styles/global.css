@@ -10,6 +10,8 @@
   --muted: #858585;
   --line: rgb(17 17 17 / 0.14);
   --line-strong: rgb(17 17 17 / 0.85);
+  /* Square block behind the hero portrait, for contrast */
+  --backdrop: #d9d9d9;
 
   --dark: #111111;
   --dark-2: #191919;
@@ -25,11 +27,11 @@
     Roboto, sans-serif;
   --font-mono: ui-monospace, 'Cascadia Code', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
 
+  /* Square design: no border-radius and no circles anywhere (flags, letterforms
+     and third-party logos excepted). */
   --container: 1200px;
   --gutter: clamp(16px, 5vw, 64px);
   --header-h: 64px;
-  --radius: 6px;
-  --radius-lg: 14px;
 
   --shadow-card: 0 1px 2px rgb(0 0 0 / 0.04), 0 8px 24px rgb(0 0 0 / 0.06);
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
@@ -140,10 +142,14 @@ button {
   color: inherit;
 }
 
+/* Components set their own display; `hidden` must still win. */
+[hidden] {
+  display: none !important;
+}
+
 :focus-visible {
   outline: 2px solid currentColor;
   outline-offset: 3px;
-  border-radius: 2px;
 }
 
 ::selection {
@@ -198,7 +204,6 @@ button {
   height: var(--btn-h);
   padding-inline: 20px;
   border: 1px solid transparent;
-  border-radius: 2px;
   font-size: 0.95rem;
   font-weight: 500;
   line-height: 1;
@@ -289,6 +294,20 @@ button {
   --btn-h: 38px;
   padding-inline: 16px;
   font-size: 0.85rem;
+}
+
+/* On 320 px screens a long label ("Vamos agendar o diagnóstico") wraps instead of
+   pushing the page sideways; short labels keep their single line. */
+@media (max-width: 400px) {
+  .btn {
+    max-width: 100%;
+    height: auto;
+    min-height: var(--btn-h);
+    padding-block: 8px;
+    line-height: 1.25;
+    white-space: normal;
+    text-align: center;
+  }
 }
 
 .btn--light {
@@ -446,8 +465,12 @@ html.js [data-reveal].is-revealed {
 }
 
 /* ---------------------------------------------------------------------------
- * Custom cursor: the Figma-style arrow used in the hero, on precise pointers
- * only. Text fields keep the I-beam so typing stays obvious.
+ * Cursor: a square-cornered arrow on precise pointers only. Text fields keep
+ * the I-beam so typing stays obvious.
+ *
+ * The CSS cursors below are the fallback (no JS, touch screens, forced colors).
+ * src/scripts/cursor.ts replaces them with an element that animates every
+ * change (hover, press, click, busy); it adds html.has-cursor while active.
  * ------------------------------------------------------------------------- */
 :root {
   --cursor-pointer: pointer;
@@ -455,12 +478,12 @@ html.js [data-reveal].is-revealed {
 
 @media (pointer: fine) {
   :root {
-    --cursor-pointer: url('/cursors/pointer.svg') 4 4, pointer;
+    --cursor-pointer: url('/cursors/pointer.svg') 3 3, pointer;
   }
 
   html {
     cursor:
-      url('/cursors/arrow.svg') 4 4,
+      url('/cursors/arrow.svg') 3 3,
       auto;
   }
 
@@ -477,6 +500,174 @@ html.js [data-reveal].is-revealed {
   textarea {
     cursor: text;
   }
+
+  html.has-cursor,
+  html.has-cursor * {
+    cursor: none !important;
+  }
+
+  html.has-cursor :is(input:not([type='checkbox'], [type='radio'], [type='submit'], [type='button']), textarea) {
+    cursor: text !important;
+  }
+}
+
+/* The tip of the arrow sits exactly on the pointer: the body is offset by the
+   hotspot (3, 3) and scales around it. */
+.cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 2147483000;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s var(--ease);
+}
+
+.cursor.is-visible {
+  opacity: 1;
+}
+
+/* Over text fields the native I-beam takes over. */
+.cursor.is-visible.is-text {
+  opacity: 0;
+}
+
+.cursor-body {
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  width: 24px;
+  height: 24px;
+  transform-origin: 3px 3px;
+  transition:
+    transform 0.28s var(--ease),
+    opacity 0.2s var(--ease);
+}
+
+.cursor-arrow {
+  overflow: visible;
+}
+
+.cursor-arrow path {
+  fill: var(--ink);
+  stroke: #fff;
+  stroke-width: 1.5;
+  stroke-linejoin: miter;
+  transition:
+    fill 0.22s var(--ease),
+    stroke 0.22s var(--ease);
+}
+
+/* Interactive: the arrow inverts and a square "selection" mark appears. */
+.cursor.is-link .cursor-arrow path {
+  fill: #fff;
+  stroke: var(--ink);
+}
+
+.cursor-mark {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  width: 7px;
+  height: 7px;
+  background: var(--ink);
+  outline: 1.5px solid #fff;
+  opacity: 0;
+  transition:
+    opacity 0.2s var(--ease),
+    transform 0.32s var(--ease);
+}
+
+.cursor.is-link .cursor-mark,
+.cursor.is-busy .cursor-mark {
+  opacity: 1;
+}
+
+/* Reduced motion: every change cross-fades, nothing scales or spins. */
+.cursor.is-down .cursor-body {
+  opacity: 0.7;
+}
+
+.cursor.is-busy .cursor-mark {
+  animation: cursor-blink 0.9s ease-in-out infinite;
+}
+
+/* Click feedback: a square that fades out where the click happened. */
+.cursor-pulse {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 2147483000;
+  pointer-events: none;
+}
+
+.cursor-pulse::before {
+  content: '';
+  position: absolute;
+  inset: -12px;
+  border: 1.5px solid #fff;
+  mix-blend-mode: difference;
+  animation: cursor-pulse-fade 0.5s var(--ease) both;
+}
+
+@keyframes cursor-pulse-fade {
+  from {
+    opacity: 0.9;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes cursor-blink {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cursor-mark {
+    transform: scale(0) rotate(-90deg);
+  }
+
+  .cursor.is-link .cursor-body {
+    transform: scale(1.12);
+  }
+
+  .cursor.is-link .cursor-mark {
+    transform: none;
+  }
+
+  .cursor.is-down .cursor-body {
+    opacity: 1;
+    transform: scale(0.82);
+  }
+
+  .cursor.is-busy .cursor-mark {
+    transform: none;
+    animation: cursor-spin 0.9s linear infinite;
+  }
+
+  .cursor-pulse::before {
+    animation-name: cursor-pulse;
+  }
+
+  @keyframes cursor-pulse {
+    from {
+      opacity: 0.9;
+      transform: scale(0.3);
+    }
+    to {
+      opacity: 0;
+      transform: scale(1.5) rotate(45deg);
+    }
+  }
+
+  @keyframes cursor-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
 }
 
 @media print {
@@ -484,13 +675,16 @@ html.js [data-reveal].is-revealed {
     background: #fff;
   }
 
-  /* Printed pages (and the CV PDFs) never wait for scroll reveals or show the consent banner. */
+  /* Printed pages never wait for scroll reveals or show fixed overlays. */
   html.js [data-reveal] {
     opacity: 1 !important;
     animation: none !important;
   }
 
-  .consent {
+  .consent,
+  .floating,
+  .cursor,
+  .cursor-pulse {
     display: none !important;
   }
 }

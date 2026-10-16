@@ -5,7 +5,8 @@ import { site } from '@/config/site';
 import Icon from '@/components/ui/Icon.astro';
 import RichHeading from '@/components/ui/RichHeading.astro';
 import { useTranslations } from '@/i18n';
-import type { Locale } from '@/i18n/locales';
+import { localeMeta, type Locale } from '@/i18n/locales';
+import { NPM_DOWNLOADS_TOKEN, buildTotalDownloads } from '@/lib/npm';
 
 interface Props {
   locale: Locale;
@@ -13,6 +14,14 @@ interface Props {
 
 const { locale } = Astro.props;
 const t = useTranslations(locale);
+
+// Real npm downloads at build time; the script below refreshes them live. An offline
+// build shows a dash (scripts/verify-seo.mjs fails if a page ships without the number).
+const npmTotal = await buildTotalDownloads().catch((error: unknown) => {
+  console.warn(`[npm] ${error instanceof Error ? error.message : String(error)}`);
+  return undefined;
+});
+const formatCount = new Intl.NumberFormat(localeMeta[locale].htmlLang);
 ---
 
 <section id="home" class="hero" aria-labelledby="hero-title">
@@ -34,7 +43,6 @@ const t = useTranslations(locale);
               ))
             }
           </span>
-          <Icon name="cursor" size={18} class="badge-cursor" />
         </span>
       </p>
 
@@ -59,9 +67,15 @@ const t = useTranslations(locale);
           t.hero.stats.map((stat) => (
             <div class="stat">
               <dt>
-                <span class="stat-value" data-count>
-                  {stat.value}
-                </span>
+                {stat.value === NPM_DOWNLOADS_TOKEN ? (
+                  <span class="stat-value" data-count data-count-value={npmTotal} data-npm-total>
+                    {npmTotal === undefined ? '—' : formatCount.format(npmTotal)}
+                  </span>
+                ) : (
+                  <span class="stat-value" data-count>
+                    {stat.value}
+                  </span>
+                )}
                 <span class="stat-label">{stat.label}</span>
               </dt>
               <dd>{stat.detail}</dd>
@@ -81,15 +95,13 @@ const t = useTranslations(locale);
         fetchpriority="high"
         class="photo"
       />
-      <span class="peer-cursor" aria-hidden="true">
-        <Icon name="cursor" size={20} />
-        <span>{site.givenName}</span>
-      </span>
     </figure>
   </div>
 </section>
 
 <script>
+  import { totalDownloads } from '@/lib/npm';
+
   /**
    * Rotates the roles in the hero badge. Pauses on hover/focus and while the hero
    * is off-screen and stops after a few cycles (WCAG 2.2.2). With
@@ -126,6 +138,27 @@ const t = useTranslations(locale);
     badge?.addEventListener('mouseenter', () => (paused = true));
     badge?.addEventListener('mouseleave', () => (paused = false));
     new IntersectionObserver(([entry]) => (visible = entry?.isIntersecting ?? true)).observe(container);
+  }
+
+  /**
+   * Refreshes the npm downloads stat with today's real count once the page is idle,
+   * so it never competes with the first paint. On failure the build-time number stays.
+   */
+  const npmTotal = document.querySelector<HTMLElement>('[data-npm-total]');
+  if (npmTotal) {
+    const refresh = () =>
+      totalDownloads()
+        .then((total) => {
+          npmTotal.dataset.countValue = String(total);
+          // A running count-up (src/scripts/motion.ts) picks the new value up on its next frame.
+          if (!('counting' in npmTotal.dataset)) {
+            npmTotal.textContent = new Intl.NumberFormat(document.documentElement.lang).format(total);
+          }
+        })
+        .catch(() => undefined);
+    // Safari has no requestIdleCallback.
+    if (typeof window.requestIdleCallback === 'function') window.requestIdleCallback(refresh, { timeout: 4000 });
+    else setTimeout(refresh, 2000);
   }
 </script>
 
@@ -189,10 +222,6 @@ const t = useTranslations(locale);
       animation-name: enter-photo;
       animation-duration: 1.1s;
     }
-
-    .peer-cursor {
-      animation: drift 7s ease-in-out 1.2s infinite;
-    }
   }
 
   @keyframes enter {
@@ -208,13 +237,7 @@ const t = useTranslations(locale);
     }
   }
 
-  @keyframes drift {
-    50% {
-      transform: translate(-10px, 8px);
-    }
-  }
-
-  /* Badge with cursor, like the Figma label in the design */
+  /* Badge, like the Figma label in the design */
   .badge {
     position: relative;
     display: inline-flex;
@@ -232,7 +255,6 @@ const t = useTranslations(locale);
     place-items: center;
     width: 22px;
     height: 22px;
-    border-radius: 6px;
     background: var(--ink);
     color: #fff;
     font-size: 0.7rem;
@@ -248,7 +270,6 @@ const t = useTranslations(locale);
     gap: 6px;
     padding: 7px 16px 7px 14px;
     border: 1.5px solid var(--ink);
-    border-radius: 999px;
     background: var(--surface);
     font-size: 0.8rem;
     line-height: 1.2;
@@ -309,14 +330,6 @@ const t = useTranslations(locale);
     :global(.js) .roles .role.is-leaving {
       transform: none;
     }
-  }
-
-  .badge-pill :global(.badge-cursor) {
-    position: absolute;
-    right: -14px;
-    bottom: -14px;
-    color: var(--ink);
-    filter: drop-shadow(0 0 1px #fff) drop-shadow(0 0 1px #fff);
   }
 
   .hero :global(.hero-title) {
@@ -380,38 +393,29 @@ const t = useTranslations(locale);
     color: var(--ink-soft);
   }
 
-  /* Black & white cut-out portrait that "stands" on the dark section, as in the design */
+  /* Black & white cut-out portrait that "stands" on the dark section, as in the design.
+     A square block behind it and a short shadow separate it from the light grid;
+     the head rises above the block. */
   .hero-photo {
     position: relative;
     justify-self: end;
     width: 100%;
+    isolation: isolate;
+  }
+
+  .hero-photo::before {
+    content: '';
+    position: absolute;
+    inset: 20% 2% 0 8%;
+    z-index: -1;
+    background: var(--backdrop);
   }
 
   .hero-photo :global(.photo) {
     display: block;
     width: 100%;
     height: auto;
-  }
-
-  /* Figma-style "collaborator" cursor */
-  .peer-cursor {
-    position: absolute;
-    top: 44%;
-    left: -6%;
-    display: flex;
-    align-items: flex-start;
-    color: var(--ink);
-    pointer-events: none;
-  }
-
-  .peer-cursor span {
-    margin: 16px 0 0 -2px;
-    padding: 3px 9px;
-    border-radius: 4px 999px 999px 999px;
-    background: var(--ink);
-    color: #fff;
-    font-size: 0.72rem;
-    font-weight: 600;
+    filter: drop-shadow(0 14px 22px rgb(0 0 0 / 0.22));
   }
 
   @media (max-width: 860px) {
@@ -427,10 +431,6 @@ const t = useTranslations(locale);
       justify-self: center;
       width: min(80%, 380px);
       margin-top: 8px;
-    }
-
-    .peer-cursor {
-      left: -8%;
     }
   }
 

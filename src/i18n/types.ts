@@ -23,8 +23,10 @@ export interface Dictionary {
     title: string;
     description: string;
     ogAlt: string;
-    /** Job title used in structured data and on the CV. */
+    /** Job title used in structured data. */
     jobTitle: string;
+    /** One line that tells this Emanuel Guzman apart from namesakes (JSON-LD disambiguatingDescription). */
+    disambiguation: string;
     keywords: string[];
   };
   a11y: {
@@ -38,6 +40,8 @@ export interface Dictionary {
     scrollHint: string;
     /** Prefix read before the list of rotating roles ("Roles"). */
     rolesLabel: string;
+    /** Floating button that scrolls back to the top. */
+    backToTop: string;
   };
   nav: {
     services: string;
@@ -83,6 +87,7 @@ export interface Dictionary {
     editorComment: string;
     editorResult: string;
     editorCaption: string;
+    /** Opens the uploaded CV PDF. */
     cvCta: string;
   };
   projects: {
@@ -106,6 +111,8 @@ export interface Dictionary {
     eyebrow: string;
     title: RichText;
     ecosystemsLabel: string;
+    /** Link to the public source that proves an achievement. */
+    source: string;
   };
   contact: {
     eyebrow: string;
@@ -116,6 +123,10 @@ export interface Dictionary {
     directTitle: string;
     ctaCv: string;
     mailSubject: string;
+    /** Label of the floating WhatsApp button. */
+    whatsappCta: string;
+    /** Message prefilled when a WhatsApp link opens the chat. */
+    whatsappMessage: string;
     form: {
       name: string;
       namePlaceholder: string;
@@ -137,13 +148,22 @@ export interface Dictionary {
       messagePlaceholder: string;
       optional: string;
       privacy: string;
+      /** Default submit: sends the form by email (FormSubmit). */
       submit: string;
+      submitWhatsapp: string;
       sending: string;
       successTitle: string;
       successBody: string;
       error: string;
       errorRequired: string;
       errorEmail: string;
+      /** First line of the WhatsApp message composed from the form. */
+      whatsappIntro: string;
+      /** Short label for the service line of that message (the field label is a question). */
+      whatsappService: string;
+      /** Shown after WhatsApp opens, followed by a link (`whatsappRetry`) to open it again. */
+      whatsappOpened: string;
+      whatsappRetry: string;
     };
   };
   footer: {
@@ -165,26 +185,9 @@ export interface Dictionary {
     description: string;
     heading: string;
     updated: string;
+    back: string;
     /** `{email}` inside a body is replaced with the contact email link. */
     sections: Step[];
-  };
-  cv: {
-    title: string;
-    description: string;
-    heading: string;
-    download: string;
-    back: string;
-    summaryTitle: string;
-    summary: string;
-    experienceTitle: string;
-    projectsTitle: string;
-    achievementsTitle: string;
-    educationTitle: string;
-    certificationsTitle: string;
-    skillsTitle: string;
-    contactTitle: string;
-    present: string;
-    inProgress: string;
   };
   notFound: {
     title: string;

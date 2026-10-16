@@ -5,11 +5,15 @@ import { BUDGET_VALUES, SERVICE_EXTRA_VALUES } from '@/data/contact';
 import { services } from '@/data/services';
 import { useTranslations } from '@/i18n';
 import { localePath, type Locale } from '@/i18n/locales';
+import { whatsappUrl } from '@/lib/whatsapp';
 
 /**
- * Lead form. Works without JavaScript (classic POST to FormSubmit, which
- * redirects back to #contact-sent); with JavaScript it validates inline, sends
- * JSON, shows the result in place and reports a GA4 `generate_lead` event.
+ * Lead form with two channels. Email works without JavaScript (classic POST to
+ * FormSubmit, which redirects back to #contact-sent); with JavaScript it
+ * validates inline, sends JSON and shows the result in place. "Send via
+ * WhatsApp" (JavaScript only) validates the same fields, except that the email
+ * becomes optional, and opens WhatsApp with the message already written.
+ * Both report a GA4 `generate_lead` event with the channel as `method`.
  */
 interface Props {
   locale: Locale;
@@ -25,6 +29,13 @@ const serviceOptions = [
   { value: SERVICE_EXTRA_VALUES.cosmos, label: f.serviceCosmos, id: 'cosmos' },
   { value: SERVICE_EXTRA_VALUES.other, label: f.serviceOther, id: 'other' },
 ];
+
+/** What the script needs to compose the WhatsApp message in the visitor's language. */
+const whatsapp = {
+  url: whatsappUrl(),
+  intro: f.whatsappIntro,
+  labels: { name: f.name, email: f.email, company: f.company, website: f.website, service: f.whatsappService, budget: f.budget },
+};
 ---
 
 <div class="form-card" data-reveal="scale">
@@ -36,6 +47,7 @@ const serviceOptions = [
     data-endpoint={site.contactForm.ajaxEndpoint}
     data-error-required={f.errorRequired}
     data-error-email={f.errorEmail}
+    data-whatsapp={JSON.stringify(whatsapp)}
   >
     <input type="hidden" name="_subject" value={`New inquiry from ${site.domain} (${locale})`} />
     <input type="hidden" name="_template" value="table" />
@@ -121,16 +133,30 @@ const serviceOptions = [
       <p class="privacy">
         {f.privacy} <a href={localePath(locale, 'privacy')}>{t.privacy.heading}</a>
       </p>
-      <button type="submit" class="btn btn--solid submit" data-submit>
-        <span class="submit-label">{f.submit}</span>
-        <span class="submit-sending" hidden>{f.sending}</span>
-        <Icon name="send" size={18} class="btn-arrow" />
-      </button>
+      <!-- Email first: implicit submission (Enter in a field) uses the first submit button. -->
+      <div class="submit-group">
+        <button type="submit" class="btn btn--solid submit" data-submit>
+          <span class="submit-label">{f.submit}</span>
+          <span class="submit-sending" hidden>{f.sending}</span>
+          <Icon name="send" size={18} class="btn-arrow" />
+        </button>
+        <button type="submit" class="btn btn--frame submit" data-channel="whatsapp" data-submit-whatsapp hidden>
+          <Icon name="whatsapp" size={18} />
+          {f.submitWhatsapp}
+          <span class="visually-hidden"> {t.a11y.newTab}</span>
+        </button>
+      </div>
     </div>
 
     <p class="status" role="status" aria-live="polite" data-status></p>
     <template data-error-template>
       {f.error} <a href={`mailto:${site.email}`}>{site.email}</a>.
+    </template>
+    <template data-whatsapp-template>
+      {f.whatsappOpened}{' '}
+      <a target="_blank" rel="noopener" data-whatsapp-link>
+        {f.whatsappRetry}<span class="visually-hidden"> {t.a11y.newTab}</span>
+      </a>
     </template>
   </form>
 
@@ -157,15 +183,27 @@ const serviceOptions = [
     const submit = form.querySelector<HTMLButtonElement>('[data-submit]')!;
     const success = form.parentElement!.querySelector<HTMLElement>('[data-success]')!;
     const errorTemplate = form.querySelector<HTMLTemplateElement>('[data-error-template]')!;
+    const whatsappTemplate = form.querySelector<HTMLTemplateElement>('[data-whatsapp-template]')!;
+    const whatsappButton = form.querySelector<HTMLButtonElement>('[data-submit-whatsapp]')!;
     const serviceSelect = form.querySelector<HTMLSelectElement>('[data-service-select]')!;
     const messages = { required: form.dataset.errorRequired ?? '', email: form.dataset.errorEmail ?? '' };
+    const whatsapp = JSON.parse(form.dataset.whatsapp ?? '{}') as {
+      url: string;
+      intro: string;
+      labels: Record<'name' | 'email' | 'company' | 'website' | 'service' | 'budget', string>;
+    };
     let attempted = false;
+    let channel: 'email' | 'whatsapp' = 'email';
 
     // Native validation stays as the no-JS fallback; with JS we show our own messages.
     form.noValidate = true;
+    // WhatsApp needs JavaScript to compose the message.
+    whatsappButton.hidden = false;
 
     const fieldError = (field: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement): string => {
-      if (field.validity.valueMissing) return messages.required;
+      // Over WhatsApp the visitor's number is the reply channel: the email becomes optional.
+      const optional = channel === 'whatsapp' && field.name === 'email';
+      if (field.validity.valueMissing) return optional ? '' : messages.required;
       if (field.validity.typeMismatch) return messages.email;
       return '';
     };
@@ -201,14 +239,62 @@ const serviceOptions = [
 
     const setSending = (sending: boolean) => {
       submit.disabled = sending;
+      whatsappButton.disabled = sending;
+      submit.setAttribute('aria-busy', String(sending));
       submit.classList.toggle('is-sending', sending);
       submit.querySelector<HTMLElement>('.submit-label')!.hidden = sending;
       submit.querySelector<HTMLElement>('.submit-sending')!.hidden = !sending;
     };
 
+    const selectedLabel = (name: string) => {
+      const select = form.querySelector<HTMLSelectElement>(`[name="${name}"]`);
+      return select?.value ? (select.selectedOptions[0]?.textContent?.trim() ?? '') : '';
+    };
+
+    /** Message in the visitor's language, with WhatsApp's *bold* labels; empty fields are skipped. */
+    const composeWhatsapp = (data: Record<string, FormDataEntryValue>): string => {
+      const value = (key: string) => String(data[key] ?? '').trim();
+      const line = (label: string, text: string) => (text ? `*${label}:* ${text}` : null);
+      const details = [
+        line(whatsapp.labels.name, value('name')),
+        line(whatsapp.labels.email, value('email')),
+        line(whatsapp.labels.company, value('company')),
+        line(whatsapp.labels.website, value('website')),
+        line(whatsapp.labels.service, selectedLabel('service')),
+        line(whatsapp.labels.budget, selectedLabel('budget')),
+      ].filter((text): text is string => text !== null);
+      return [whatsapp.intro, details.join('\n'), value('message')].join('\n\n');
+    };
+
+    const sendWhatsapp = (data: Record<string, FormDataEntryValue>) => {
+      const url = `${whatsapp.url}?text=${encodeURIComponent(composeWhatsapp(data))}`;
+      window.open(url, '_blank', 'noopener');
+      // The new tab may be blocked or closed: keep a link to open it again.
+      const notice = whatsappTemplate.content.cloneNode(true) as DocumentFragment;
+      notice.querySelector<HTMLAnchorElement>('[data-whatsapp-link]')!.href = url;
+      status.replaceChildren(notice);
+      status.classList.remove('is-error');
+      status.classList.add('is-info');
+      document.dispatchEvent(
+        new CustomEvent('analytics:event', {
+          detail: {
+            name: 'generate_lead',
+            params: {
+              method: 'whatsapp',
+              service: String(data.service ?? ''),
+              budget: String(data.budget ?? ''),
+              form_language: String(data.language ?? ''),
+            },
+          },
+        }),
+      );
+    };
+
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
       attempted = true;
+      channel = (event.submitter as HTMLElement | null)?.dataset.channel === 'whatsapp' ? 'whatsapp' : 'email';
+      // Over WhatsApp an empty email passes, but a typed one must still be valid.
       const invalid = requiredFields.filter((field) => !showError(field));
       if (invalid.length) {
         invalid[0]!.focus();
@@ -219,8 +305,14 @@ const serviceOptions = [
       if (data._honey) return;
       delete data._next;
 
+      if (channel === 'whatsapp') {
+        sendWhatsapp(data);
+        return;
+      }
+
       setSending(true);
       status.textContent = '';
+      status.classList.remove('is-error', 'is-info');
       try {
         const response = await fetch(form.dataset.endpoint!, {
           method: 'POST',
@@ -237,7 +329,12 @@ const serviceOptions = [
           new CustomEvent('analytics:event', {
             detail: {
               name: 'generate_lead',
-              params: { service: String(data.service ?? ''), budget: String(data.budget ?? ''), form_language: String(data.language ?? '') },
+              params: {
+                method: 'email',
+                service: String(data.service ?? ''),
+                budget: String(data.budget ?? ''),
+                form_language: String(data.language ?? ''),
+              },
             },
           }),
         );
@@ -256,7 +353,6 @@ const serviceOptions = [
     position: relative;
     padding: clamp(22px, 3.5vw, 40px);
     border: 1px solid var(--line);
-    border-radius: 20px;
     background: var(--surface);
     box-shadow: 0 40px 80px -48px rgb(0 0 0 / 0.35);
   }
@@ -306,7 +402,6 @@ const serviceOptions = [
     min-height: 48px;
     padding: 12px 14px;
     border: 1px solid rgb(17 17 17 / 0.22);
-    border-radius: 10px;
     background: var(--bg);
     color: var(--ink);
     font: inherit;
@@ -397,6 +492,12 @@ const serviceOptions = [
     color: var(--ink-soft);
   }
 
+  .submit-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
   .submit {
     --btn-h: 52px;
     padding-inline: 26px;
@@ -437,13 +538,17 @@ const serviceOptions = [
   .status {
     margin-top: 16px;
     padding: 12px 14px;
-    border-radius: 10px;
     font-size: 0.9rem;
   }
 
   .status.is-error {
     background: #fef2f2;
     color: #991b1b;
+  }
+
+  .status.is-info {
+    background: var(--bg);
+    color: var(--ink-2);
   }
 
   .success {
@@ -484,7 +589,6 @@ const serviceOptions = [
     place-items: center;
     width: 64px;
     height: 64px;
-    border-radius: 50%;
     background: var(--ink);
     color: #fff;
   }
@@ -521,6 +625,7 @@ const serviceOptions = [
       grid-template-columns: 1fr;
     }
 
+    .submit-group,
     .submit {
       width: 100%;
     }

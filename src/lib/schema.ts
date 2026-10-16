@@ -14,7 +14,25 @@ import { localeMeta, localePath, locales, type Locale } from '@/i18n/locales';
 
 export type JsonLd = Record<string, unknown>;
 
+/** A rendered image, with the size schema.org consumers expect. */
+export interface ImageRef {
+  url: string;
+  width: number;
+  height: number;
+}
+
 const abs = (path: string) => new URL(path, site.url).href;
+
+const imageObject = (image: ImageRef, caption?: string): JsonLd => ({
+  '@type': 'ImageObject',
+  url: image.url,
+  width: image.width,
+  height: image.height,
+  ...(caption ? { caption } : {}),
+});
+
+/** `programmingLanguage` only takes languages; frameworks and platforms go to `keywords`. */
+const LANGUAGES = new Set(['TypeScript', 'JavaScript', 'Rust', 'Kotlin', 'Solidity', 'Python', 'Go', 'Java', 'Swift', 'SQL']);
 
 export const ids = {
   person: abs('/#person'),
@@ -23,7 +41,14 @@ export const ids = {
   cloudycoding: abs('/#cloudycoding'),
 };
 
-export function personNode(locale: Locale, imageUrl: string): JsonLd {
+const serviceCatalogId = (locale: Locale) => abs(`${localePath(locale)}#services`);
+
+interface PersonOptions {
+  /** Link the service catalog: only on pages whose graph includes `serviceCatalogNode`. */
+  offers?: boolean;
+}
+
+export function personNode(locale: Locale, image: ImageRef, { offers = false }: PersonOptions = {}): JsonLd {
   const t = useTranslations(locale);
 
   return {
@@ -33,15 +58,12 @@ export function personNode(locale: Locale, imageUrl: string): JsonLd {
     alternateName: [site.fullName, 'Emanuel250'],
     givenName: site.givenName,
     familyName: site.familyName,
-    url: site.url,
-    image: {
-      '@type': 'ImageObject',
-      url: imageUrl,
-      caption: t.hero.photoAlt,
-    },
-    email: `mailto:${site.email}`,
+    url: abs('/'),
+    image: imageObject(image, t.hero.photoAlt),
+    email: site.email,
     jobTitle: t.meta.jobTitle,
     description: t.meta.description,
+    disambiguatingDescription: t.meta.disambiguation,
     address: {
       '@type': 'PostalAddress',
       addressLocality: site.location.city,
@@ -56,7 +78,7 @@ export function personNode(locale: Locale, imageUrl: string): JsonLd {
     })),
     hasOccupation: roles.map((role) => ({
       '@type': 'Occupation',
-      name: `${role.title[locale]} · ${role.company}`,
+      name: role.title[locale],
       description: role.summary[locale],
     })),
     hasCredential: certifications.map((cert) => ({
@@ -74,19 +96,22 @@ export function personNode(locale: Locale, imageUrl: string): JsonLd {
       '@type': 'ContactPoint',
       contactType: 'sales',
       email: site.email,
+      // The WhatsApp number, published on purpose by the owner.
+      telephone: `+${site.whatsapp.number}`,
       url: abs(`${localePath(locale)}#contact`),
       availableLanguage: ['es', 'en'],
     },
-    makesOffer: { '@id': abs(`${localePath(locale)}#services`) },
+    ...(offers ? { hasOfferCatalog: { '@id': serviceCatalogId(locale) } } : {}),
   };
 }
 
-/** The services on the home page, as an OfferCatalog the person provides. */
+/** The services on the home page, as an OfferCatalog the person provides (no area limit: remote, any country). */
 export function serviceCatalogNode(locale: Locale): JsonLd {
   return {
     '@type': 'OfferCatalog',
-    '@id': abs(`${localePath(locale)}#services`),
+    '@id': serviceCatalogId(locale),
     name: useTranslations(locale).services.eyebrow,
+    inLanguage: localeMeta[locale].htmlLang,
     itemListElement: services.map((service) => ({
       '@type': 'Offer',
       itemOffered: {
@@ -95,19 +120,21 @@ export function serviceCatalogNode(locale: Locale): JsonLd {
         description: service.description[locale],
         serviceType: service.formValue,
         provider: { '@id': ids.person },
-        areaServed: [{ '@type': 'Place', name: 'Latin America' }, { '@type': 'Place', name: 'Worldwide' }],
       },
     })),
   };
 }
 
-export function organizationNodes(): JsonLd[] {
+export function organizationNodes(locale: Locale): JsonLd[] {
+  const cosmosPay = projects.find((project) => project.id === 'cosmos-pay');
+
   return [
     {
       '@type': 'Organization',
       '@id': ids.cosmos,
       name: site.company.name,
       url: site.company.url,
+      ...(cosmosPay ? { description: cosmosPay.description[locale] } : {}),
       founder: { '@id': ids.person },
       sameAs: [site.socials.cosmosGithub, site.company.ecosystemUrl],
     },
@@ -139,21 +166,27 @@ export function projectListNode(locale: Locale): JsonLd {
     '@type': 'ItemList',
     '@id': abs(`${localePath(locale)}#projects`),
     name: useTranslations(locale).projects.listName,
-    itemListElement: projects.map((project, index) => ({
-      '@type': 'ListItem',
-      position: index + 1,
-      item: {
-        '@type': 'SoftwareSourceCode',
-        name: project.name,
-        description: project.description[locale],
-        ...(project.url ? { url: project.url } : {}),
-        ...(project.repo ? { codeRepository: project.repo } : {}),
-        programmingLanguage: project.tech,
-        dateCreated: project.year,
-        author: { '@id': ids.person },
-        creator: { '@id': ids.person },
-      },
-    })),
+    inLanguage: localeMeta[locale].htmlLang,
+    itemListElement: projects.map((project, index) => {
+      const languages = project.tech.filter((tech) => LANGUAGES.has(tech));
+      const platforms = project.tech.filter((tech) => !LANGUAGES.has(tech));
+      return {
+        '@type': 'ListItem',
+        position: index + 1,
+        item: {
+          '@type': 'SoftwareSourceCode',
+          name: project.name,
+          description: project.description[locale],
+          ...(project.url ? { url: project.url } : {}),
+          ...(project.repo ? { codeRepository: project.repo } : {}),
+          ...(languages.length ? { programmingLanguage: languages } : {}),
+          ...(platforms.length ? { keywords: platforms.join(', ') } : {}),
+          dateCreated: project.year,
+          author: { '@id': ids.person },
+          creator: { '@id': ids.person },
+        },
+      };
+    }),
   };
 }
 
@@ -163,12 +196,15 @@ interface PageNodeOptions {
   title: string;
   description: string;
   type: 'ProfilePage' | 'WebPage';
-  imageUrl: string;
+  image: ImageRef;
   breadcrumb?: { name: string; path: string }[];
 }
 
-export function pageNode({ locale, path, title, description, type, imageUrl, breadcrumb }: PageNodeOptions): JsonLd[] {
+export function pageNode({ locale, path, title, description, type, image, breadcrumb }: PageNodeOptions): JsonLd[] {
   const url = abs(localePath(locale, path));
+  // From the git history of the page's content (astro.config.mjs): stable across deploys
+  // that change nothing, absent outside a git checkout.
+  const dates = __CONTENT_DATES__[`${locale}:${path}`];
   const nodes: JsonLd[] = [
     {
       '@type': type,
@@ -180,8 +216,9 @@ export function pageNode({ locale, path, title, description, type, imageUrl, bre
       isPartOf: { '@id': ids.website },
       about: { '@id': ids.person },
       ...(type === 'ProfilePage' ? { mainEntity: { '@id': ids.person } } : {}),
-      primaryImageOfPage: { '@type': 'ImageObject', url: imageUrl },
-      dateModified: new Date().toISOString(),
+      primaryImageOfPage: imageObject(image),
+      ...(dates?.created ? { dateCreated: dates.created } : {}),
+      ...(dates?.modified ? { dateModified: dates.modified } : {}),
       ...(breadcrumb ? { breadcrumb: { '@id': `${url}#breadcrumb` } } : {}),
     },
   ];

@@ -17,6 +17,16 @@ export const site = {
   logo: 'emanuel.',
   email: 'emanuel@cloudycoding.com',
 
+  /**
+   * WhatsApp, published on purpose by the owner (floating button, contact
+   * section, footer and the form's "send via WhatsApp" option).
+   */
+  whatsapp: {
+    /** Country code + number, digits only, as wa.me expects. */
+    number: '5493874732727',
+    display: '+54 9 387 473-2727',
+  },
+
   location: {
     city: 'Salta',
     region: 'Salta',

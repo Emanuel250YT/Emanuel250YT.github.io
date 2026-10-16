@@ -1,11 +1,10 @@
 ---
-import { getImage } from 'astro:assets';
-import portrait from '@/assets/portrait.png';
 import { site } from '@/config/site';
 import Icon from '@/components/ui/Icon.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { useTranslations } from '@/i18n';
 import { localeMeta, localePath, type Locale } from '@/i18n/locales';
+import { portraitRef } from '@/lib/portrait';
 import { graph, organizationNodes, pageNode, personNode, websiteNode } from '@/lib/schema';
 
 /** Bump when the policy text changes. */
@@ -21,12 +20,12 @@ const updated = new Intl.DateTimeFormat(localeMeta[locale].dateLocale, { dateSty
   new Date(`${UPDATED}T00:00:00Z`),
 );
 
-const portraitImage = await getImage({ src: portrait, width: 744, format: 'webp' });
-const portraitUrl = new URL(portraitImage.src, Astro.site ?? site.url).href;
+const portrait = await portraitRef();
 
+// No service catalog here: personNode() leaves out hasOfferCatalog, so no @id dangles.
 const jsonLd = graph([
-  personNode(locale, portraitUrl),
-  ...organizationNodes(),
+  personNode(locale, portrait),
+  ...organizationNodes(locale),
   websiteNode(),
   ...pageNode({
     locale,
@@ -34,7 +33,7 @@ const jsonLd = graph([
     title: t.privacy.title,
     description: t.privacy.description,
     type: 'WebPage',
-    imageUrl: portraitUrl,
+    image: portrait,
     breadcrumb: [
       { name: site.name, path: '' },
       { name: t.privacy.heading, path: 'privacy' },
@@ -50,7 +49,7 @@ const parts = (body: string) => body.split('{email}');
   <article class="container privacy" aria-labelledby="privacy-title">
     <a class="back link-arrow" href={localePath(locale)}>
       <Icon name="arrow-left" size={18} />
-      {t.cv.back}
+      {t.privacy.back}
     </a>
     <h1 id="privacy-title" class="display" data-reveal>{t.privacy.heading}</h1>
     <p class="updated" data-reveal>

@@ -5,6 +5,7 @@ import { site } from '@/config/site';
 import Icon, { type IconName } from '@/components/ui/Icon.astro';
 import { useTranslations } from '@/i18n';
 import { localePath, type Locale } from '@/i18n/locales';
+import { whatsappUrl } from '@/lib/whatsapp';
 
 interface Props {
   locale: Locale;
@@ -49,10 +50,25 @@ const socials: { label: string; href: string; icon: IconName }[] = [
         {t.nav.cta}
         <Icon name="arrow-right" size={18} class="btn-arrow" />
       </a>
-      <a class="mail" href={`mailto:${site.email}`} data-track="contact_click" data-track-method="email_footer">
-        <Image src={avatar} alt="" width={30} height={30} densities={[1, 2]} class="mail-avatar" />
-        {site.email}
-      </a>
+      <div class="channels">
+        <a class="channel" href={`mailto:${site.email}`} data-track="contact_click" data-track-method="email_footer">
+          <Image src={avatar} alt="" width={30} height={30} densities={[1, 2]} class="channel-avatar" />
+          {site.email}
+        </a>
+        <a
+          class="channel"
+          href={whatsappUrl(t.contact.whatsappMessage)}
+          target="_blank"
+          rel="noopener"
+          data-track="contact_click"
+          data-track-method="whatsapp_footer"
+        >
+          <span class="channel-icon"><Icon name="whatsapp" size={16} /></span>
+          <span class="visually-hidden">WhatsApp: </span>
+          {site.whatsapp.display}
+          <span class="visually-hidden"> {t.a11y.newTab}</span>
+        </a>
+      </div>
     </div>
   </div>
 
@@ -75,28 +91,11 @@ const socials: { label: string; href: string; icon: IconName }[] = [
 </footer>
 
 <style>
+  /* Plain black: no gradients or glows, only the links. */
   .site-footer {
-    position: relative;
-    overflow: hidden;
     background: #000;
     color: var(--on-dark);
     padding-top: clamp(48px, 6vw, 72px);
-    isolation: isolate;
-  }
-
-  /* Light halo rising from the bottom, as in the design */
-  .site-footer::before {
-    content: '';
-    position: absolute;
-    left: 50%;
-    bottom: -55%;
-    z-index: -1;
-    width: min(1100px, 140vw);
-    aspect-ratio: 2 / 1;
-    border-radius: 50%;
-    background: radial-gradient(closest-side, rgb(255 255 255 / 0.22), rgb(255 255 255 / 0.06) 55%, transparent);
-    transform: translateX(-50%);
-    pointer-events: none;
   }
 
   .footer-grid {
@@ -133,7 +132,6 @@ const socials: { label: string; href: string; icon: IconName }[] = [
     min-height: 40px;
     padding: 8px 14px;
     border: 1px solid rgb(255 255 255 / 0.55);
-    border-radius: 2px;
     font-size: 0.875rem;
     text-decoration: none;
     transition:
@@ -161,15 +159,20 @@ const socials: { label: string; href: string; icon: IconName }[] = [
   .legal {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     justify-content: center;
     gap: 4px 18px;
     margin: 4px 0;
   }
 
+  /* The link and the button share one box, so their text lines up. */
   .legal a,
   .link-button {
+    display: inline-flex;
+    align-items: center;
     min-height: 32px;
     padding: 0;
+    line-height: 1.2;
     border: 0;
     background: none;
     font: inherit;
@@ -186,32 +189,45 @@ const socials: { label: string; href: string; icon: IconName }[] = [
     text-decoration-color: currentColor;
   }
 
-  .mail {
+  .channels {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+
+  .channel {
     display: inline-flex;
     align-items: center;
     gap: 10px;
     min-height: 44px;
     padding: 6px 18px 6px 6px;
-    border-radius: 999px;
     background: #fff;
     color: #000;
     font-weight: 500;
     font-size: 0.9rem;
     text-decoration: none;
     overflow-wrap: anywhere;
-    transition: transform 0.2s var(--ease);
+    transition: translate 0.2s var(--ease);
   }
 
-  .mail:hover {
-    transform: translateY(-2px);
+  .channel:hover {
+    translate: 0 -2px;
   }
 
-  .mail :global(.mail-avatar) {
+  .channel :global(.channel-avatar),
+  .channel-icon {
     flex: none;
     width: 30px;
     height: 30px;
-    border-radius: 50%;
     object-fit: cover;
+  }
+
+  .channel-icon {
+    display: grid;
+    place-items: center;
+    background: #000;
+    color: #fff;
   }
 
   .bottom {
@@ -234,6 +250,15 @@ const socials: { label: string; href: string; icon: IconName }[] = [
   @media (max-width: 640px) {
     .reach {
       align-items: flex-start;
+    }
+
+    .channels {
+      justify-content: flex-start;
+    }
+
+    /* Room for the floating buttons at the end of the page. */
+    .bottom {
+      padding-bottom: 140px;
     }
   }
 </style>

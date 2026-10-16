@@ -4,11 +4,10 @@
  *   - src/assets/portrait.png, src/assets/avatar.png  (black & white, from assets-src/portrait.png)
  *   - public/favicon.ico, apple-touch-icon.png, icon-192/512.png, icon-maskable-512.png
  *   - public/og/og-<locale>.png                        (1200x630, one per locale)
- *   - public/[<locale>/]cv/emanuel-guzman-cv.pdf        (printed from /cv/, one per locale)
  *
- * Usage: npm run assets              (everything)
- *        npm run assets -- --no-cv   (skip the PDFs, no build needed)
+ * The CV PDFs are not generated: the owner uploads them (see src/lib/cv.ts).
  *
+ * Usage: npm run assets
  * Requires Google Chrome / Chromium / Edge (set CHROME_PATH to force one).
  */
 import { spawn } from 'node:child_process';
@@ -21,22 +20,20 @@ import sharp from 'sharp';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const pub = path.join(root, 'public');
-const withCv = !process.argv.includes('--no-cv');
 
 // Keep in sync with src/i18n/locales.ts (plain Node cannot import TS sources).
 const LOCALES = ['es', 'en', 'pt', 'fr', 'de', 'zh', 'hi'];
-const DEFAULT_LOCALE = 'es';
-const localePrefix = (locale) => (locale === DEFAULT_LOCALE ? '' : `${locale}/`);
 
 const BRAND_BG = '#111111';
+// Square design: square tile, square stroke ends and a square dot (same drawing as public/favicon.svg).
 const glyph = (scale = 1) => {
   // The "e." of the logo, centred on a 64x64 canvas.
   const t = (64 - 64 * scale) / 2;
-  return `<g transform="translate(${t} ${t}) scale(${scale})"><path d="M17 33h23a11.5 11.5 0 1 0-3.4 8.2" fill="none" stroke="#fff" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="48" cy="43.5" r="3.8" fill="#fff"/></g>`;
+  return `<g transform="translate(${t} ${t}) scale(${scale})"><path d="M17 33h23a11.5 11.5 0 1 0-3.4 8.2" fill="none" stroke="#fff" stroke-width="5.5" stroke-linecap="butt" stroke-linejoin="miter"/><rect x="44.2" y="39.7" width="7.6" height="7.6" fill="#fff"/></g>`;
 };
-const iconSvg = ({ radius = 14, scale = 1 } = {}) =>
+const iconSvg = ({ scale = 1 } = {}) =>
   Buffer.from(
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="${radius}" fill="${BRAND_BG}"/>${glyph(scale)}</svg>`,
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" fill="${BRAND_BG}"/>${glyph(scale)}</svg>`,
   );
 
 function findChrome() {
@@ -107,10 +104,10 @@ async function icons() {
   const png = (svg, size) => sharp(svg, { density: 512 }).resize(size, size).png({ compressionLevel: 9 }).toBuffer();
   await writeFile(path.join(pub, 'icon-192.png'), await png(iconSvg(), 192));
   await writeFile(path.join(pub, 'icon-512.png'), await png(iconSvg(), 512));
-  // iOS rounds the corners itself: full background, no transparent corners.
-  await writeFile(path.join(pub, 'apple-touch-icon.png'), await png(iconSvg({ radius: 0, scale: 0.86 }), 180));
+  // iOS applies its own mask: full background, glyph slightly smaller.
+  await writeFile(path.join(pub, 'apple-touch-icon.png'), await png(iconSvg({ scale: 0.86 }), 180));
   // Maskable: the glyph stays inside the 80 % safe zone.
-  await writeFile(path.join(pub, 'icon-maskable-512.png'), await png(iconSvg({ radius: 0, scale: 0.7 }), 512));
+  await writeFile(path.join(pub, 'icon-maskable-512.png'), await png(iconSvg({ scale: 0.7 }), 512));
   const ico = buildIco([
     { size: 32, data: await png(iconSvg(), 32) },
     { size: 48, data: await png(iconSvg(), 48) },
@@ -165,6 +162,8 @@ const OG_COPY = {
   },
 };
 
+const OG_PNG = { compressionLevel: 9, palette: true, quality: 90, effort: 10 };
+
 async function ogImages(chrome) {
   const fontUrl = pathToFileURL(
     path.join(root, 'node_modules/@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2'),
@@ -184,7 +183,7 @@ async function ogImages(chrome) {
         background-image:linear-gradient(rgb(17 17 17/.06) 1px,transparent 1px),linear-gradient(90deg,rgb(17 17 17/.06) 1px,transparent 1px);
         background-size:28px 28px;display:flex;align-items:stretch;padding:0 0 0 72px;position:relative}
       .copy{flex:1;display:flex;flex-direction:column;justify-content:center;padding:56px 0;position:relative;z-index:1}
-      .badge{display:inline-flex;align-self:flex-start;gap:8px;align-items:center;padding:9px 20px;border:2px solid #111;border-radius:999px;background:#fff;font-size:20px}
+      .badge{display:inline-flex;align-self:flex-start;gap:8px;align-items:center;padding:9px 20px;border:2px solid #111;background:#fff;font-size:20px}
       .badge b{font-weight:600}.badge span{color:#555;font-size:16px;letter-spacing:.06em}
       h1{margin-top:30px;font-size:66px;line-height:1.1;font-weight:400;letter-spacing:-.03em}
       :lang(zh) h1,:lang(hi) h1{letter-spacing:0;line-height:1.3}
@@ -217,9 +216,11 @@ async function ogImages(chrome) {
       `--screenshot=${shotPath}`,
       pathToFileURL(htmlPath).href,
     ]);
+    // Palette PNG: the card is greys plus a B&W photo, so 256 colours keep it sharp at a
+    // third of the weight (link previews fetch it on every share; WhatsApp wants < 300 KB).
     const out = await sharp(await readFile(shotPath))
       .extract({ left: 0, top: 0, width: 1200, height: 630 })
-      .png({ compressionLevel: 9 })
+      .png(OG_PNG)
       .toBuffer();
     await writeFile(path.join(pub, 'og', `og-${locale}.png`), out);
   }
@@ -227,53 +228,7 @@ async function ogImages(chrome) {
   console.log(`✓ Open Graph images (${LOCALES.length})`);
 }
 
-async function waitFor(url, timeoutMs = 30000) {
-  const start = Date.now();
-  while (Date.now() - start < timeoutMs) {
-    try {
-      const response = await fetch(url);
-      if (response.ok) return;
-    } catch {
-      // the server is not ready yet
-    }
-    await new Promise((resolve) => setTimeout(resolve, 300));
-  }
-  throw new Error(`Timed out waiting for ${url}`);
-}
-
-async function cvPdfs(chrome) {
-  const astro = path.join(root, 'node_modules/astro/bin/astro.mjs');
-  console.log('… building the site to print the CV');
-  await run(process.execPath, [astro, 'build'], { cwd: root });
-
-  const port = 4399;
-  const preview = spawn(process.execPath, [astro, 'preview', '--port', String(port), '--host', '127.0.0.1'], {
-    cwd: root,
-    stdio: 'ignore',
-  });
-  try {
-    await waitFor(`http://127.0.0.1:${port}/cv/`);
-    for (const locale of LOCALES) {
-      const prefix = localePrefix(locale);
-      const outDir = path.join(pub, prefix, 'cv');
-      await mkdir(outDir, { recursive: true });
-      await run(chrome, [
-        '--headless=new',
-        '--disable-gpu',
-        '--no-pdf-header-footer',
-        '--virtual-time-budget=4000',
-        `--print-to-pdf=${path.join(outDir, 'emanuel-guzman-cv.pdf')}`,
-        `http://127.0.0.1:${port}/${prefix}cv/`,
-      ]);
-    }
-  } finally {
-    preview.kill();
-  }
-  console.log(`✓ CV PDFs (${LOCALES.length}) — run \`npm run build\` to include them in dist/`);
-}
-
 const chrome = findChrome();
 await portraits();
 await icons();
 await ogImages(chrome);
-if (withCv) await cvPdfs(chrome);
