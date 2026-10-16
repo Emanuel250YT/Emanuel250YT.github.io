@@ -181,7 +181,7 @@ export const de: Dictionary = {
     sections: [
       { title: "Verantwortlicher", body: "Diese Website gehört Emanuel Guzman aus Salta, Argentinien. Bei Fragen zu deinen Daten schreib mir an {email}." },
       { title: "Kontaktformular", body: "Wenn du mir über das Formular schreibst, erhalte ich die Angaben, die du ausfüllst: Name, E-Mail, Unternehmen, Website, Leistung, Budget und Nachricht. Der Versand läuft über FormSubmit (formsubmit.co), das mir die Nachricht per E-Mail weiterleitet. Ich nutze diese Daten nur, um dir zu antworten, und verkaufe oder teile sie nicht mit Dritten." },
-      { title: "Webanalyse", body: "Wenn du Analyse-Cookies akzeptierst, lade ich Google Analytics 4, um Besuche und die Nutzung der Website zusammengefasst zu messen: Seitenaufrufe, Klicks auf Buttons, Downloads und Formularsendungen. Wenn du ablehnst, wird Google Analytics nicht geladen. Deine Wahl wird nur in deinem Browser gespeichert und lässt sich jederzeit über „Cookie-Einstellungen“ in der Fußzeile ändern." },
+      { title: "Webanalyse", body: "Wenn du Analyse-Cookies akzeptierst, lade ich Google Analytics 4 und den Google Tag Manager, um Besuche und die Nutzung der Website zusammengefasst zu messen: Seitenaufrufe, Klicks auf Buttons, Downloads und Formularsendungen. Wenn du ablehnst, wird keines von beiden geladen. Deine Wahl wird nur in deinem Browser gespeichert und lässt sich jederzeit über „Cookie-Einstellungen“ in der Fußzeile ändern." },
       { title: "Deine Rechte", body: "Du kannst jederzeit Auskunft, Berichtigung oder Löschung deiner Daten verlangen, indem du an {email} schreibst. Diese Website zeigt keine Werbung und setzt keine eigenen Cookies." },
     ],
   },

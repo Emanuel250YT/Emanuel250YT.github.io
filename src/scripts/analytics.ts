@@ -1,11 +1,16 @@
 /**
- * Google Analytics 4 with explicit consent ("basic" consent mode).
+ * Google Analytics 4 + Google Tag Manager with explicit consent ("basic" consent mode).
  *
  * - Nothing from Google loads until the visitor accepts; the choice is kept in
  *   localStorage and can be changed from any `[data-consent-open]` button.
- * - Conversions are reported through `track()` (or a `analytics:event`
+ * - GA4 is loaded directly with gtag.js. GTM is loaded for extra tags only:
+ *   do NOT add a Google tag / GA4 tag for the same measurement ID inside GTM, or
+ *   every page view and event would be counted twice.
+ * - Conversions are reported through `track()` (or an `analytics:event`
  *   CustomEvent) and through `[data-track]` attributes on links/buttons:
- *   `data-track="cta_click" data-track-location="hero"`.
+ *   `data-track="cta_click" data-track-location="hero"`. Each event goes to GA4
+ *   (`gtag('event')`) and, when GTM is present, to the dataLayer as
+ *   `{ event: name, ...params }` so GTM triggers can use it.
  */
 
 type Params = Record<string, string | number | boolean>;
@@ -20,6 +25,7 @@ declare global {
 
 const STORAGE_KEY = 'consent.analytics';
 let measurementId = '';
+let containerId = '';
 let loaded = false;
 
 function readChoice(): Choice | null {
@@ -39,30 +45,42 @@ function storeChoice(choice: Choice): void {
   }
 }
 
-function loadGoogleAnalytics(): void {
-  if (loaded || !measurementId) return;
+function injectScript(src: string): void {
+  const script = document.createElement('script');
+  script.async = true;
+  script.src = src;
+  document.head.append(script);
+}
+
+function loadGoogleTags(): void {
+  if (loaded || (!measurementId && !containerId)) return;
   loaded = true;
   window.dataLayer = window.dataLayer ?? [];
   window.gtag = function gtag() {
     // gtag.js expects the arguments object itself, not an array.
     window.dataLayer!.push(arguments);
   };
+  // Consent state first, so every Google tag (gtag.js or GTM) starts from it.
   window.gtag('consent', 'default', {
     analytics_storage: 'granted',
     ad_storage: 'denied',
     ad_user_data: 'denied',
     ad_personalization: 'denied',
   });
-  window.gtag('js', new Date());
-  window.gtag('config', measurementId, { page_title: document.title, language: document.documentElement.lang });
 
-  const script = document.createElement('script');
-  script.async = true;
-  script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(measurementId)}`;
-  document.head.append(script);
+  if (measurementId) {
+    window.gtag('js', new Date());
+    window.gtag('config', measurementId, { page_title: document.title, language: document.documentElement.lang });
+    injectScript(`https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(measurementId)}`);
+  }
+
+  if (containerId) {
+    window.dataLayer.push({ 'gtm.start': Date.now(), event: 'gtm.js' });
+    injectScript(`https://www.googletagmanager.com/gtm.js?id=${encodeURIComponent(containerId)}`);
+  }
 }
 
-function revokeGoogleAnalytics(): void {
+function revokeGoogleTags(): void {
   window.gtag?.('consent', 'update', { analytics_storage: 'denied' });
   // Remove the GA cookies set for this domain.
   for (const cookie of document.cookie.split(';')) {
@@ -74,9 +92,11 @@ function revokeGoogleAnalytics(): void {
   }
 }
 
-/** Sends a GA4 event when analytics is active; a no-op otherwise. */
+/** Sends an event to GA4 and GTM when the visitor accepted analytics; a no-op otherwise. */
 export function track(name: string, params: Params = {}): void {
-  if (loaded && readChoice() === 'granted') window.gtag?.('event', name, params);
+  if (!loaded || readChoice() !== 'granted') return;
+  if (measurementId) window.gtag?.('event', name, params);
+  if (containerId) window.dataLayer?.push({ event: name, ...params });
 }
 
 function trackFromAttributes(element: HTMLElement): void {
@@ -96,10 +116,11 @@ function trackFromAttributes(element: HTMLElement): void {
 export function initAnalytics(): void {
   const banner = document.querySelector<HTMLElement>('[data-consent]');
   measurementId = banner?.dataset.gaId ?? '';
-  if (!banner || !measurementId) return;
+  containerId = banner?.dataset.gtmId ?? '';
+  if (!banner || (!measurementId && !containerId)) return;
 
   const choice = readChoice();
-  if (choice === 'granted') loadGoogleAnalytics();
+  if (choice === 'granted') loadGoogleTags();
   if (choice === null) banner.hidden = false;
 
   banner.addEventListener('click', (event) => {
@@ -108,8 +129,8 @@ export function initAnalytics(): void {
     const next = button.dataset.consentChoice as Choice;
     storeChoice(next);
     banner.hidden = true;
-    if (next === 'granted') loadGoogleAnalytics();
-    else revokeGoogleAnalytics();
+    if (next === 'granted') loadGoogleTags();
+    else revokeGoogleTags();
   });
 
   document.addEventListener('click', (event) => {

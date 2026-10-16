@@ -181,7 +181,7 @@ export const en: Dictionary = {
     sections: [
       { title: "Who is responsible", body: "This site belongs to Emanuel Guzman, from Salta, Argentina. For any question about your data, email me at {email}." },
       { title: "Contact form", body: "When you write to me through the form, I receive the details you fill in: name, email, company, website, service, budget and message. Submissions are processed by FormSubmit (formsubmit.co), which forwards the message to my email. I only use this data to reply to you and never sell or share it with third parties." },
-      { title: "Analytics", body: "If you accept analytics cookies, I load Google Analytics 4 to measure, in aggregate, visits and how the site is used: page views, button clicks, downloads and form submissions. If you decline, Google Analytics is not loaded. Your choice is stored only in your browser and you can change it at any time from \"Cookie preferences\" in the footer." },
+      { title: "Analytics", body: "If you accept analytics cookies, I load Google Analytics 4 and Google Tag Manager to measure, in aggregate, visits and how the site is used: page views, button clicks, downloads and form submissions. If you decline, neither of them is loaded. Your choice is stored only in your browser and you can change it at any time from \"Cookie preferences\" in the footer." },
       { title: "Your rights", body: "You can ask me at any time to access, correct or delete your data by emailing {email}. This site shows no ads and sets no first-party cookies." },
     ],
   },

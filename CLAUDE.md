@@ -116,8 +116,14 @@ About stays right after the hero because the cut-out portrait "stands" on its da
 
 ## 6 · Analytics and consent
 
-- GA4 loads **only after the visitor accepts** (consent "basic" mode). The banner
-  renders only when `site.googleAnalyticsId` is set; reject and accept weigh the same;
+- IDs in `site.ts`: GA4 `G-GJVKXV08PC` (loaded directly with gtag.js) and GTM
+  `GTM-5BT3SKXR` (for any extra tags). **Never add a Google tag / GA4 tag for the
+  same measurement ID inside GTM**: page views and events would be counted twice.
+  GTM receives every event in the `dataLayer` as `{ event, ...params }` for its triggers.
+- Never paste Google's install snippets into `<head>`: they load before consent.
+  No GTM `<noscript>` iframe either (no consent is possible without JS).
+- GA4 and GTM load **only after the visitor accepts** (consent "basic" mode), with
+  `consent default` pushed first. The banner renders only when an ID is set; reject and accept weigh the same;
   the choice lives in `localStorage` (`consent.analytics`); "Cookie preferences" in the
   footer reopens it. Declining removes `_ga*` cookies.
 - Events: `cta_click` (with `location`), `select_service`, `contact_click`,
@@ -125,6 +131,8 @@ About stays right after the hero because the cut-out portrait "stands" on its da
   `data-track="<event>" data-track-<param>="<value>"`, or dispatch
   `new CustomEvent('analytics:event', { detail: { name, params } })`.
 - Mark `generate_lead` as a key event (conversion) in GA4.
+- Test consent locally by stubbing `HTMLHeadElement.prototype.append`: accepting on
+  localhost with the real IDs would send test traffic to the live property.
 - The privacy page (`/privacy/` per locale) documents the form processor and GA4.
   Update it (and its `UPDATED` date) whenever data handling changes.
 
@@ -231,7 +239,7 @@ Every indexable page has, and `scripts/verify-seo.mjs` enforces:
 - Baseline: **Lighthouse ≥ 98 / 100 / 100 / 100** (mobile and desktop) on `/`, `/zh/`,
   `/hi/`, a CV page and a privacy page. CLS 0, TBT 0.
 - The LCP is the hero portrait (`fetchpriority="high"`, WebP `srcset` 340/460/600/744).
-- No third-party script runs before consent; GA4 is the only one, loaded async.
+- No third-party script runs before consent; GA4 and GTM load async afterwards.
 
 ## 13 · Deploy and domain (dev.ar → GitHub Pages)
 

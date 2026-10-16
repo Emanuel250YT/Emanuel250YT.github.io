@@ -13,7 +13,7 @@ interface Props {
 const { locale } = Astro.props;
 const t = useTranslations(locale);
 const year = new Date().getFullYear();
-const analyticsEnabled = Boolean(site.googleAnalyticsId);
+const analyticsEnabled = Boolean(site.googleAnalyticsId || site.googleTagManagerId);
 const home = localePath(locale);
 
 const socials: { label: string; href: string; icon: IconName }[] = [

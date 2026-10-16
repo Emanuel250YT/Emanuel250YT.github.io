@@ -51,11 +51,16 @@ export const site = {
   },
 
   /**
-   * Google Analytics 4 measurement ID (e.g. "G-ABC123XYZ"). Empty = analytics
-   * and the consent banner are not rendered at all. GA only loads after the
-   * visitor accepts analytics cookies.
+   * Google Analytics 4 measurement ID, loaded directly with gtag.js. Empty IDs
+   * here and in googleTagManagerId = no consent banner and no Google scripts.
+   * Both only load after the visitor accepts analytics cookies.
    */
-  googleAnalyticsId: '',
+  googleAnalyticsId: 'G-GJVKXV08PC',
+  /**
+   * Google Tag Manager container for additional tags. Never add a GA4 / Google
+   * tag for the measurement ID above inside it: GA4 is already loaded directly.
+   */
+  googleTagManagerId: 'GTM-5BT3SKXR',
 
   /**
    * Google Search Console: paste the `content` of the verification meta tag

@@ -173,7 +173,7 @@ export const zh: Dictionary = {
     sections: [
       { title: "数据负责人", body: "本网站属于来自阿根廷萨尔塔的 Emanuel Guzman。如对你的数据有任何疑问，请发送邮件至 {email}。" },
       { title: "联系表单", body: "当你通过表单联系我时，我会收到你填写的信息：姓名、邮箱、公司、网站、服务、预算和留言。表单由 FormSubmit（formsubmit.co）处理，并通过邮件转发给我。我仅使用这些数据回复你，绝不出售或与第三方共享。" },
-      { title: "数据分析", body: "如果你接受分析类 Cookie，我会加载 Google Analytics 4，以汇总方式统计访问量和网站使用情况：页面浏览、按钮点击、下载和表单提交。如果你拒绝，则不会加载 Google Analytics。你的选择只保存在你的浏览器中，你可以随时通过页脚的“Cookie 偏好设置”进行更改。" },
+      { title: "数据分析", body: "如果你接受分析类 Cookie，我会加载 Google Analytics 4 和 Google Tag Manager，以汇总方式统计访问量和网站使用情况：页面浏览、按钮点击、下载和表单提交。如果你拒绝，两者都不会加载。你的选择只保存在你的浏览器中，你可以随时通过页脚的“Cookie 偏好设置”进行更改。" },
       { title: "你的权利", body: "你可以随时发送邮件至 {email}，要求访问、更正或删除你的数据。本网站不展示广告，也不设置第一方 Cookie。" },
     ],
   },

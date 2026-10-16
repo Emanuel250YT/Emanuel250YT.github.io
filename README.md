@@ -66,14 +66,17 @@ The form posts to [FormSubmit](https://formsubmit.co), which forwards every mess
 3. Optional: replace the email in both URLs of `site.contactForm` with the random alias
    FormSubmit shows after activation (hides the address from scrapers).
 
-### 2 · Google Analytics 4
+### 2 · Google Analytics 4 and Google Tag Manager
 
-1. In [analytics.google.com](https://analytics.google.com) create a property and a
-   **Web** data stream for `https://emanuel250.dev.ar`.
-2. Copy the **Measurement ID** (`G-…`) into `site.googleAnalyticsId` and push. The
-   consent banner appears automatically; GA4 only loads after a visitor accepts.
-3. In GA4 → Admin → Events, mark **`generate_lead`** as a key event (conversion).
-   Other events sent: `cta_click`, `select_service`, `contact_click`, `cv_download`.
+Already configured in `src/config/site.ts`: GA4 `G-GJVKXV08PC` and GTM `GTM-5BT3SKXR`.
+Both load only after a visitor accepts analytics cookies.
+
+1. In GA4 → Admin → Events, mark **`generate_lead`** as a key event (conversion) once
+   it appears. Other events sent: `cta_click`, `select_service`, `contact_click`,
+   `cv_download`.
+2. In GTM, **do not add a Google tag / GA4 tag for `G-GJVKXV08PC`**: GA4 is already
+   loaded directly and would count everything twice. Use GTM for other tags; the events
+   above arrive in the `dataLayer` as `{ event: "<name>", ...params }` to use as triggers.
 
 ### 3 · Google Search Console (and Bing)
 

@@ -181,7 +181,7 @@ export const es: Dictionary = {
     sections: [
       { title: "Quién es responsable", body: "Este sitio pertenece a Emanuel Guzman, de Salta, Argentina. Para cualquier consulta sobre tus datos escribime a {email}." },
       { title: "Formulario de contacto", body: "Cuando me escribís desde el formulario recibo los datos que completás: nombre, email, empresa, sitio web, servicio, presupuesto y mensaje. El envío se procesa con FormSubmit (formsubmit.co), que me reenvía el mensaje por email. Uso esos datos solo para responderte y no los vendo ni los comparto con terceros." },
-      { title: "Analítica", body: "Si aceptás las cookies de analítica, cargo Google Analytics 4 para medir de forma agregada las visitas y cómo se usa el sitio: páginas vistas, clics en botones, descargas y envíos del formulario. Si las rechazás, Google Analytics no se carga. Tu elección se guarda solo en tu navegador y podés cambiarla cuando quieras desde \"Preferencias de cookies\", al pie de la página." },
+      { title: "Analítica", body: "Si aceptás las cookies de analítica, cargo Google Analytics 4 y Google Tag Manager para medir de forma agregada las visitas y cómo se usa el sitio: páginas vistas, clics en botones, descargas y envíos del formulario. Si las rechazás, no se carga ninguno de los dos. Tu elección se guarda solo en tu navegador y podés cambiarla cuando quieras desde \"Preferencias de cookies\", al pie de la página." },
       { title: "Tus derechos", body: "Podés pedirme en cualquier momento acceder a tus datos, corregirlos o eliminarlos escribiendo a {email}. Este sitio no muestra publicidad ni usa cookies propias." },
     ],
   },

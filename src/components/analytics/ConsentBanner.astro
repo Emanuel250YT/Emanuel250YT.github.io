@@ -4,8 +4,9 @@ import { useTranslations } from '@/i18n';
 import { localePath, type Locale } from '@/i18n/locales';
 
 /**
- * Analytics consent banner (GDPR "basic" mode): Google Analytics is not loaded
- * at all until the visitor accepts. Rendered only when a GA4 ID is configured.
+ * Analytics consent banner (GDPR "basic" mode): neither Google Analytics nor
+ * Google Tag Manager loads until the visitor accepts. Rendered only when a GA4
+ * or GTM ID is configured.
  * Accept and decline have the same weight, as consent rules require.
  */
 interface Props {
@@ -15,11 +16,20 @@ interface Props {
 const { locale } = Astro.props;
 const t = useTranslations(locale);
 const measurementId: string = site.googleAnalyticsId;
+const containerId: string = site.googleTagManagerId;
 ---
 
 {
-  measurementId && (
-    <div class="consent" role="region" aria-label={t.footer.cookies} data-consent data-ga-id={measurementId} hidden>
+  (measurementId || containerId) && (
+    <div
+      class="consent"
+      role="region"
+      aria-label={t.footer.cookies}
+      data-consent
+      data-ga-id={measurementId}
+      data-gtm-id={containerId}
+      hidden
+    >
       <p class="consent-text">
         {t.consent.text} <a href={localePath(locale, 'privacy')}>{t.privacy.heading}</a>
       </p>
