@@ -20,7 +20,7 @@ const t = useTranslations(defaultLocale);
 >
   <section class="container not-found" aria-labelledby="nf-title">
     <p class="code" aria-hidden="true">404</p>
-    <h1 id="nf-title" class="display">{t.notFound.heading}</h1>
+    <h1 id="nf-title" class="display" data-type>{t.notFound.heading}</h1>
     <p class="text">{t.notFound.body}</p>
     <div class="actions">
       <a class="btn btn--solid" href={localePath(defaultLocale)}>

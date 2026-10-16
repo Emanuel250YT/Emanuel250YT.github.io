@@ -2,10 +2,10 @@ import type { Dictionary } from '@/i18n/types';
 
 export const pt: Dictionary = {
   meta: {
-    title: 'Emanuel Guzman — Desenvolvedor full stack · Pagamentos e blockchain',
+    title: 'Emanuel Guzman · Desenvolvedor full stack · Pagamentos e blockchain',
     description:
       'Emanuel Guzman, desenvolvedor full stack de Salta, Argentina. Software sob medida, integrações de pagamento e produtos blockchain. Founder da Cosmos Pay.',
-    ogAlt: 'Emanuel Guzman — Desenvolvedor full stack · Pagamentos e blockchain',
+    ogAlt: 'Emanuel Guzman · Desenvolvedor full stack · Pagamentos e blockchain',
     jobTitle: 'Desenvolvedor full stack e product manager',
     disambiguation: 'Desenvolvedor full stack de Salta, Argentina; fundador da Cosmos Pay',
     keywords: [
@@ -55,7 +55,7 @@ export const pt: Dictionary = {
     ctaSecondary: 'Ver serviços',
     stats: [
       { value: '8+', label: 'Anos construindo', detail: 'Software desde 2018, como freelancer e na CloudyCoding' },
-      { value: '{npmDownloads}', label: 'Downloads no npm', detail: 'MacroClickJS, ArkaCDN e ASide, ao vivo do npm' },
+      { value: '{npmDownloads}', label: 'Downloads no npm', detail: 'Todos os projetos em que colaboro, ao vivo do npm' },
       { value: '20+', label: 'Projetos open source', detail: 'SDKs, wallets e protocolos' },
     ],
     photoAlt: 'Emanuel Guzman falando ao microfone, com a camiseta do Stellar Summit 2026',
@@ -152,7 +152,7 @@ export const pt: Dictionary = {
       serviceOther: 'Outro',
       budget: 'Orçamento estimado',
       budgetPlaceholder: 'Escolha uma faixa',
-      budgetOptions: ['Menos de USD 1.000', 'USD 1.000 – 5.000', 'USD 5.000 – 15.000', 'Mais de USD 15.000', 'Ainda não sei'],
+      budgetOptions: ['Menos de USD 1.000', 'USD 1.000 a 5.000', 'USD 5.000 a 15.000', 'Mais de USD 15.000', 'Ainda não sei'],
       message: 'Mensagem',
       messagePlaceholder: 'Conte brevemente o que você precisa, para quando e qualquer link útil.',
       optional: 'opcional',
@@ -184,7 +184,7 @@ export const pt: Dictionary = {
     reject: "Recusar",
   },
   privacy: {
-    title: "Política de privacidade — Emanuel Guzman",
+    title: "Política de privacidade · Emanuel Guzman",
     description: "Quais dados o emanuel250.dev.ar coleta, para que os uso, com quem são compartilhados (FormSubmit, WhatsApp, Google) e como exercer seus direitos.",
     heading: "Política de privacidade",
     updated: "Última atualização",
@@ -199,7 +199,7 @@ export const pt: Dictionary = {
     ],
   },
   notFound: {
-    title: 'Página não encontrada — Emanuel Guzman',
+    title: 'Página não encontrada · Emanuel Guzman',
     description: 'A página que você procura não existe ou foi movida.',
     heading: 'Esta página não existe.',
     body: 'O link pode estar quebrado ou a página pode ter sido movida. Volte ao início para ver meus projetos.',

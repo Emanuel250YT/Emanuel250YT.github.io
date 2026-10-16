@@ -37,7 +37,7 @@ export const projects: Project[] = [
       fr: 'Une infrastructure de paiement pour les développeurs : payment intents, webhooks, stablecoins et rampes fiat, avec un règlement en quelques secondes pour une fraction de centime.',
       de: 'Zahlungsinfrastruktur für Entwickler: Payment Intents, Webhooks, Stablecoins und Fiat-Rampen, mit Abwicklung in Sekunden für Bruchteile eines Cents.',
       zh: '面向开发者的支付基础设施：支付意图、Webhook、稳定币和法币出入金通道，数秒内完成结算，手续费不到一美分。',
-      hi: 'डेवलपर्स के लिए पेमेंट इंफ्रास्ट्रक्चर: पेमेंट इंटेंट्स, वेबहुक्स, स्टेबलकॉइन्स और फ़िएट रैंप्स — सेकंडों में सेटलमेंट और एक सेंट से भी कम फ़ीस।',
+      hi: 'डेवलपर्स के लिए पेमेंट इंफ्रास्ट्रक्चर: पेमेंट इंटेंट्स, वेबहुक्स, स्टेबलकॉइन्स और फ़िएट रैंप्स, सेकंडों में सेटलमेंट और एक सेंट से भी कम फ़ीस।',
     },
     tags: {
       es: ['Founder', 'Producto', 'Stellar · Solana · Monad'],
@@ -71,9 +71,9 @@ export const projects: Project[] = [
       en: 'A Stellar wallet shipped as a browser extension, Android app, web and desktop: send, swap and track activity, with your 12 words as the only key.',
       pt: 'Wallet Stellar como extensão de navegador, app Android, web e desktop: enviar, fazer swaps e acompanhar sua atividade, com suas 12 palavras como única chave.',
       fr: 'Un wallet Stellar en extension de navigateur, app Android, web et desktop : envoyer, échanger et suivre son activité, avec ses 12 mots comme seule clé.',
-      de: 'Eine Stellar-Wallet als Browser-Erweiterung, Android-App, Web- und Desktop-App: senden, tauschen und Aktivitäten verfolgen – mit deinen 12 Wörtern als einzigem Schlüssel.',
+      de: 'Eine Stellar-Wallet als Browser-Erweiterung, Android-App, Web- und Desktop-App: senden, tauschen und Aktivitäten verfolgen, mit deinen 12 Wörtern als einzigem Schlüssel.',
       zh: 'Stellar 钱包，提供浏览器扩展、Android 应用、网页版和桌面版：转账、兑换、查看动态，你的 12 个助记词就是唯一的钥匙。',
-      hi: 'ब्राउज़र एक्सटेंशन, Android ऐप, वेब और डेस्कटॉप के रूप में Stellar वॉलेट: भेजें, स्वैप करें और अपनी गतिविधि देखें — आपके 12 शब्द ही एकमात्र चाबी हैं।',
+      hi: 'ब्राउज़र एक्सटेंशन, Android ऐप, वेब और डेस्कटॉप के रूप में Stellar वॉलेट: भेजें, स्वैप करें और अपनी गतिविधि देखें। आपके 12 शब्द ही एकमात्र चाबी हैं।',
     },
     tags: {
       es: ['Extensión', 'Android', 'Desktop'],
@@ -108,8 +108,8 @@ export const projects: Project[] = [
       pt: 'Evolução do MacroClickJS, a biblioteca para integrar o gateway do Banco Macro que somou 2.586 downloads na primeira semana. Um cliente unificado para integrações bancárias.',
       fr: 'L’évolution de MacroClickJS, la bibliothèque d’intégration de la passerelle de Banco Macro qui a atteint 2 586 téléchargements dès sa première semaine. Un client unique pour les intégrations bancaires.',
       de: 'Die Weiterentwicklung von MacroClickJS, der Bibliothek für das Gateway der Banco Macro, die in der ersten Woche 2.586 Downloads erreichte. Ein Client für Bankintegrationen.',
-      zh: 'MacroClickJS 的演进版本——这个用于对接 Banco Macro 支付网关的库首周下载量达到 2,586 次。一个统一的银行集成客户端。',
-      hi: 'MacroClickJS का अगला रूप — Banco Macro के पेमेंट गेटवे से जुड़ने वाली लाइब्रेरी, जिसके पहले हफ़्ते में 2,586 डाउनलोड हुए। बैंकिंग इंटीग्रेशन के लिए एक यूनिफ़ाइड क्लाइंट।',
+      zh: 'MacroClickJS 的演进版本：这个用于对接 Banco Macro 支付网关的库首周下载量达到 2,586 次。一个统一的银行集成客户端。',
+      hi: 'MacroClickJS का अगला रूप: Banco Macro के पेमेंट गेटवे से जुड़ने वाली लाइब्रेरी, जिसके पहले हफ़्ते में 2,586 डाउनलोड हुए। बैंकिंग इंटीग्रेशन के लिए एक यूनिफ़ाइड क्लाइंट।',
     },
     tags: {
       es: ['Open source', 'npm', 'TypeScript'],
@@ -141,9 +141,9 @@ export const projects: Project[] = [
       en: 'Files encrypted in the browser, sharded with Reed-Solomon and kept by nodes paid for every copy, checked with on-chain storage proofs.',
       pt: 'Arquivos criptografados no navegador, fragmentados com Reed-Solomon e guardados por nós que recebem por cada cópia, verificada com provas de armazenamento on-chain.',
       fr: 'Des fichiers chiffrés dans le navigateur, fragmentés avec Reed-Solomon et conservés par des nœuds rémunérés pour chaque copie, vérifiée par des preuves de stockage on-chain.',
-      de: 'Dateien werden im Browser verschlüsselt, mit Reed-Solomon fragmentiert und von Nodes gespeichert, die für jede Kopie bezahlt werden – geprüft mit On-Chain-Speichernachweisen.',
+      de: 'Dateien werden im Browser verschlüsselt, mit Reed-Solomon fragmentiert und von Nodes gespeichert, die für jede Kopie bezahlt werden, geprüft mit On-Chain-Speichernachweisen.',
       zh: '文件在浏览器中加密，经 Reed-Solomon 分片后由节点保存；每份副本都通过链上存储证明验证，节点按副本获得报酬。',
-      hi: 'फ़ाइलें ब्राउज़र में एन्क्रिप्ट होती हैं, Reed-Solomon से टुकड़ों में बँटती हैं और ऐसे नोड्स पर रखी जाती हैं जिन्हें हर कॉपी का भुगतान मिलता है — ऑन-चेन स्टोरेज प्रूफ़ से सत्यापित।',
+      hi: 'फ़ाइलें ब्राउज़र में एन्क्रिप्ट होती हैं, Reed-Solomon से टुकड़ों में बँटती हैं और ऐसे नोड्स पर रखी जाती हैं जिन्हें हर कॉपी का भुगतान मिलता है, ऑन-चेन स्टोरेज प्रूफ़ से सत्यापित।',
     },
     tags: {
       es: ['Protocolo', 'Solana', 'Monad'],

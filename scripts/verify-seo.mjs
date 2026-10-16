@@ -93,6 +93,9 @@ for (const file of files) {
   const lang = html.match(/<html[^>]*\slang="([^"]+)"/)?.[1];
   if (!lang) fail(rel, '<html> has no lang');
   if (!/<meta name="viewport"/.test(html)) fail(rel, 'missing meta viewport');
+  // House style: no em/en dashes in copy, titles or structured data (they read as machine-written).
+  const dash = html.match(/.{0,40}[—–].{0,40}/)?.[0];
+  if (dash) fail(rel, `contains an em/en dash: "${dash}"`);
 
   // Title + description
   const title = html.match(/<title>([^<]*)<\/title>/)?.[1]?.trim();
@@ -193,6 +196,10 @@ for (const [locale, { prefix }] of Object.entries(LOCALES)) {
     if (!existsSync(path.join(dist, prefix, route, 'index.html'))) fail('dist', `missing /${prefix}${route}`);
   }
   if (!existsSync(path.join(dist, `og/og-${locale}.png`))) fail('dist', `missing og/og-${locale}.png (npm run assets)`);
+}
+for (const text of ['llms.txt', 'site.webmanifest']) {
+  const file = path.join(dist, text);
+  if (existsSync(file) && /[—–]/.test(await readFile(file, 'utf8'))) fail(text, 'contains an em/en dash');
 }
 if (existsSync(path.join(dist, 'CNAME'))) {
   const cname = (await readFile(path.join(dist, 'CNAME'), 'utf8')).trim();

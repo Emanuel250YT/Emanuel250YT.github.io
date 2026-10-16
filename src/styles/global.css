@@ -348,7 +348,7 @@ button {
   background-size: 100% 1px;
 }
 
-/* Section header: "01 — Services" eyebrow, two-tone title, optional intro */
+/* Section header: "01 Services" eyebrow, two-tone title, optional intro */
 .eyebrow {
   display: flex;
   align-items: center;
@@ -364,13 +364,6 @@ button {
 .eyebrow-index {
   font-weight: 600;
   color: var(--ink);
-}
-
-.eyebrow-line {
-  width: 32px;
-  height: 1px;
-  background: currentColor;
-  transform-origin: left;
 }
 
 /* ---------------------------------------------------------------------------
@@ -392,6 +385,51 @@ html.js [data-reveal].is-revealed {
 
 @keyframes reveal-fade {
   from {
+    opacity: 0;
+  }
+}
+
+/* Typewriter reveal (src/scripts/typing.ts). Until the script takes over, typed copy
+   is almost transparent (0.01 still counts as painted for LCP); if the script never
+   runs it shows up after 3 s. The untyped part is a highlight painted transparent,
+   so the text itself never changes. */
+html.js [data-type]:not([data-type-ready]) {
+  opacity: 0.01;
+  animation: type-failsafe 0.2s linear 3s forwards;
+}
+
+@keyframes type-failsafe {
+  to {
+    opacity: 1;
+  }
+}
+
+::highlight(type-pending) {
+  color: transparent;
+  text-decoration-color: transparent;
+  text-shadow: none;
+}
+
+.type-caret {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 40;
+  width: 2px;
+  background: currentColor;
+  pointer-events: none;
+}
+
+/* Typing changes text in place, so it also runs with reduced motion; only the
+   caret's farewell blink is skipped. */
+@media (prefers-reduced-motion: no-preference) {
+  .type-caret.is-done {
+    animation: caret-blink 0.5s step-end 2;
+  }
+}
+
+@keyframes caret-blink {
+  50% {
     opacity: 0;
   }
 }
@@ -429,16 +467,6 @@ html.js [data-reveal].is-revealed {
       opacity: 0;
       transform: scale(0.96);
     }
-  }
-
-  .js .eyebrow-line {
-    transform: scaleX(0);
-    transition: transform 0.9s var(--ease) 0.2s;
-  }
-
-  .js .is-revealed .eyebrow-line,
-  .js .eyebrow.is-revealed .eyebrow-line {
-    transform: scaleX(1);
   }
 
   ::view-transition-old(root) {
@@ -676,7 +704,8 @@ html.js [data-reveal].is-revealed {
   }
 
   /* Printed pages never wait for scroll reveals or show fixed overlays. */
-  html.js [data-reveal] {
+  html.js [data-reveal],
+  html.js [data-type] {
     opacity: 1 !important;
     animation: none !important;
   }
@@ -684,7 +713,8 @@ html.js [data-reveal].is-revealed {
   .consent,
   .floating,
   .cursor,
-  .cursor-pulse {
+  .cursor-pulse,
+  .type-caret {
     display: none !important;
   }
 }

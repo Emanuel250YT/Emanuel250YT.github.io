@@ -2,10 +2,10 @@ import type { Dictionary } from '@/i18n/types';
 
 export const de: Dictionary = {
   meta: {
-    title: 'Emanuel Guzman — Full-Stack-Entwickler · Zahlungen & Blockchain',
+    title: 'Emanuel Guzman · Full-Stack-Entwickler · Zahlungen & Blockchain',
     description:
       'Emanuel Guzman, Full-Stack-Entwickler aus Salta, Argentinien. Individuelle Software, Zahlungsintegrationen und Blockchain-Produkte. Gründer von Cosmos Pay.',
-    ogAlt: 'Emanuel Guzman — Full-Stack-Entwickler · Zahlungen & Blockchain',
+    ogAlt: 'Emanuel Guzman · Full-Stack-Entwickler · Zahlungen & Blockchain',
     jobTitle: 'Full-Stack-Entwickler und Product Manager',
     disambiguation: 'Full-Stack-Entwickler aus Salta, Argentinien; Gründer von Cosmos Pay',
     keywords: [
@@ -50,12 +50,12 @@ export const de: Dictionary = {
       { text: 'zu', muted: true },
       { text: ' echten Produkten.' },
     ],
-    lead: 'Ich bin Emanuel Guzman. Von Salta in Argentinien aus konzipiere und entwickle ich remote individuelle Software, Zahlungsintegrationen und Blockchain-Produkte für Unternehmen und Startups weltweit – von der Analyse bis zur Produktion, direkt mit dir.',
+    lead: 'Ich bin Emanuel Guzman. Von Salta in Argentinien aus konzipiere und entwickle ich remote individuelle Software, Zahlungsintegrationen und Blockchain-Produkte für Unternehmen und Startups weltweit, von der Analyse bis zur Produktion, direkt mit dir.',
     ctaPrimary: 'Erzähl mir von deinem Projekt',
     ctaSecondary: 'Leistungen ansehen',
     stats: [
       { value: '8+', label: 'Jahre Erfahrung', detail: 'Software seit 2018, freiberuflich und bei CloudyCoding' },
-      { value: '{npmDownloads}', label: 'npm-Downloads', detail: 'MacroClickJS, ArkaCDN und ASide, live von npm' },
+      { value: '{npmDownloads}', label: 'npm-Downloads', detail: 'Alle Projekte, an denen ich mitarbeite, live von npm' },
       { value: '20+', label: 'Open-Source-Projekte', detail: 'SDKs, Wallets und Protokolle' },
     ],
     photoAlt: 'Emanuel Guzman spricht ins Mikrofon, im T-Shirt des Stellar Summit 2026',
@@ -70,13 +70,13 @@ export const de: Dictionary = {
   process: {
     eyebrow: 'Ablauf',
     title: [{ text: 'Von der Analyse', muted: true }, { text: ' bis zur Produktion.' }],
-    intro: 'Du arbeitest direkt mit mir – mit klarem Umfang und Fortschritten, die du jede Woche testen kannst.',
+    intro: 'Du arbeitest direkt mit mir, mit klarem Umfang und Fortschritten, die du jede Woche testen kannst.',
     steps: [
       {
         title: 'Analyse',
         body: 'Ein 30-minütiger Call, um das Problem, deine Nutzer und die Erfolgskriterien des Projekts zu verstehen.',
       },
-      { title: 'Angebot', body: 'Umfang, Zeitplan und Budget schriftlich – bevor die erste Zeile Code entsteht.' },
+      { title: 'Angebot', body: 'Umfang, Zeitplan und Budget schriftlich, bevor die erste Zeile Code entsteht.' },
       { title: 'Umsetzung', body: 'Wöchentliche Lieferungen mit echten Fortschritten, die du testen und kommentieren kannst.' },
       { title: 'Launch', body: 'Deployment in Produktion, Dokumentation und Begleitung nach dem Launch.' },
     ],
@@ -87,7 +87,7 @@ export const de: Dictionary = {
     title: [{ text: 'Klar gedacht,' }, { br: true }, { text: 'sorgfältig gebaut.' }],
     body: [
       'Ich bin Full-Stack-Entwickler und Gründer von Cosmos, einem Ökosystem, das Zahlungen, Handel und Blockchain in Lateinamerika verbindet. Mein Fokus liegt heute auf Cosmos Pay: einem interoperablen Zahlungs-Gateway in lokalen Währungen mit nativem USDC.',
-      'Gute Technologie funktioniert nicht nur – man versteht sie, kann sie leicht integrieren, und sie löst ein echtes Problem.',
+      'Gute Technologie funktioniert nicht nur: Man versteht sie, kann sie leicht integrieren, und sie löst ein echtes Problem.',
     ],
     rolesLabel: 'Aktuell',
     skillsLabel: 'Kern-Stack',
@@ -152,7 +152,7 @@ export const de: Dictionary = {
       serviceOther: 'Sonstiges',
       budget: 'Geschätztes Budget',
       budgetPlaceholder: 'Bereich wählen',
-      budgetOptions: ['Unter 1.000 USD', '1.000 – 5.000 USD', '5.000 – 15.000 USD', 'Über 15.000 USD', 'Weiß ich noch nicht'],
+      budgetOptions: ['Unter 1.000 USD', '1.000 bis 5.000 USD', '5.000 bis 15.000 USD', 'Über 15.000 USD', 'Weiß ich noch nicht'],
       message: 'Nachricht',
       messagePlaceholder: 'Beschreib kurz, was du brauchst, bis wann und nützliche Links.',
       optional: 'optional',
@@ -167,7 +167,7 @@ export const de: Dictionary = {
       errorEmail: 'Bitte gib eine gültige E-Mail-Adresse ein.',
       whatsappIntro: 'Hallo Emanuel, ich schreibe dir über dein Portfolio.',
       whatsappService: 'Leistung',
-      whatsappOpened: 'Deine Nachricht ist in WhatsApp bereit – du musst sie nur noch senden. Nicht geöffnet?',
+      whatsappOpened: 'Deine Nachricht ist in WhatsApp bereit. Du musst sie nur noch senden. Nicht geöffnet?',
       whatsappRetry: 'WhatsApp öffnen',
     },
   },
@@ -184,7 +184,7 @@ export const de: Dictionary = {
     reject: "Ablehnen",
   },
   privacy: {
-    title: "Datenschutzerklärung — Emanuel Guzman",
+    title: "Datenschutzerklärung · Emanuel Guzman",
     description: "Welche Daten emanuel250.dev.ar erhebt, wofür ich sie nutze, an wen sie gehen (FormSubmit, WhatsApp, Google) und wie du deine Rechte ausübst.",
     heading: "Datenschutzerklärung",
     updated: "Zuletzt aktualisiert",
@@ -199,7 +199,7 @@ export const de: Dictionary = {
     ],
   },
   notFound: {
-    title: 'Seite nicht gefunden — Emanuel Guzman',
+    title: 'Seite nicht gefunden · Emanuel Guzman',
     description: 'Die gesuchte Seite existiert nicht oder wurde verschoben.',
     heading: 'Diese Seite existiert nicht.',
     body: 'Der Link ist möglicherweise defekt oder die Seite wurde verschoben. Zurück zur Startseite, um meine Projekte zu sehen.',

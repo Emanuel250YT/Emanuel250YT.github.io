@@ -6,7 +6,7 @@ import Icon from '@/components/ui/Icon.astro';
 import RichHeading from '@/components/ui/RichHeading.astro';
 import { useTranslations } from '@/i18n';
 import { localeMeta, type Locale } from '@/i18n/locales';
-import { NPM_DOWNLOADS_TOKEN, buildTotalDownloads } from '@/lib/npm';
+import { NPM_DOWNLOADS_TOKEN, buildDownloads } from '@/lib/npm';
 
 interface Props {
   locale: Locale;
@@ -15,9 +15,10 @@ interface Props {
 const { locale } = Astro.props;
 const t = useTranslations(locale);
 
-// Real npm downloads at build time; the script below refreshes them live. An offline
-// build shows a dash (scripts/verify-seo.mjs fails if a page ships without the number).
-const npmTotal = await buildTotalDownloads().catch((error: unknown) => {
+// Real npm downloads at build time; the script below refreshes them live for the same
+// packages. An offline build shows an ellipsis (scripts/verify-seo.mjs fails if a page
+// ships without the number).
+const npm = await buildDownloads().catch((error: unknown) => {
   console.warn(`[npm] ${error instanceof Error ? error.message : String(error)}`);
   return undefined;
 });
@@ -28,27 +29,20 @@ const formatCount = new Intl.NumberFormat(localeMeta[locale].htmlLang);
   <div class="container hero-grid">
     <div class="hero-copy">
       <p class="badge enter" style="--enter-index: 0">
-        <span class="badge-mark" aria-hidden="true">e.</span>
         <span class="badge-pill">
           <strong>{site.name}</strong>
           <span class="badge-sep" aria-hidden="true">/</span>
           <span class="visually-hidden">{t.a11y.rolesLabel}: {t.hero.roles.join(', ')}</span>
-          <!-- Rotating role: every role sits in the same grid cell, so the pill keeps the width of the longest one. -->
-          <span class="roles" aria-hidden="true" data-roles>
-            {
-              t.hero.roles.map((role, index) => (
-                <span class:list={['role', { 'is-active': index === 0 }]} data-role>
-                  {role}
-                </span>
-              ))
-            }
+          <!-- Rotating role, typed and erased by the script below. Every role also sits invisible
+               in the same grid cell, so the pill keeps the width of the longest one. -->
+          <span class="roles" aria-hidden="true">
+            {t.hero.roles.map((role) => <span class="role-size" data-role>{role}</span>)}
+            <span class="role-typed" data-role-typed>{t.hero.roles[0]}</span>
           </span>
         </span>
       </p>
 
-      <div class="enter" style="--enter-index: 1">
-        <RichHeading as="h1" id="hero-title" class="hero-title" parts={t.hero.title} />
-      </div>
+      <RichHeading as="h1" id="hero-title" class="hero-title" parts={t.hero.title} typeDelay={150} />
 
       <p class="lead enter" style="--enter-index: 2">{t.hero.lead}</p>
 
@@ -68,8 +62,14 @@ const formatCount = new Intl.NumberFormat(localeMeta[locale].htmlLang);
             <div class="stat">
               <dt>
                 {stat.value === NPM_DOWNLOADS_TOKEN ? (
-                  <span class="stat-value" data-count data-count-value={npmTotal} data-npm-total>
-                    {npmTotal === undefined ? '—' : formatCount.format(npmTotal)}
+                  <span
+                    class="stat-value"
+                    data-count
+                    data-count-value={npm?.total}
+                    data-npm-total
+                    data-npm-packages={npm && JSON.stringify(npm.packages)}
+                  >
+                    {npm ? formatCount.format(npm.total) : '…'}
                   </span>
                 ) : (
                   <span class="stat-value" data-count>
@@ -100,54 +100,91 @@ const formatCount = new Intl.NumberFormat(localeMeta[locale].htmlLang);
 </section>
 
 <script>
+  import type { NpmPackage } from '@/data/npm';
+  import { graphemes } from '@/lib/graphemes';
   import { totalDownloads } from '@/lib/npm';
 
   /**
-   * Rotates the roles in the hero badge. Pauses on hover/focus and while the hero
-   * is off-screen and stops after a few cycles (WCAG 2.2.2). With
-   * prefers-reduced-motion the roles cross-fade instead of sliding (CSS).
-   * Screen readers get the full list once, statically.
+   * Types the roles of the hero badge one after another: type, hold, erase, next.
+   * Pauses on hover, while the hero is off-screen or the tab is hidden, and stops on
+   * the first role after three cycles (WCAG 2.2.2). Only text changes and nothing
+   * moves, so it runs the same with prefers-reduced-motion (the caret just stops
+   * blinking). Screen readers get the full list once, statically.
    */
-  const container = document.querySelector<HTMLElement>('[data-roles]');
-  const roles = container ? [...container.querySelectorAll<HTMLElement>('[data-role]')] : [];
-  if (container && roles.length > 1) {
-    const INTERVAL = 2600;
-    const MAX_STEPS = roles.length * 3;
+  const typed = document.querySelector<HTMLElement>('[data-role-typed]');
+  const roles = [...document.querySelectorAll<HTMLElement>('[data-role]')].map((role) => graphemes(role.textContent ?? ''));
+  if (typed && roles.length > 1) {
+    const TYPE_MS = 65;
+    const ERASE_MS = 32;
+    const HOLD_MS = 2200;
+    const GAP_MS = 320;
+    const CYCLES = 3;
     let index = 0;
-    let steps = 0;
+    let shown = roles[0]!.length;
+    let cycles = 0;
+    let phase: 'hold' | 'erase' | 'type' = 'hold';
     let paused = false;
     let visible = true;
 
-    const show = (next: number) => {
-      const current = roles[index]!;
-      current.classList.remove('is-active');
-      current.classList.add('is-leaving');
-      window.setTimeout(() => current.classList.remove('is-leaving'), 600);
-      index = next;
-      roles[index]!.classList.add('is-active');
+    const render = () => {
+      typed.textContent = roles[index]!.slice(0, shown)
+        .map((character) => character.segment)
+        .join('');
     };
 
-    const timer = window.setInterval(() => {
-      if (paused || !visible) return;
-      steps += 1;
-      show((index + 1) % roles.length);
-      if (steps >= MAX_STEPS && index === 0) window.clearInterval(timer);
-    }, INTERVAL);
+    const step = (): void => {
+      if (paused || !visible || document.hidden) {
+        window.setTimeout(step, 250);
+        return;
+      }
+      if (phase === 'hold') {
+        typed.classList.remove('is-holding');
+        phase = 'erase';
+      }
+      if (phase === 'erase') {
+        shown -= 1;
+        render();
+        if (shown > 0) {
+          window.setTimeout(step, ERASE_MS);
+          return;
+        }
+        index = (index + 1) % roles.length;
+        if (index === 0) cycles += 1;
+        phase = 'type';
+        window.setTimeout(step, GAP_MS);
+        return;
+      }
+      shown += 1;
+      render();
+      if (shown < roles[index]!.length) {
+        window.setTimeout(step, TYPE_MS);
+        return;
+      }
+      phase = 'hold';
+      typed.classList.add('is-holding');
+      if (cycles >= CYCLES && index === 0) typed.classList.add('is-done');
+      else window.setTimeout(step, HOLD_MS);
+    };
 
-    const badge = container.closest('.badge');
+    typed.classList.add('is-holding');
+    window.setTimeout(step, HOLD_MS);
+
+    const badge = typed.closest('.badge');
     badge?.addEventListener('mouseenter', () => (paused = true));
     badge?.addEventListener('mouseleave', () => (paused = false));
-    new IntersectionObserver(([entry]) => (visible = entry?.isIntersecting ?? true)).observe(container);
+    new IntersectionObserver(([entry]) => (visible = entry?.isIntersecting ?? true)).observe(typed);
   }
 
   /**
    * Refreshes the npm downloads stat with today's real count once the page is idle,
-   * so it never competes with the first paint. On failure the build-time number stays.
+   * so it never competes with the first paint. It counts the same packages as the
+   * build, npm organisations included. On failure the build-time number stays.
    */
   const npmTotal = document.querySelector<HTMLElement>('[data-npm-total]');
-  if (npmTotal) {
+  const npmPackages = npmTotal?.dataset.npmPackages;
+  if (npmTotal && npmPackages) {
     const refresh = () =>
-      totalDownloads()
+      totalDownloads(JSON.parse(npmPackages) as NpmPackage[])
         .then((total) => {
           npmTotal.dataset.countValue = String(total);
           // A running count-up (src/scripts/motion.ts) picks the new value up on its next frame.
@@ -239,28 +276,8 @@ const formatCount = new Intl.NumberFormat(localeMeta[locale].htmlLang);
 
   /* Badge, like the Figma label in the design */
   .badge {
-    position: relative;
     display: inline-flex;
-    align-items: flex-start;
     margin-bottom: 18px;
-    padding: 10px 0 0 6px;
-  }
-
-  .badge-mark {
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 1;
-    display: grid;
-    place-items: center;
-    width: 22px;
-    height: 22px;
-    background: var(--ink);
-    color: #fff;
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: -0.04em;
-    transform: rotate(-8deg);
   }
 
   .badge-pill {
@@ -290,45 +307,46 @@ const formatCount = new Intl.NumberFormat(localeMeta[locale].htmlLang);
     letter-spacing: 0.06em;
   }
 
+  /* Without JS the typed role simply shows the first one. The invisible copies of
+     every role keep the pill as wide as the longest; the padding leaves room for the caret. */
   .roles {
     display: grid;
-    overflow: hidden;
+    padding-right: 6px;
   }
 
-  .role {
+  .role-size,
+  .role-typed {
     grid-area: 1 / 1;
     white-space: nowrap;
   }
 
-  /* Without JS only the first role shows. */
-  .roles .role:not(.is-active) {
+  .role-size {
     visibility: hidden;
   }
 
-  :global(.js) .roles .role {
-    visibility: visible;
-    opacity: 0;
-    transform: translateY(110%);
-    transition:
-      opacity 0.45s var(--ease),
-      transform 0.6s var(--ease);
+  .role-typed {
+    position: relative;
+    justify-self: start;
+    min-height: 1lh;
   }
 
-  :global(.js) .roles .role.is-active {
-    opacity: 1;
-    transform: none;
+  :global(.js) .role-typed::after {
+    content: '';
+    position: absolute;
+    top: 0.1em;
+    bottom: 0.1em;
+    left: calc(100% + 2px);
+    width: 2px;
+    background: var(--ink);
   }
 
-  :global(.js) .roles .role.is-leaving {
-    opacity: 0;
-    transform: translateY(-110%);
+  :global(.js) .role-typed.is-done::after {
+    content: none;
   }
 
-  /* Reduced motion: the roles cross-fade in place instead of sliding. */
-  @media (prefers-reduced-motion: reduce) {
-    :global(.js) .roles .role,
-    :global(.js) .roles .role.is-leaving {
-      transform: none;
+  @media (prefers-reduced-motion: no-preference) {
+    :global(.js) .role-typed.is-holding::after {
+      animation: caret-blink 1s step-end infinite;
     }
   }
 

@@ -6,12 +6,14 @@ interface Props {
   parts: RichText;
   class?: string;
   id?: string;
+  /** Extra wait before the heading types itself in (src/scripts/typing.ts), in ms. */
+  typeDelay?: number;
 }
 
-const { as: Tag = 'h2', parts, class: className, id } = Astro.props;
+const { as: Tag = 'h2', parts, class: className, id, typeDelay } = Astro.props;
 ---
 
-<Tag class:list={['display', className]} id={id}>
+<Tag class:list={['display', className]} id={id} data-type data-type-delay={typeDelay}>
   {
     parts.map((part) =>
       'br' in part ? (

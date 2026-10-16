@@ -2,10 +2,10 @@ import type { Dictionary } from '@/i18n/types';
 
 export const en: Dictionary = {
   meta: {
-    title: 'Emanuel Guzman — Full Stack Developer · Payments & Blockchain',
+    title: 'Emanuel Guzman · Full Stack Developer · Payments & Blockchain',
     description:
       'Emanuel Guzman, full stack developer from Salta, Argentina. Custom software, payment integrations and blockchain products. Founder of Cosmos Pay.',
-    ogAlt: 'Emanuel Guzman — Full Stack Developer · Payments & Blockchain',
+    ogAlt: 'Emanuel Guzman · Full Stack Developer · Payments & Blockchain',
     jobTitle: 'Full Stack Developer & Product Manager',
     disambiguation: 'Full stack developer from Salta, Argentina; founder of Cosmos Pay',
     keywords: [
@@ -50,12 +50,12 @@ export const en: Dictionary = {
       { text: 'into', muted: true },
       { text: ' real products.' },
     ],
-    lead: "I'm Emanuel Guzman. From Salta, Argentina, I design and build custom software, payment integrations and blockchain products for companies and startups anywhere, remotely — from diagnosis to production, working directly with you.",
+    lead: "I'm Emanuel Guzman. From Salta, Argentina, I design and build custom software, payment integrations and blockchain products for companies and startups anywhere, remotely: from diagnosis to production, working directly with you.",
     ctaPrimary: 'Tell me about your project',
     ctaSecondary: 'See services',
     stats: [
       { value: '8+', label: 'Years building', detail: 'Shipping software since 2018, freelance and at CloudyCoding' },
-      { value: '{npmDownloads}', label: 'npm downloads', detail: 'MacroClickJS, ArkaCDN and ASide, live from npm' },
+      { value: '{npmDownloads}', label: 'npm downloads', detail: 'Every project I collaborate on, live from npm' },
       { value: '20+', label: 'Open source projects', detail: 'SDKs, wallets and protocols' },
     ],
     photoAlt: 'Emanuel Guzman speaking into a microphone, wearing a Stellar Summit 2026 T-shirt',
@@ -87,7 +87,7 @@ export const en: Dictionary = {
     title: [{ text: 'Building with' }, { br: true }, { text: 'clarity and intention.' }],
     body: [
       "I'm a full stack developer and the founder of Cosmos, an ecosystem connecting payments, commerce and blockchain across Latin America. Today I'm focused on Cosmos Pay: an interoperable payment gateway that works in local currencies with native USDC.",
-      "I believe good technology isn't just the kind that works — it's the kind people understand, can integrate easily, and that solves a real problem.",
+      "I believe good technology isn't just the kind that works: it's the kind people understand, can integrate easily, and that solves a real problem.",
     ],
     rolesLabel: 'Now',
     skillsLabel: 'Core stack',
@@ -152,7 +152,7 @@ export const en: Dictionary = {
       serviceOther: 'Other',
       budget: 'Estimated budget',
       budgetPlaceholder: 'Choose a range',
-      budgetOptions: ['Under USD 1,000', 'USD 1,000 – 5,000', 'USD 5,000 – 15,000', 'Over USD 15,000', "I don't know yet"],
+      budgetOptions: ['Under USD 1,000', 'USD 1,000 to 5,000', 'USD 5,000 to 15,000', 'Over USD 15,000', "I don't know yet"],
       message: 'Message',
       messagePlaceholder: 'Briefly tell me what you need, by when, and any useful links.',
       optional: 'optional',
@@ -184,7 +184,7 @@ export const en: Dictionary = {
     reject: "Decline",
   },
   privacy: {
-    title: "Privacy policy — Emanuel Guzman",
+    title: "Privacy policy · Emanuel Guzman",
     description: "What data emanuel250.dev.ar collects, why I use it, who it is shared with (FormSubmit, WhatsApp, Google) and how to exercise your rights.",
     heading: "Privacy policy",
     updated: "Last updated",
@@ -199,7 +199,7 @@ export const en: Dictionary = {
     ],
   },
   notFound: {
-    title: 'Page not found — Emanuel Guzman',
+    title: 'Page not found · Emanuel Guzman',
     description: "The page you're looking for doesn't exist or has moved.",
     heading: "This page doesn't exist.",
     body: 'The link may be broken or the page may have moved. Head back home to see my projects.',

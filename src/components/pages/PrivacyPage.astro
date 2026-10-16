@@ -51,7 +51,7 @@ const parts = (body: string) => body.split('{email}');
       <Icon name="arrow-left" size={18} />
       {t.privacy.back}
     </a>
-    <h1 id="privacy-title" class="display" data-reveal>{t.privacy.heading}</h1>
+    <h1 id="privacy-title" class="display" data-reveal data-type>{t.privacy.heading}</h1>
     <p class="updated" data-reveal>
       {t.privacy.updated}: <time datetime={UPDATED}>{updated}</time>
     </p>
@@ -59,7 +59,7 @@ const parts = (body: string) => body.split('{email}');
     {
       t.privacy.sections.map((section) => (
         <section class="block" data-reveal>
-          <h2>{section.title}</h2>
+          <h2 data-type>{section.title}</h2>
           <p>
             {parts(section.body).map((chunk, index) => (
               <>

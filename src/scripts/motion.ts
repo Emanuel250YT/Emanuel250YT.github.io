@@ -4,10 +4,9 @@
  * - `[data-reveal]` elements start hidden via CSS (only under `html.js`) and get
  *   `.is-revealed` once visible: they slide in, or only fade with reduced motion.
  * - Children of `[data-reveal-stagger]` receive an increasing `--reveal-index`.
- * - `[data-count]` elements animate the number inside their text when revealed.
+ * - `[data-count]` elements count their number up when revealed. Digits change in
+ *   place and nothing moves, so this also runs with reduced motion.
  */
-
-const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
 function staggerChildren(): void {
   for (const group of document.querySelectorAll<HTMLElement>('[data-reveal-stagger]')) {
@@ -24,7 +23,7 @@ function staggerChildren(): void {
  */
 function countUpValue(element: HTMLElement): void {
   const format = new Intl.NumberFormat(document.documentElement.lang);
-  const duration = 1400;
+  const duration = 1800;
   const start = performance.now();
   element.dataset.counting = '';
   const step = (now: number) => {
@@ -48,7 +47,7 @@ function countUp(element: HTMLElement): void {
   if (!match) return;
   const [, prefix, numberText, suffix] = match;
   const target = Number(numberText!.replace(',', '.'));
-  const duration = 1400;
+  const duration = 1800;
   const start = performance.now();
   const step = (now: number) => {
     const progress = Math.min((now - start) / duration, 1);
@@ -62,11 +61,8 @@ function countUp(element: HTMLElement): void {
 
 function reveal(element: HTMLElement): void {
   element.classList.add('is-revealed');
-  // Counting numbers is movement for the eye: skipped with reduced motion.
-  if (!reducedMotion.matches) {
-    element.querySelectorAll<HTMLElement>('[data-count]').forEach(countUp);
-    if (element.hasAttribute('data-count')) countUp(element);
-  }
+  element.querySelectorAll<HTMLElement>('[data-count]').forEach(countUp);
+  if (element.hasAttribute('data-count')) countUp(element);
 }
 
 function init(): void {

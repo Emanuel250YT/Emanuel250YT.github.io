@@ -30,11 +30,12 @@ src/
   config/site.ts          identity, WhatsApp, contact form endpoint, GA4/GTM IDs, search-engine verification
   i18n/                   locales.ts (languages, URLs, flags), types.ts (Dictionary), one file per locale
   data/                   services.ts, projects.ts, achievements.ts, resume.ts, contact.ts (form values, ecosystems),
-                          npm.ts (published packages whose downloads are counted)
-  lib/                    schema.ts (JSON-LD), portrait.ts (JSON-LD image), npm.ts (npm downloads API), fonts.ts (@font-face), format.ts (dates),
-                          cv.ts (uploaded PDF paths), whatsapp.ts (wa.me links)
-  scripts/                motion.ts (reveal + count-up), cursor.ts (animated cursor), analytics.ts (consent + GA4 events)
-  layouts/BaseLayout.astro  full <head>, js flag, header/footer, floating actions, consent banner, motion + cursor scripts
+                          npm.ts (packages and npm orgs whose downloads are counted),
+                          experience.json (work experience, read through resume.ts)
+  lib/                    schema.ts (JSON-LD), portrait.ts (JSON-LD image), npm.ts (npm registry + downloads API), fonts.ts (@font-face), format.ts (dates),
+                          cv.ts (uploaded PDF paths), whatsapp.ts (wa.me links), graphemes.ts (character splitting for typing)
+  scripts/                motion.ts (reveal + count-up), typing.ts (typed headings), cursor.ts (animated cursor), analytics.ts (consent + GA4 events)
+  layouts/BaseLayout.astro  full <head>, js flag, header/footer, floating actions, consent banner, motion + typing + cursor scripts
   components/
     sections/             Header, Hero, About, Services, Process, Projects, Achievements, Contact, Footer
     contact/ContactForm.astro    the lead form (email or WhatsApp, validation, AJAX, no-JS fallback)
@@ -69,8 +70,10 @@ honoured by Astro/Vite). Type imports too: `import type { Locale } from '@/i18n/
   `npm run check` fail. Components never hard-code visible text, including the
   words drawn inside the project covers (`projects.cover`).
 - **Data** (services, projects, achievements, experience, education, certifications,
-  skills) lives in `src/data/*.ts` as `Localized` fields (`Record<Locale, T>`), so every
-  translation is mandatory. The home page, the JSON-LD and `llms.txt` derive from it:
+  skills) lives in `src/data/` as `Localized` fields (`Record<Locale, T>`), so every
+  translation is mandatory. Work experience is `src/data/experience.json` (easy to edit by
+  hand; `resume.ts` types it as `Role[]`, so a missing field or language fails
+  `npm run check`); give every company its `companyUrl` when it has a site. The home page, the JSON-LD and `llms.txt` derive from it:
   update it once.
 - **Identity and integrations** (name, email, WhatsApp, socials, domain, form endpoint,
   GA4 ID, verification tokens) live in `src/config/site.ts`.
@@ -81,8 +84,8 @@ honoured by Astro/Vite). Type imports too: `import type { Locale } from '@/i18n/
   add any other. Commitments in the copy (48 h reply, 30-minute call, written proposal,
   weekly deliveries) were approved as marketing promises: change them only together
   with the owner.
-- The hero badge never shows a single fixed title: `hero.roles` rotates (full stack
-  developer, product manager, blockchain developer, founder, CEO). Do not put
+- The hero badge never shows a single fixed title: `hero.roles` rotates, typed and erased
+  one after another (full stack developer, product manager, blockchain developer, founder, CEO). Do not put
   "Founder of Cosmos Pay" back as the main title; it lives in the description.
 - **The CV is a PDF the owner uploads, never generated**: `public/cv/emanuel-guzman-cv.pdf`
   (default locale, required: `verify-seo.mjs` fails without it) and optionally
@@ -91,12 +94,20 @@ honoured by Astro/Vite). Type imports too: `import type { Locale } from '@/i18n/
   sites link to and fetch them. There is no HTML CV page; `src/data/resume.ts` only
   feeds the JSON-LD and the About section.
 - **Download numbers come from npm, never by hand.** The hero stat whose value is
-  `{npmDownloads}` shows the total of the packages in `src/data/npm.ts`, fetched from
-  npm's public API at build time (the daily deploy refreshes it) and again in the browser
-  (`src/lib/npm.ts`). Past claims ("2,586 downloads in its first week") quote npm's own
-  numbers and link their npm-stat chart through `Achievement.url`. Publish a new package →
-  add it to `src/data/npm.ts`.
+  `{npmDownloads}` shows the total of every project he publishes or collaborates on: the
+  packages listed in `src/data/npm.ts` plus every package of the npm organisations in
+  `npmOrgs` (today `cosmosapp`), listed from the registry at build time. The total comes
+  from npm's public API at build time (the daily deploy refreshes it) and again in the
+  browser for the same package list, embedded in the page (`src/lib/npm.ts`); the
+  registry's org endpoint has no CORS, so the browser never lists orgs. Its detail line
+  says "every project I collaborate on", never a single package name. Past claims ("2,586
+  downloads in its first week") quote npm's own numbers and link their npm-stat chart
+  through `Achievement.url`. A new package under a listed org is picked up by itself; any
+  other new package → add it to `npmPackages`.
 - After changing services, projects or roles: update `public/llms.txt` as well.
+- **No em or en dashes (— –)** in any copy, title, alt, structured data, `llms.txt` or the
+  manifest: they read as machine-written. Use a comma, colon, period or "·" (titles:
+  `Name · Role`), and words for ranges ("USD 1.000 a 5.000"). `verify-seo.mjs` fails on them.
 
 ## 4 · Page structure and conversion
 
@@ -224,9 +235,9 @@ Every indexable page has, and `scripts/verify-seo.mjs` enforces:
 - Cards use the stretched-link pattern; scrollable regions get `tabindex="0"`,
   `role="region"` and a label; target size ≥ 24 px (≥ 44 px for primary actions).
 - Mobile menu: `aria-expanded`/`aria-controls`, Escape closes and returns focus.
-- **Auto-updating content (2.2.2)**: the rotating role pauses on hover and while
-  off-screen and stops after three cycles; screen readers get the whole list once
-  (`.visually-hidden`), the animated copy is `aria-hidden`. Moving strips are
+- **Auto-updating content (2.2.2)**: the rotating role pauses on hover, while off-screen
+  and while the tab is hidden, and stops on the first role after three cycles; screen
+  readers get the whole list once (`.visually-hidden`), the typed copy is `aria-hidden`. Moving strips are
   scroll-linked (never autoplay).
 
 ## 10 · Motion
@@ -237,9 +248,18 @@ Every indexable page has, and `scripts/verify-seo.mjs` enforces:
 - Reveals are CSS **animations** with `fill-mode: backwards`, not transitions, so they
   never fight component hover transitions. For hover lifts use the `translate`
   property, not `transform`.
-- **`prefers-reduced-motion: reduce` means fade, not frozen**: reveals, the hero
-  entrance and the role rotator cross-fade; slides, drifts, count-ups and the
-  scroll-linked strip are disabled. Wrap any new movement in
+- **Typed headings**: every `RichHeading` (hero `<h1>`, section titles) and the privacy and
+  404 headings carry `data-type` and type themselves in when they scroll into view
+  (`src/scripts/typing.ts`). Only key headings type, never body copy, cards or labels
+  (owner's decision). The DOM is never changed: the untyped part is a CSS highlight
+  (`::highlight(type-pending)`) painted transparent, so screen readers, crawlers and
+  copy get the full text and nothing reflows. Before the script runs the heading is at
+  `opacity: 0.01` (LCP), with a CSS failsafe that shows it after 3 s.
+- **Typing and count-ups change text in place and move nothing**, so they run with
+  and without reduced motion (the owner's machine has it on and wants to see them).
+- **`prefers-reduced-motion: reduce` means fade, not frozen**: reveals and the hero
+  entrance cross-fade; slides, drifts, caret blinks and the scroll-linked strip are
+  disabled. Wrap any new movement in
   `@media (prefers-reduced-motion: no-preference)` and give it a fade fallback.
   (The owner's machine has reduced motion enabled: test both modes.)
 - Hero entrance animations start at `opacity: 0.01`, not 0, so LCP is not delayed.
@@ -262,7 +282,9 @@ Every indexable page has, and `scripts/verify-seo.mjs` enforces:
   `ProjectCover.astro` and the flags). Space Grotesk Variable (Latin subset preloaded);
   Chinese and Devanagari use platform fonts via `:lang()`, which also reset the display
   tracking/leading tokens (`var(--tracking-*)`, `var(--leading-*)`).
-- Section headers use `SectionHeader` (numbered eyebrow + `RichHeading` + intro);
+- Section headers use `SectionHeader` (numbered eyebrow "01 Services", with no line or
+  dash between number and label, + `RichHeading` + intro); the hero badge has no mark
+  above it;
   two-tone headings always come from a `RichText` in the dictionary
   (`{ br: true, space: false }` for languages without spaces).
 - Buttons: `.btn` + `.btn--solid` (primary), `.btn--frame` (secondary, corner frame),

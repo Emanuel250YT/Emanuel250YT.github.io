@@ -2,10 +2,10 @@ import type { Dictionary } from '@/i18n/types';
 
 export const zh: Dictionary = {
   meta: {
-    title: 'Emanuel Guzman — 全栈开发者 · 支付与区块链',
+    title: 'Emanuel Guzman · 全栈开发者 · 支付与区块链',
     description:
       'Emanuel Guzman，来自阿根廷萨尔塔的全栈开发者：为企业和初创公司提供定制软件、支付集成与区块链产品开发服务。Cosmos Pay 创始人。',
-    ogAlt: 'Emanuel Guzman — 全栈开发者 · 支付与区块链',
+    ogAlt: 'Emanuel Guzman · 全栈开发者 · 支付与区块链',
     jobTitle: '全栈开发者、产品经理',
     disambiguation: '来自阿根廷萨尔塔的全栈开发者，Cosmos Pay 创始人',
     keywords: [
@@ -50,12 +50,12 @@ export const zh: Dictionary = {
       { text: '到', muted: true },
       { text: '真实的产品。' },
     ],
-    lead: '我是 Emanuel Guzman。我在阿根廷萨尔塔远程工作，为世界各地的企业和初创公司设计并开发定制软件、支付集成和区块链产品——从需求诊断到上线生产，与你直接合作。',
+    lead: '我是 Emanuel Guzman。我在阿根廷萨尔塔远程工作，为世界各地的企业和初创公司设计并开发定制软件、支付集成和区块链产品，从需求诊断到上线生产，与你直接合作。',
     ctaPrimary: '告诉我你的项目',
     ctaSecondary: '查看服务',
     stats: [
       { value: '8+', label: '年开发经验', detail: '自 2018 年起从事软件开发，自由职业并任职于 CloudyCoding' },
-      { value: '{npmDownloads}', label: 'npm 下载量', detail: 'MacroClickJS、ArkaCDN 与 ASide，实时数据来自 npm' },
+      { value: '{npmDownloads}', label: 'npm 下载量', detail: '我参与协作的所有项目，实时数据来自 npm' },
       { value: '20+', label: '开源项目', detail: 'SDK、钱包和协议' },
     ],
     photoAlt: 'Emanuel Guzman 手持麦克风发言，身穿 Stellar Summit 2026 T 恤',
@@ -144,7 +144,7 @@ export const zh: Dictionary = {
       serviceOther: '其他',
       budget: '预计预算',
       budgetPlaceholder: '请选择范围',
-      budgetOptions: ['低于 1,000 美元', '1,000 – 5,000 美元', '5,000 – 15,000 美元', '高于 15,000 美元', '还不确定'],
+      budgetOptions: ['低于 1,000 美元', '1,000 至 5,000 美元', '5,000 至 15,000 美元', '高于 15,000 美元', '还不确定'],
       message: '留言',
       messagePlaceholder: '简单说说你的需求、时间要求，以及任何有用的链接。',
       optional: '选填',
@@ -176,7 +176,7 @@ export const zh: Dictionary = {
     reject: "拒绝",
   },
   privacy: {
-    title: "隐私政策 — Emanuel Guzman",
+    title: "隐私政策 · Emanuel Guzman",
     description: "emanuel250.dev.ar 收集哪些数据、如何使用、与谁共享（FormSubmit、WhatsApp、Google），以及你如何行使自己对这些数据的权利。",
     heading: "隐私政策",
     updated: "最后更新",
@@ -191,7 +191,7 @@ export const zh: Dictionary = {
     ],
   },
   notFound: {
-    title: '页面未找到 — Emanuel Guzman',
+    title: '页面未找到 · Emanuel Guzman',
     description: '您要找的页面不存在或已被移动。',
     heading: '此页面不存在。',
     body: '链接可能已失效，或页面已被移动。返回首页查看我的项目。',

@@ -88,7 +88,7 @@ export function personNode(locale: Locale, image: ImageRef, { offers = false }: 
       recognizedBy: { '@type': 'Organization', name: cert.issuer },
       dateCreated: cert.date,
     })),
-    award: achievements.map((item) => `${item.title[locale]} — ${item.detail[locale]}`),
+    award: achievements.map((item) => `${item.title[locale]}: ${item.detail[locale]}`),
     knowsAbout: [...new Set(skillGroups.flatMap((group) => group.items))],
     knowsLanguage: ['es', 'en'],
     sameAs: [site.socials.github, site.socials.linkedin, site.socials.npm],

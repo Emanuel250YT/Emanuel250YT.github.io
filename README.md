@@ -1,9 +1,9 @@
 # emanuel250.dev.ar
 
-Portfolio of **Emanuel Guzman** — full stack developer, product manager and founder of
+Portfolio of **Emanuel Guzman**: full stack developer, product manager and founder of
 [Cosmos Pay](https://cosmospay.lat), from Salta, Argentina.
 
-- Site: **https://emanuel250.dev.ar** — in Español, English, Português, Français,
+- Site: **https://emanuel250.dev.ar**, in Español, English, Português, Français,
   Deutsch, 中文 and हिन्दी (`/`, `/en/`, `/pt/`, `/fr/`, `/de/`, `/zh/`, `/hi/`)
 - CV: [PDF](https://emanuel250.dev.ar/cv/emanuel-guzman-cv.pdf) (`/<locale>/cv/emanuel-guzman-cv.pdf`
   per language), uploaded by hand at stable URLs that other sites can link to or fetch
@@ -11,12 +11,13 @@ Portfolio of **Emanuel Guzman** — full stack developer, product manager and fo
 Built with [Astro](https://astro.build) as a fully static site on GitHub Pages and
 designed to turn visitors into leads: services with their own calls to action, a
 clear process, proof (projects and achievements) and a short contact form. No UI or
-CSS framework, seven languages, motion that respects reduced-motion preferences, and
+CSS framework, seven languages, typed headings and count-up numbers, motion that respects
+reduced-motion preferences, and
 SEO + accessibility checks in CI.
 
 | Lighthouse (mobile) | `/` | `/zh/` | `/hi/` | `/privacy/` |
 | --- | --- | --- | --- | --- |
-| Performance · Accessibility · Best practices · SEO | 99–100 · 100 · 100 · 100 | 95–97 · 100 · 100 · 100 | 93–98 · 100 · 100 · 100 | 100 · 100 · 100 · 100 |
+| Performance · Accessibility · Best practices · SEO | 99-100 · 100 · 100 · 100 | 95-97 · 100 · 100 · 100 | 93-98 · 100 · 100 · 100 | 100 · 100 · 100 · 100 |
 
 Lab runs with Lighthouse 13.5.0 and the Chrome flags listed in `CLAUDE.md` §15 (without
 them, headless Chrome on Windows inflates the score). Desktop: 100 on every page.
@@ -35,7 +36,7 @@ npm run assets    # regenerates portraits, icons and Open Graph images (needs Ch
 
 ## Page structure
 
-Hero (rotating roles, primary CTA) → About → Services (4, each with its own CTA that
+Hero (typed rotating roles, primary CTA) → About → Services (4, each with its own CTA that
 preselects the service in the form) → Process (4 steps) → Projects → Achievements and
 ecosystems → Contact (form by email or WhatsApp + what happens next + direct channels) →
 Footer. Every page has floating WhatsApp and back-to-top buttons at the bottom right.
@@ -48,7 +49,9 @@ Footer. Every page has floating WhatsApp and back-to-top buttons at the bottom r
 | Rotating roles in the hero | `hero.roles` in each dictionary |
 | Services | `src/data/services.ts` |
 | Projects / achievements | `src/data/projects.ts`, `src/data/achievements.ts` |
-| Experience, education, certifications, skills (JSON-LD) | `src/data/resume.ts` |
+| Work experience (About section + JSON-LD) | `src/data/experience.json` |
+| Education, certifications, skills (JSON-LD) | `src/data/resume.ts` |
+| npm packages and organisations counted in the downloads stat | `src/data/npm.ts` |
 | CV PDF | upload `public/cv/emanuel-guzman-cv.pdf` (required) and, optionally, `public/<locale>/cv/emanuel-guzman-cv.pdf` |
 | Form options (budget ranges, extra services), ecosystems strip | `src/data/contact.ts` |
 | Name, email, WhatsApp, socials, domain, form endpoint, GA4, search-console tokens | `src/config/site.ts` |
@@ -105,7 +108,7 @@ day, so the npm download count baked into the HTML stays current.
   `emanuel250.dev.ar` (declared by `public/CNAME`), **Enforce HTTPS** on. Settings →
   Environments → `github-pages` must allow the `main` branch.
 - **dev.ar** (https://home.dev.ar): **DNS** = `emanuel250yt.github.io` (no `https://`,
-  no slashes), **Redirección** empty — only one of them can be active. Propagation can
+  no slashes), **Redirección** empty: only one of them can be active. Propagation can
   take up to 48 h; check with `nslookup -type=CNAME emanuel250.dev.ar`.
 - **Optional domain verification on GitHub**: GitHub asks for a TXT record
   `_github-pages-challenge-Emanuel250YT.emanuel250.dev.ar`; on dev.ar, TXT records are

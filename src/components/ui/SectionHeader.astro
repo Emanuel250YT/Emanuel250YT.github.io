@@ -3,7 +3,7 @@ import RichHeading from '@/components/ui/RichHeading.astro';
 import type { RichText } from '@/i18n/types';
 
 /**
- * Section header: numbered eyebrow ("01 — Services"), two-tone title and an
+ * Section header: numbered eyebrow ("01 Services"), two-tone title (typed in) and an
  * optional intro. `layout="split"` puts the intro on the right on wide screens.
  */
 interface Props {
@@ -24,7 +24,6 @@ const number = String(index).padStart(2, '0');
   <div class="section-header-main">
     <p class="eyebrow" data-reveal="fade">
       <span class="eyebrow-index" aria-hidden="true">{number}</span>
-      <span class="eyebrow-line" aria-hidden="true"></span>
       {eyebrow}
     </p>
     <div data-reveal>

@@ -14,7 +14,7 @@ The site is available in Spanish (default), English, Portuguese, French, German,
 ## Services
 
 - Custom software: web platforms, dashboards, APIs and backends (TypeScript, Node.js, Astro/React, PostgreSQL)
-- Payment integrations: local gateways, banks and stablecoins — checkout, payment links, webhooks, reconciliation (Mercado Pago, USDC, Cosmos Pay)
+- Payment integrations: local gateways, banks and stablecoins: checkout, payment links, webhooks, reconciliation (Mercado Pago, USDC, Cosmos Pay)
 - Blockchain products: wallets, smart contracts and dApps on Stellar, Solana and EVM chains
 - SDKs and APIs for developers: libraries, docs and developer platforms
 
@@ -24,10 +24,10 @@ How a project runs: a 30-minute diagnosis call, a written proposal with scope, t
 
 ## Roles
 
-- Founder — Cosmos · Cosmos Pay (2026 – present): https://cosmospay.lat
-- CEO — CloudyCoding (2018 – present): https://cloudycoding.com
-- Full Stack Developer — SaltaDev (2025 – present): https://salta.dev.ar
-- Independent developer — Freelance (2018 – present)
+- Founder at Cosmos · Cosmos Pay (2026 to present): https://cosmospay.lat
+- CEO at CloudyCoding (2018 to present): https://cloudycoding.com
+- Full Stack Developer at SaltaDev (2025 to present): https://salta.dev.ar
+- Independent developer, freelance (2018 to present)
 
 ## Projects
 
@@ -40,14 +40,14 @@ How a project runs: a 30-minute diagnosis call, a written proposal with scope, t
 
 ## Achievements
 
-- Selected for the Scale Track of Código Alebrije 2026 (Mexico City) with Cosmos — Stellar Development Foundation, BAF
-- Builder at ImpactaBootcamp 2026: Soroban and trustless escrow — Trustless Work, BAF
+- Selected for the Scale Track of Código Alebrije 2026 (Mexico City) with Cosmos, by the Stellar Development Foundation and BAF
+- Builder at ImpactaBootcamp 2026: Soroban and trustless escrow, by Trustless Work and BAF
 - Speaker at Blockchain Salta 2025 (DESAFIA, SaltaDev)
 - Sponsor of Hackathon del Milagro 2025 with CloudyCoding: free hosting for the winning projects
 - Hacker at a global Ethereum hackathon and at ETH Argentina (2025)
 - NASA Open Science certificate (2024)
 
-Download numbers come from npm's public API; the home page shows the live total of every package (https://www.npmjs.com/~emanuel250dev).
+Download numbers come from npm's public API; the home page shows the live total of every package he publishes or collaborates on: his own (https://www.npmjs.com/~emanuel250dev) and every package of the cosmosapp organization (https://www.npmjs.com/org/cosmosapp).
 
 ## Contact
 
