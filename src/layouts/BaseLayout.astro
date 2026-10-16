@@ -1,0 +1,153 @@
+---
+import '@fontsource-variable/space-grotesk/wght.css';
+import '@/styles/global.css';
+import fontLatin from '@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2?url';
+import { site } from '@/config/site';
+import Footer from '@/components/sections/Footer.astro';
+import Header from '@/components/sections/Header.astro';
+import { useTranslations } from '@/i18n';
+import { localeMeta, localePath, locales, otherLocale, type Locale } from '@/i18n/locales';
+import type { JsonLd } from '@/lib/schema';
+
+interface Props {
+  locale: Locale;
+  /** Ruta sin prefijo de idioma: '' para el inicio, 'cv' para /cv/. */
+  path: string;
+  title: string;
+  description: string;
+  /** Ruta absoluta (desde la raiz) de la imagen Open Graph. */
+  ogImage?: string;
+  ogType?: 'website' | 'profile';
+  noindex?: boolean;
+  jsonLd?: JsonLd;
+  /** El 404 no tiene equivalente por idioma. */
+  alternates?: boolean;
+  header?: boolean;
+}
+
+const {
+  locale,
+  path,
+  title,
+  description,
+  ogImage = `/og/og-${locale}.png`,
+  ogType = 'website',
+  noindex = false,
+  jsonLd,
+  alternates = true,
+  header = true,
+} = Astro.props;
+
+const t = useTranslations(locale);
+const meta = localeMeta[locale];
+const siteUrl = Astro.site ?? new URL(site.url);
+const canonical = new URL(localePath(locale, path), siteUrl).href;
+const ogImageUrl = new URL(ogImage, siteUrl).href;
+const alternateLocale = otherLocale(locale);
+---
+
+<!doctype html>
+<html lang={meta.htmlLang} dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {!noindex && <link rel="canonical" href={canonical} />}
+    <meta
+      name="robots"
+      content={noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'}
+    />
+    <meta name="author" content={site.name} />
+    <meta name="creator" content={site.name} />
+    <meta name="keywords" content={t.meta.keywords.join(', ')} />
+    <meta name="theme-color" content="#f3f3f3" />
+    <meta name="color-scheme" content="light" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="generator" content={Astro.generator} />
+
+    {
+      alternates &&
+        locales.map((code) => (
+          <link rel="alternate" hreflang={localeMeta[code].hreflang} href={new URL(localePath(code, path), siteUrl).href} />
+        ))
+    }
+    {alternates && <link rel="alternate" hreflang="x-default" href={new URL(localePath('es', path), siteUrl).href} />}
+
+    <!-- Open Graph / redes -->
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content={meta.ogLocale} />
+    {alternates && <meta property="og:locale:alternate" content={localeMeta[alternateLocale].ogLocale} />}
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:secure_url" content={ogImageUrl} />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={t.meta.ogAlt} />
+    {
+      ogType === 'profile' && (
+        <>
+          <meta property="profile:first_name" content={site.givenName} />
+          <meta property="profile:last_name" content={site.familyName} />
+          <meta property="profile:username" content="emanuel250" />
+        </>
+      )
+    }
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
+    <meta name="twitter:image:alt" content={t.meta.ogAlt} />
+
+    <!-- Iconos y PWA -->
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
+
+    <link rel="preload" href={fontLatin} as="font" type="font/woff2" crossorigin />
+
+    {site.googleSiteVerification && <meta name="google-site-verification" content={site.googleSiteVerification} />}
+    {site.bingSiteVerification && <meta name="msvalidate.01" content={site.bingSiteVerification} />}
+
+    {jsonLd && <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+    <slot name="head" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">{t.a11y.skip}</a>
+    {header && <Header locale={locale} path={path} />}
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <Footer locale={locale} />
+  </body>
+</html>
+
+<style>
+  .skip-link {
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 100;
+    padding: 10px 16px;
+    background: var(--ink);
+    color: #fff;
+    font-weight: 500;
+    text-decoration: none;
+    transform: translateY(-200%);
+    transition: transform 0.2s var(--ease);
+  }
+
+  .skip-link:focus {
+    transform: none;
+  }
+
+  main:focus {
+    outline: none;
+  }
+</style>

@@ -1,0 +1,20 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    # No adoptar versiones con menos de 7 dias publicadas (ataques de supply chain).
+    cooldown:
+      default-days: 7
+    groups:
+      astro:
+        patterns: ['astro', '@astrojs/*']
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7

@@ -1,0 +1,65 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { useTranslations } from '@/i18n';
+import { localePath } from '@/i18n/locales';
+
+// GitHub Pages sirve este archivo para cualquier ruta inexistente, en ambos idiomas.
+const es = useTranslations('es');
+const en = useTranslations('en');
+---
+
+<BaseLayout locale="es" path="404" title={es.notFound.title} description={es.notFound.description} noindex alternates={false}>
+  <section class="container not-found" aria-labelledby="nf-title">
+    <p class="code" aria-hidden="true">404</p>
+    <h1 id="nf-title" class="display">{es.notFound.heading}</h1>
+    <p class="text">{es.notFound.body}</p>
+    <div class="actions">
+      <a class="btn btn--solid" href={localePath('es')}>
+        <Icon name="arrow-left" />
+        {es.notFound.back}
+      </a>
+      <a class="btn btn--frame" href={localePath('en')} lang="en" hreflang="en">{en.notFound.back} (English)</a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .not-found {
+    min-height: 70vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-block: 96px;
+    background-image:
+      linear-gradient(rgb(17 17 17 / 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(17 17 17 / 0.05) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+
+  .code {
+    font-size: clamp(4rem, 14vw, 9rem);
+    font-weight: 300;
+    line-height: 1;
+    letter-spacing: -0.05em;
+    color: var(--muted);
+  }
+
+  h1 {
+    margin-top: 12px;
+    font-size: clamp(2rem, 4vw, 3rem);
+  }
+
+  .text {
+    max-width: 32rem;
+    margin-top: 16px;
+    color: var(--ink-soft);
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 32px;
+  }
+</style>

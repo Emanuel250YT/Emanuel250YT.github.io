@@ -1,0 +1,188 @@
+---
+import ProjectCover from '@/components/projects/ProjectCover.astro';
+import Icon from '@/components/ui/Icon.astro';
+import RichHeading from '@/components/ui/RichHeading.astro';
+import { projects } from '@/data/projects';
+import { useTranslations } from '@/i18n';
+import type { Locale } from '@/i18n/locales';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+---
+
+<section id="projects" class="section projects" aria-labelledby="projects-title">
+  <div class="container">
+    <RichHeading id="projects-title" class="projects-title" parts={t.projects.title} />
+
+    <ul class="grid" role="list">
+      {
+        projects.map((project) => (
+          <li>
+            <article class:list={['card', { 'card--linked': project.url }]} aria-labelledby={`project-${project.id}`}>
+              <div class="media">
+                <ProjectCover kind={project.cover} />
+                {project.url && (
+                  <span class="go" aria-hidden="true">
+                    <Icon name="arrow-up-right" size={16} />
+                  </span>
+                )}
+              </div>
+              <div class="head">
+                <h3 id={`project-${project.id}`} class="name">
+                  {project.url ? (
+                    <a href={project.url} target="_blank" rel="noopener" class="stretched">
+                      {project.name}
+                      <span class="visually-hidden">
+                        — {t.projects.visit} {t.a11y.newTab}
+                      </span>
+                    </a>
+                  ) : (
+                    project.name
+                  )}
+                </h3>
+                <p class="tagline">{project.tagline[locale]}</p>
+              </div>
+              <ul class="tags" role="list">
+                {project.tags[locale].map((tag) => (
+                  <li>{tag}</li>
+                ))}
+              </ul>
+              <p class="desc">{project.description[locale]}</p>
+            </article>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .projects :global(.projects-title) {
+    max-width: 50rem;
+    font-size: clamp(1.9rem, 3.6vw, 2.75rem);
+    margin-bottom: clamp(40px, 5vw, 56px);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(32px, 4vw, 48px) clamp(16px, 2.2vw, 28px);
+    margin: 0;
+  }
+
+  .card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .media {
+    position: relative;
+    overflow: hidden;
+    border-radius: 4px;
+  }
+
+  .go {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #fff;
+    color: var(--ink);
+    box-shadow: var(--shadow-card);
+    opacity: 0;
+    transform: translateY(-4px);
+    transition:
+      opacity 0.3s var(--ease),
+      transform 0.3s var(--ease);
+  }
+
+  .card--linked:hover .go,
+  .card--linked:focus-within .go {
+    opacity: 1;
+    transform: none;
+  }
+
+  .card--linked:hover .media :global(.cover > *) {
+    transform: scale(1.04);
+  }
+
+  .head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 2px 12px;
+    margin-top: 16px;
+  }
+
+  .name {
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .name a {
+    text-decoration: none;
+  }
+
+  /* Toda la tarjeta es clickeable sin anidar contenido dentro del <a>. */
+  .stretched::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+
+  .stretched:focus-visible {
+    outline: none;
+  }
+
+  .card:has(.stretched:focus-visible) {
+    outline: 2px solid var(--ink);
+    outline-offset: 6px;
+    border-radius: 4px;
+  }
+
+  .tagline {
+    font-size: 0.875rem;
+    color: var(--ink-2);
+  }
+
+  .tags {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin: 6px 0 0;
+    font-size: 0.75rem;
+    color: var(--ink-soft);
+  }
+
+  .desc {
+    margin-top: 12px;
+    font-size: 0.85rem;
+    line-height: 1.55;
+    color: var(--ink-soft);
+  }
+
+  @media (max-width: 960px) {
+    .grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 600px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

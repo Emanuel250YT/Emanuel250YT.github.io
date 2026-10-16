@@ -1,0 +1,687 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import type { CoverKind } from '@/data/projects';
+
+/**
+ * Portadas ilustradas en HTML/CSS: pesan casi nada, escalan nitidas y no
+ * dependen de capturas. Son decorativas (aria-hidden): el texto de la tarjeta
+ * describe el proyecto.
+ */
+interface Props {
+  kind: CoverKind;
+}
+
+const { kind } = Astro.props;
+
+// <pre> conserva todo el espacio en blanco: el codigo se arma como string.
+const codeHtml = [
+  '<span class="k">import</span> { BancaClient } <span class="k">from</span> <span class="s">"bancasdk"</span>;',
+  '<span class="k">import</span> { MacroClickProvider } <span class="k">from</span> <span class="s">"bancasdk/macro-click"</span>;',
+  '',
+  '<span class="k">const</span> banca = <span class="k">new</span> <span class="f">BancaClient</span>()',
+  '  .<span class="f">use</span>(<span class="k">new</span> <span class="f">MacroClickProvider</span>(config));',
+  '',
+  '<span class="k">await</span> banca.<span class="f">paymentLinks</span>(<span class="s">"macro-click"</span>)',
+  '  .<span class="f">createPaymentLink</span>({ amount: 15000 });',
+].join('\n');
+
+const terminalHtml = [
+  '<span class="p">$</span> orchestra start',
+  '<span class="ok">♪</span> summarizer  <span class="dim">ready</span>',
+  '<span class="ok">♪</span> translator  <span class="dim">ready</span>',
+  '<span class="ok">♪</span> researcher  <span class="dim">ready</span>',
+  '<span class="p">→</span> task #42 paid <span class="s">0.01 USDC</span> <span class="dim">x402</span>',
+].join('\n');
+---
+
+<div class:list={['cover', `cover--${kind}`]} aria-hidden="true">
+  {
+    kind === 'checkout' && (
+      <>
+        <div class="glow" />
+        <div class="checkout">
+          <div class="checkout-head">
+            <span class="brand">
+              cosmos<b>pay</b>
+            </span>
+            <span class="pill">Stellar</span>
+          </div>
+          <span class="muted-label">Total</span>
+          <span class="amount">
+            25,00 <small>USDC</small>
+          </span>
+          <span class="line w80" />
+          <span class="line w60" />
+          <span class="pay-btn">Pagar</span>
+          <span class="nets">
+            <i>Stellar</i>
+            <i>Solana</i>
+            <i>Monad</i>
+          </span>
+        </div>
+        <span class="toast">
+          <Icon name="check" size={12} /> 5 s
+        </span>
+      </>
+    )
+  }
+
+  {
+    kind === 'wallet' && (
+      <>
+        <span class="orb orb-a" />
+        <span class="orb orb-b" />
+        <div class="phone">
+          <div class="screen">
+            <span class="notch" />
+            <span class="muted-label">Balance</span>
+            <span class="amount">1.250,00</span>
+            <span class="asset">USDC · XLM</span>
+            <span class="actions">
+              <i>
+                <Icon name="send" size={11} />
+              </i>
+              <i>
+                <Icon name="swap" size={11} />
+              </i>
+              <i>
+                <Icon name="receive" size={11} />
+              </i>
+            </span>
+            <span class="row">
+              <b /> <span class="line w60" />
+            </span>
+            <span class="row">
+              <b /> <span class="line w80" />
+            </span>
+            <span class="row">
+              <b /> <span class="line w50" />
+            </span>
+          </div>
+        </div>
+        <div class="phone phone--back">
+          <div class="screen">
+            <span class="notch" />
+            <span class="qr" />
+            <span class="line w60" />
+          </div>
+        </div>
+      </>
+    )
+  }
+
+  {
+    kind === 'code' && (
+      <div class="window">
+        <div class="window-bar">
+          <span class="lights">
+            <i />
+            <i />
+            <i />
+          </span>
+          <span>pay.ts</span>
+        </div>
+        <pre set:html={codeHtml} />
+      </div>
+    )
+  }
+
+  {
+    kind === 'storage' && (
+      <>
+        <div class="panel">
+          {[
+            ['contrato.pdf', '3/3'],
+            ['fotos-2026.zip', '3/3'],
+            ['backup.db', '2/3'],
+          ].map(([file, replicas]) => (
+            <span class="file">
+              <Icon name="lock" size={12} />
+              <span class="file-name">{file}</span>
+              <span class="replicas">{replicas}</span>
+            </span>
+          ))}
+        </div>
+        <div class="shards">
+          {Array.from({ length: 12 }, (_, index) => (
+            <i class:list={{ on: [0, 1, 3, 4, 6, 8, 9, 11].includes(index) }} />
+          ))}
+        </div>
+      </>
+    )
+  }
+
+  {
+    kind === 'social' && (
+      <>
+        <span class="orb orb-a" />
+        <div class="phone">
+          <div class="screen">
+            <span class="notch" />
+            <span class="profile">
+              <b />
+              <span class="line w50" />
+            </span>
+            <span class="post" />
+            <span class="reactions">
+              <Icon name="heart" size={10} />
+              <span class="line w30" />
+            </span>
+            <span class="profile">
+              <b />
+              <span class="line w60" />
+            </span>
+            <span class="post post--short" />
+          </div>
+        </div>
+        <span class="npm">npm i @emanuel250dev/aside</span>
+      </>
+    )
+  }
+
+  {
+    kind === 'terminal' && (
+      <div class="window window--term">
+        <div class="window-bar">
+          <span class="lights">
+            <i />
+            <i />
+            <i />
+          </span>
+          <span>orchestra</span>
+        </div>
+        <pre set:html={terminalHtml} />
+      </div>
+    )
+  }
+</div>
+
+<style>
+  .cover {
+    position: relative;
+    display: grid;
+    place-items: center;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    border-radius: 4px;
+    isolation: isolate;
+    font-family: var(--font-sans);
+    user-select: none;
+    transition: transform 0.6s var(--ease);
+  }
+
+  .cover > :global(*) {
+    transition: transform 0.6s var(--ease);
+  }
+
+  .line {
+    display: block;
+    height: 5px;
+    border-radius: 3px;
+    background: currentColor;
+    opacity: 0.16;
+  }
+
+  .w30 {
+    width: 30%;
+  }
+  .w50 {
+    width: 50%;
+  }
+  .w60 {
+    width: 60%;
+  }
+  .w80 {
+    width: 80%;
+  }
+
+  /* Aunque las portadas son decorativas, el texto visible cumple AA (4.5:1). */
+  .muted-label {
+    font-size: 0.55rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.72;
+  }
+
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(2px);
+  }
+
+  /* 1 · Cosmos Pay: brillo calido sobre negro */
+  .cover--checkout {
+    background: radial-gradient(120% 90% at 15% 20%, #f08a4b 0%, #8a3b1c 30%, #1d1310 60%, #0c0c0c 100%);
+  }
+
+  .cover--checkout .glow {
+    position: absolute;
+    inset: auto -20% -40% 30%;
+    height: 80%;
+    background: radial-gradient(closest-side, rgb(0 8 119 / 0.55), transparent);
+  }
+
+  .checkout {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 56%;
+    padding: 14px;
+    border-radius: 12px;
+    background: #fff;
+    color: #111;
+    box-shadow: 0 24px 40px -12px rgb(0 0 0 / 0.6);
+    transform: rotate(-4deg);
+  }
+
+  .checkout-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+
+  .brand {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  .brand b {
+    color: var(--cosmic);
+  }
+
+  .pill {
+    padding: 2px 6px;
+    border-radius: 999px;
+    background: #eef0ff;
+    color: var(--cosmic);
+    font-size: 0.5rem;
+    font-weight: 600;
+  }
+
+  .amount {
+    font-size: 1.15rem;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+  }
+
+  .amount small {
+    font-size: 0.55rem;
+    font-weight: 500;
+    opacity: 0.72;
+  }
+
+  .pay-btn {
+    margin-top: 6px;
+    padding: 7px;
+    border-radius: 7px;
+    background: var(--cosmic);
+    color: #fff;
+    font-size: 0.6rem;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .nets {
+    display: flex;
+    gap: 4px;
+  }
+
+  .nets i {
+    flex: 1;
+    padding: 2px 0;
+    border: 1px solid #e4e4e4;
+    border-radius: 4px;
+    font-size: 0.45rem;
+    font-style: normal;
+    text-align: center;
+    color: #4a4a4a;
+  }
+
+  .toast {
+    position: absolute;
+    right: 12%;
+    top: 18%;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 9px;
+    border-radius: 999px;
+    background: #15803d;
+    color: #fff;
+    font-size: 0.6rem;
+    font-weight: 600;
+    box-shadow: 0 8px 18px rgb(0 0 0 / 0.35);
+    transform: rotate(6deg);
+  }
+
+  /* Telefonos compartidos */
+  .phone {
+    position: relative;
+    z-index: 2;
+    width: 34%;
+    aspect-ratio: 9 / 18;
+    padding: 4px;
+    border-radius: 18px;
+    background: #111;
+    box-shadow: 0 24px 40px -14px rgb(0 0 0 / 0.45);
+    transform: rotate(-6deg) translateX(-14%);
+  }
+
+  .screen {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    height: 100%;
+    padding: 18px 9px 10px;
+    border-radius: 14px;
+    background: #fff;
+    color: #111;
+    overflow: hidden;
+  }
+
+  .notch {
+    position: absolute;
+    top: 5px;
+    left: 50%;
+    width: 30%;
+    height: 6px;
+    border-radius: 999px;
+    background: #111;
+    transform: translateX(-50%);
+  }
+
+  /* 2 · Wallet: cromado azul sobre blanco */
+  .cover--wallet {
+    background: linear-gradient(160deg, #f4f5fa 0%, #dfe3f3 100%);
+  }
+
+  .cover--wallet .orb-a {
+    width: 46%;
+    aspect-ratio: 1;
+    left: -8%;
+    top: -12%;
+    background: radial-gradient(circle at 35% 35%, #c7d2ff, #3b4cf5 45%, #000877 80%);
+  }
+
+  .cover--wallet .orb-b {
+    width: 30%;
+    aspect-ratio: 1;
+    right: -4%;
+    bottom: -8%;
+    background: radial-gradient(circle at 35% 35%, #e0e7ff, #5b6cff 50%, #05064f 85%);
+  }
+
+  .cover--wallet .amount {
+    font-size: 0.95rem;
+  }
+
+  .asset {
+    font-size: 0.5rem;
+    opacity: 0.72;
+  }
+
+  .actions {
+    display: flex;
+    justify-content: space-between;
+    margin: 4px 0 6px;
+  }
+
+  .actions i {
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--cosmic);
+    color: #fff;
+  }
+
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .row b {
+    flex: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #e3e6f5;
+  }
+
+  .phone--back {
+    position: absolute;
+    z-index: 1;
+    width: 28%;
+    transform: rotate(8deg) translate(70%, 6%);
+  }
+
+  .qr {
+    width: 70%;
+    aspect-ratio: 1;
+    margin: 10px auto 6px;
+    background:
+      conic-gradient(#111 25%, transparent 0 50%, #111 0 75%, transparent 0) 0 0 / 25% 25%,
+      #fff;
+    border: 3px solid #111;
+    border-radius: 3px;
+  }
+
+  /* 3 · BancaSDK: verde a naranja */
+  .cover--code {
+    background: linear-gradient(135deg, #0f6b45 0%, #6e9a3a 45%, #f0a43a 100%);
+  }
+
+  .window {
+    width: 82%;
+    overflow: hidden;
+    border-radius: 9px;
+    background: #0e0e0e;
+    color: #e8e8e8;
+    box-shadow: 0 24px 44px -14px rgb(0 0 0 / 0.55);
+    transform: rotate(-2deg);
+  }
+
+  .window-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 10px;
+    background: #1b1b1b;
+    font-family: var(--font-mono);
+    font-size: 0.5rem;
+    color: #9a9a9a;
+  }
+
+  .lights {
+    display: flex;
+    gap: 4px;
+  }
+
+  .lights i {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #444;
+  }
+
+  .window pre {
+    margin: 0;
+    padding: 10px 12px 12px;
+    font-family: var(--font-mono);
+    font-size: clamp(0.45rem, 0.75vw, 0.56rem);
+    line-height: 1.7;
+    white-space: pre;
+    overflow: hidden;
+  }
+
+  .k {
+    color: #c4b5fd;
+  }
+  .s {
+    color: #a7f3d0;
+  }
+  .f {
+    color: #93c5fd;
+  }
+
+  /* 4 · SolaDB & MonaDB: rosa a naranja */
+  .cover--storage {
+    background: linear-gradient(140deg, #f9d4e3 0%, #f6b7c9 40%, #f39a6b 100%);
+    grid-template-columns: auto auto;
+    gap: 6%;
+    align-content: center;
+    justify-content: center;
+  }
+
+  .panel {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: clamp(120px, 15vw, 190px);
+    padding: 10px;
+    border-radius: 10px;
+    background: #fff;
+    color: #111;
+    box-shadow: 0 20px 36px -14px rgb(120 30 40 / 0.45);
+    transform: rotate(-3deg);
+  }
+
+  .file {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px;
+    border-radius: 6px;
+    background: #faf6f7;
+    font-size: 0.55rem;
+  }
+
+  .file-name {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .replicas {
+    padding: 1px 5px;
+    border-radius: 999px;
+    background: #111;
+    color: #fff;
+    font-size: 0.45rem;
+    font-weight: 600;
+  }
+
+  .shards {
+    display: grid;
+    grid-template-columns: repeat(3, 14px);
+    gap: 5px;
+    transform: rotate(4deg);
+  }
+
+  .shards i {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    background: rgb(255 255 255 / 0.45);
+  }
+
+  .shards i.on {
+    background: #111;
+  }
+
+  /* 5 · ASide & ArkaCDN: violeta a turquesa */
+  .cover--social {
+    background: linear-gradient(135deg, #2c1f7a 0%, #5a3fd1 40%, #1fb5a8 100%);
+  }
+
+  .cover--social .orb-a {
+    width: 40%;
+    aspect-ratio: 1;
+    right: 6%;
+    top: 8%;
+    background: radial-gradient(circle at 35% 35%, #ffffff, #8ff0e2 35%, #1d6fd1 75%);
+    opacity: 0.85;
+  }
+
+  .cover--social .phone {
+    transform: rotate(5deg) translateX(-30%);
+  }
+
+  .profile {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .profile b {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #5a3fd1, #1fb5a8);
+  }
+
+  .post {
+    height: 22%;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #ede9fe, #ccfbf1);
+  }
+
+  .post--short {
+    height: 12%;
+  }
+
+  .reactions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #e11d48;
+  }
+
+  .npm {
+    position: absolute;
+    right: 8%;
+    bottom: 14%;
+    z-index: 3;
+    padding: 6px 9px;
+    border-radius: 6px;
+    background: #0e0e0e;
+    color: #e8e8e8;
+    font-family: var(--font-mono);
+    font-size: 0.5rem;
+    box-shadow: 0 10px 22px rgb(0 0 0 / 0.35);
+  }
+
+  /* 6 · StellarOrchestra: grises */
+  .cover--terminal {
+    background: linear-gradient(180deg, #e2e2e2 0%, #a9a9a9 60%, #6f6f6f 100%);
+  }
+
+  .window--term {
+    width: 74%;
+    transform: rotate(2deg);
+  }
+
+  .window--term pre {
+    font-size: clamp(0.5rem, 0.85vw, 0.62rem);
+  }
+
+  .p {
+    color: #93c5fd;
+  }
+
+  .ok {
+    color: #fcd34d;
+  }
+
+  .dim {
+    color: #8a8a8a;
+  }
+</style>

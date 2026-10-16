@@ -1,0 +1,38 @@
+---
+import type { RichText } from '@/i18n/types';
+
+interface Props {
+  as?: 'h1' | 'h2' | 'h3';
+  parts: RichText;
+  class?: string;
+  id?: string;
+}
+
+const { as: Tag = 'h2', parts, class: className, id } = Astro.props;
+---
+
+<Tag class:list={['display', className]} id={id}>
+  {
+    parts.map((part) =>
+      'br' in part ? (
+        <Fragment>
+          {' '}
+          <br class="rich-br" />
+        </Fragment>
+      ) : part.muted ? (
+        <span class="muted">{part.text}</span>
+      ) : (
+        <Fragment>{part.text}</Fragment>
+      ),
+    )
+  }
+</Tag>
+
+<style>
+  /* En pantallas angostas el texto fluye libre; el corte es solo de escritorio. */
+  @media (max-width: 720px) {
+    .rich-br {
+      display: none;
+    }
+  }
+</style>

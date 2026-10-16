@@ -1,0 +1,260 @@
+---
+import { coreStack, roles } from '@/data/resume';
+import RichHeading from '@/components/ui/RichHeading.astro';
+import { useTranslations } from '@/i18n';
+import type { Locale } from '@/i18n/locales';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+const currentRoles = roles.filter((role) => !role.end && role.id !== 'freelance');
+const caption =
+  locale === 'es' ? 'Ejemplo: crear un cobro con el SDK de Cosmos Pay' : 'Example: creating a payment with the Cosmos Pay SDK';
+---
+
+<section id="about" class="about" aria-labelledby="about-title">
+  <div class="container">
+    <div class="about-grid">
+      <div class="about-copy">
+        <RichHeading id="about-title" class="about-title" parts={t.about.title} />
+        {t.about.body.map((paragraph) => <p class="about-text">{paragraph}</p>)}
+
+        <div class="roles">
+          <h3 class="roles-label">{t.about.rolesLabel}</h3>
+          <ul role="list">
+            {
+              currentRoles.map((role) => (
+                <li>
+                  <span class="role-title">{role.title[locale]}</span>
+                  <span class="role-company">
+                    {role.companyUrl ? (
+                      <a href={role.companyUrl} rel="noopener" target="_blank">
+                        {role.company}
+                        <span class="visually-hidden"> {t.a11y.newTab}</span>
+                      </a>
+                    ) : (
+                      role.company
+                    )}
+                  </span>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </div>
+
+      <figure class="editor">
+        <div class="editor-bar" aria-hidden="true">
+          <span class="lights"><i></i><i></i><i></i></span>
+          <span class="tab">{t.about.editorFile}</span>
+        </div>
+        <pre class="editor-code"><code><span class="tk-k">import</span> {'{'} <span class="tk-v">Client</span>, <span class="tk-v">Assets</span> {'}'} <span class="tk-k">from</span> <span class="tk-s">'@cosmosapp/pay_sdk'</span>;
+
+<span class="tk-k">const</span> <span class="tk-v">client</span> = <span class="tk-k">new</span> <span class="tk-f">Client</span>({'{'}
+  apiKey: process.env.<span class="tk-c2">COSMOS_PAY_API_KEY</span>,
+{'}'});
+
+<span class="tk-c">{t.about.editorComment}</span>
+<span class="tk-k">const</span> <span class="tk-v">pay</span> = <span class="tk-k">await</span> client.paymentIntents.<span class="tk-f">createPay</span>({'{'}
+  destination: <span class="tk-s">'GCAL…7AOO'</span>,
+  amount: <span class="tk-s">'25'</span>,
+  asset: Assets.<span class="tk-c2">USDC</span>,
+{'}'});
+
+pay.uri; <span class="tk-c">{t.about.editorResult}</span></code></pre>
+        <figcaption class="visually-hidden">{caption}</figcaption>
+      </figure>
+    </div>
+
+    <div class="stack">
+      <h3 class="visually-hidden">{t.about.skillsLabel}</h3>
+      <ul role="list">
+        {coreStack.map((skill) => <li>{skill}</li>)}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .about {
+    background: var(--dark);
+    color: var(--on-dark);
+    padding-block: clamp(64px, 9vw, 112px) clamp(48px, 6vw, 72px);
+  }
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+    align-items: center;
+    gap: clamp(40px, 6vw, 88px);
+  }
+
+  .about :global(.about-title) {
+    font-size: clamp(2rem, 4vw, 3.1rem);
+    font-weight: 300;
+    margin-bottom: 28px;
+  }
+
+  .about-text {
+    max-width: 34rem;
+    color: var(--on-dark-soft);
+    font-size: 1rem;
+  }
+
+  .about-text + .about-text {
+    margin-top: 14px;
+  }
+
+  .roles {
+    margin-top: 32px;
+    max-width: 34rem;
+  }
+
+  .roles-label {
+    margin-bottom: 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--on-dark-soft);
+  }
+
+  .roles li {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding-block: 10px;
+    border-top: 1px solid var(--on-dark-line);
+    font-size: 0.95rem;
+  }
+
+  .roles li:last-child {
+    border-bottom: 1px solid var(--on-dark-line);
+  }
+
+  .role-title {
+    font-weight: 500;
+  }
+
+  .role-company {
+    color: var(--on-dark-soft);
+  }
+
+  .role-company a {
+    text-decoration: underline;
+    text-decoration-color: var(--on-dark-line);
+  }
+
+  .role-company a:hover {
+    color: var(--on-dark);
+    text-decoration-color: currentColor;
+  }
+
+  /* Ventana de editor (reemplaza la captura de Figma del diseno) */
+  .editor {
+    overflow: hidden;
+    border-radius: 10px;
+    background: #0b0b0b;
+    border: 1px solid var(--on-dark-line);
+    box-shadow: 0 40px 80px -30px rgb(0 0 0 / 0.8);
+  }
+
+  .editor-bar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 10px 14px;
+    background: #161616;
+    border-bottom: 1px solid var(--on-dark-line);
+  }
+
+  .lights {
+    display: flex;
+    gap: 6px;
+  }
+
+  .lights i {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #3a3a3a;
+  }
+
+  .tab {
+    padding: 4px 10px;
+    border-radius: 4px;
+    background: #222;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--on-dark-soft);
+  }
+
+  .editor-code {
+    margin: 0;
+    padding: clamp(16px, 2.5vw, 28px);
+    /* Sin scroll horizontal: una region scrolleable necesitaria foco de teclado. */
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    font-family: var(--font-mono);
+    font-size: clamp(0.72rem, 1.05vw, 0.85rem);
+    line-height: 1.75;
+    color: #e6e6e6;
+    tab-size: 2;
+  }
+
+  .tk-k {
+    color: #c4b5fd;
+  }
+
+  .tk-s {
+    color: #a7f3d0;
+  }
+
+  .tk-f {
+    color: #93c5fd;
+  }
+
+  .tk-v {
+    color: #f5f5f5;
+  }
+
+  .tk-c {
+    color: #9a9a9a;
+  }
+
+  .tk-c2 {
+    color: #fcd34d;
+  }
+
+  .stack {
+    margin-top: clamp(48px, 7vw, 80px);
+  }
+
+  .stack ul {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 16px 32px;
+    margin: 0;
+  }
+
+  .stack li {
+    padding-bottom: 6px;
+    border-bottom: 1.5px solid currentColor;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  @media (max-width: 900px) {
+    .about-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .stack ul {
+      justify-content: flex-start;
+    }
+  }
+</style>

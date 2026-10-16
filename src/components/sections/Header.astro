@@ -1,0 +1,264 @@
+---
+import { site } from '@/config/site';
+import Icon from '@/components/ui/Icon.astro';
+import { useTranslations } from '@/i18n';
+import { localeMeta, localePath, otherLocale, type Locale } from '@/i18n/locales';
+
+interface Props {
+  locale: Locale;
+  path: string;
+}
+
+const { locale, path } = Astro.props;
+const t = useTranslations(locale);
+const home = localePath(locale);
+const isHome = path === '';
+const target = (id: string) => (isHome ? `#${id}` : `${home}#${id}`);
+
+const links = [
+  { id: 'home', label: t.nav.home },
+  { id: 'about', label: t.nav.about },
+  { id: 'projects', label: t.nav.projects },
+  { id: 'achievements', label: t.nav.achievements },
+  { id: 'contact', label: t.nav.contact },
+];
+
+const alt = otherLocale(locale);
+---
+
+<header class="site-header" data-header>
+  <div class="container bar">
+    <a class="logo" href={isHome ? '#home' : home}>
+      {site.logo}<span class="visually-hidden"> {site.name} — {t.nav.home}</span>
+    </a>
+
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav" data-menu-toggle>
+      <span class="visually-hidden" data-label-open>{t.a11y.menu}</span>
+      <span class="visually-hidden" data-label-close hidden>{t.a11y.closeMenu}</span>
+      <Icon name="menu" size={22} class="icon-open" />
+      <Icon name="close" size={22} class="icon-close" />
+    </button>
+
+    <nav id="site-nav" class="nav" aria-label={t.a11y.primaryNav}>
+      <ul role="list">
+        {
+          links.map((link, index) => (
+            <li>
+              <a href={target(link.id)} data-nav-link={link.id} aria-current={isHome && index === 0 ? 'location' : undefined}>
+                {link.label}
+              </a>
+            </li>
+          ))
+        }
+        <li class="lang">
+          <a
+            href={localePath(alt, path)}
+            hreflang={localeMeta[alt].hreflang}
+            data-lang-link
+          >
+            <Icon name="globe" size={16} />
+            {alt.toUpperCase()}
+            <span class="visually-hidden"> — {t.a11y.switchLanguage}</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+  <noscript>
+    <style>
+      .site-header .nav {
+        display: block !important;
+        position: static !important;
+      }
+      .site-header .menu-toggle {
+        display: none !important;
+      }
+    </style>
+  </noscript>
+</header>
+
+<script>
+  const header = document.querySelector<HTMLElement>('[data-header]');
+  const toggle = header?.querySelector<HTMLButtonElement>('[data-menu-toggle]');
+
+  if (header && toggle) {
+    const labelOpen = toggle.querySelector<HTMLElement>('[data-label-open]');
+    const labelClose = toggle.querySelector<HTMLElement>('[data-label-close]');
+
+    const setOpen = (open: boolean) => {
+      header.classList.toggle('is-open', open);
+      toggle.setAttribute('aria-expanded', String(open));
+      labelOpen?.toggleAttribute('hidden', open);
+      labelClose?.toggleAttribute('hidden', !open);
+    };
+
+    toggle.addEventListener('click', () => setOpen(!header.classList.contains('is-open')));
+    header.querySelectorAll('.nav a').forEach((link) => link.addEventListener('click', () => setOpen(false)));
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && header.classList.contains('is-open')) {
+        setOpen(false);
+        toggle.focus();
+      }
+    });
+
+    const onScroll = () => header.classList.toggle('is-scrolled', window.scrollY > 8);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+  }
+
+  // Resalta la seccion visible en la navegacion (solo en la pagina de inicio).
+  const navLinks = [...document.querySelectorAll<HTMLAnchorElement>('[data-nav-link]')];
+  const sections = navLinks
+    .map((link) => document.getElementById(link.dataset.navLink ?? ''))
+    .filter((section): section is HTMLElement => section !== null);
+
+  if (sections.length && 'IntersectionObserver' in window) {
+    const visible = new Map<string, number>();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) visible.set(entry.target.id, entry.isIntersecting ? entry.intersectionRatio : 0);
+        const [current] = [...visible.entries()].sort((a, b) => b[1] - a[1]);
+        if (!current || current[1] === 0) return;
+        for (const link of navLinks) {
+          if (link.dataset.navLink === current[0]) link.setAttribute('aria-current', 'location');
+          else link.removeAttribute('aria-current');
+        }
+      },
+      { rootMargin: '-35% 0px -45% 0px', threshold: [0, 0.25, 0.5, 0.75, 1] },
+    );
+    sections.forEach((section) => observer.observe(section));
+  }
+</script>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgb(243 243 243 / 0.92);
+    backdrop-filter: saturate(1.4) blur(14px);
+    -webkit-backdrop-filter: saturate(1.4) blur(14px);
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.2s var(--ease);
+  }
+
+  .site-header.is-scrolled {
+    border-bottom-color: var(--line);
+  }
+
+  .bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--header-h);
+  }
+
+  .logo {
+    font-size: 1.2rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    text-decoration: none;
+  }
+
+  .nav ul {
+    display: flex;
+    align-items: center;
+    gap: clamp(20px, 3vw, 40px);
+    margin: 0;
+  }
+
+  .nav a {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.875rem;
+    color: var(--ink-soft);
+    text-decoration: none;
+    transition: color 0.2s var(--ease);
+  }
+
+  .nav a:hover,
+  .nav a[aria-current] {
+    color: var(--ink);
+  }
+
+  .nav a[aria-current] {
+    font-weight: 600;
+  }
+
+  .lang a {
+    padding: 6px 10px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--ink);
+  }
+
+  .lang a:hover {
+    border-color: var(--ink);
+  }
+
+  .menu-toggle {
+    display: none;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    margin-right: -10px;
+    padding: 0;
+    background: none;
+    border: 0;
+    cursor: pointer;
+  }
+
+  .menu-toggle :global(.icon-close) {
+    display: none;
+  }
+
+  @media (max-width: 860px) {
+    .menu-toggle {
+      display: grid;
+    }
+
+    .nav {
+      display: none;
+      position: absolute;
+      inset: var(--header-h) 0 auto;
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+      padding: 8px var(--gutter) 24px;
+      box-shadow: 0 16px 32px rgb(0 0 0 / 0.06);
+    }
+
+    .nav ul {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0;
+    }
+
+    .nav li:not(.lang) a {
+      width: 100%;
+      padding: 14px 0;
+      font-size: 1.05rem;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .lang {
+      padding-top: 16px;
+    }
+
+    .site-header.is-open .nav {
+      display: block;
+    }
+
+    .site-header.is-open :global(.icon-open) {
+      display: none;
+    }
+
+    .site-header.is-open :global(.icon-close) {
+      display: block;
+    }
+  }
+</style>

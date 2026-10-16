@@ -1,0 +1,193 @@
+---
+import { Image } from 'astro:assets';
+import photo from '@/assets/emanuel.jpg';
+import { site } from '@/config/site';
+import Icon, { type IconName } from '@/components/ui/Icon.astro';
+import { useTranslations } from '@/i18n';
+import type { Locale } from '@/i18n/locales';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+const year = new Date().getFullYear();
+
+const socials: { label: string; href: string; icon: IconName }[] = [
+  { label: 'github', href: site.socials.github, icon: 'github' },
+  { label: 'linkedin', href: site.socials.linkedin, icon: 'linkedin' },
+  { label: 'npm', href: site.socials.npm, icon: 'npm' },
+];
+---
+
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div>
+      <p class="logo">{site.logo}</p>
+      <p class="tagline">{t.footer.tagline}</p>
+      <ul class="socials" role="list">
+        {
+          socials.map((social) => (
+            <li>
+              <a href={social.href} target="_blank" rel="me noopener">
+                <Icon name={social.icon} size={15} />
+                {social.label}
+                <span class="visually-hidden"> {t.a11y.newTab}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <div class="reach">
+      <p class="open">{t.footer.open}</p>
+      <a class="mail" href={`mailto:${site.email}`}>
+        <Image src={photo} alt="" width={28} height={28} class="mail-avatar" />
+        {site.email}
+      </a>
+    </div>
+  </div>
+
+  <div class="container bottom">
+    <p>© {year} {site.name}. {t.footer.rights}</p>
+    <p class="built">{t.footer.builtWith}</p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    position: relative;
+    overflow: hidden;
+    background: #000;
+    color: var(--on-dark);
+    padding-top: clamp(48px, 6vw, 72px);
+    isolation: isolate;
+  }
+
+  /* Halo de luz desde abajo, como en el diseno */
+  .site-footer::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -55%;
+    z-index: -1;
+    width: min(1100px, 140vw);
+    aspect-ratio: 2 / 1;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgb(255 255 255 / 0.22), rgb(255 255 255 / 0.06) 55%, transparent);
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+
+  .footer-grid {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 32px;
+  }
+
+  .logo {
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  .tagline {
+    margin-top: 8px;
+    font-size: 0.95rem;
+    color: var(--on-dark-soft);
+  }
+
+  .socials {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 24px 0 0;
+  }
+
+  .socials a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 8px 14px;
+    border: 1px solid rgb(255 255 255 / 0.55);
+    border-radius: 2px;
+    font-size: 0.875rem;
+    text-decoration: none;
+    transition:
+      background-color 0.2s var(--ease),
+      color 0.2s var(--ease);
+  }
+
+  .socials a:hover {
+    background: #fff;
+    color: #000;
+  }
+
+  .reach {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+  }
+
+  .open {
+    font-size: 0.95rem;
+    color: var(--on-dark-soft);
+  }
+
+  .mail {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    padding: 6px 18px 6px 6px;
+    border-radius: 999px;
+    background: #fff;
+    color: #000;
+    font-weight: 500;
+    font-size: 0.9rem;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+    transition: transform 0.2s var(--ease);
+  }
+
+  .mail:hover {
+    transform: translateY(-2px);
+  }
+
+  .mail :global(.mail-avatar) {
+    flex: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .bottom {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    margin-top: clamp(48px, 7vw, 88px);
+    padding-block: 20px 28px;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--on-dark-soft);
+  }
+
+  .built {
+    font-size: 0.75rem;
+    color: rgb(255 255 255 / 0.6);
+  }
+
+  @media (max-width: 640px) {
+    .reach {
+      align-items: flex-start;
+    }
+  }
+</style>

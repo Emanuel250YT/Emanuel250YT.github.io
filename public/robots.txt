@@ -1,0 +1,5 @@
+# https://emanuel250.dev.ar
+User-agent: *
+Allow: /
+
+Sitemap: https://emanuel250.dev.ar/sitemap-index.xml

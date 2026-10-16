@@ -1,0 +1,47 @@
+---
+import { getImage } from 'astro:assets';
+import photo from '@/assets/emanuel.jpg';
+import { site } from '@/config/site';
+import About from '@/components/sections/About.astro';
+import Achievements from '@/components/sections/Achievements.astro';
+import Contact from '@/components/sections/Contact.astro';
+import Hero from '@/components/sections/Hero.astro';
+import Projects from '@/components/sections/Projects.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { useTranslations } from '@/i18n';
+import type { Locale } from '@/i18n/locales';
+import { graph, organizationNodes, pageNode, personNode, projectListNode, websiteNode } from '@/lib/schema';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+
+const portrait = await getImage({ src: photo, width: 460, format: 'jpg' });
+const portraitUrl = new URL(portrait.src, Astro.site ?? site.url).href;
+
+const jsonLd = graph([
+  personNode(locale, portraitUrl),
+  ...organizationNodes(),
+  websiteNode(),
+  ...pageNode({
+    locale,
+    path: '',
+    title: t.meta.title,
+    description: t.meta.description,
+    type: 'ProfilePage',
+    imageUrl: portraitUrl,
+  }),
+  projectListNode(locale),
+]);
+---
+
+<BaseLayout locale={locale} path="" title={t.meta.title} description={t.meta.description} ogType="profile" jsonLd={jsonLd}>
+  <Hero locale={locale} />
+  <About locale={locale} />
+  <Projects locale={locale} />
+  <Achievements locale={locale} />
+  <Contact locale={locale} />
+</BaseLayout>

@@ -1,0 +1,509 @@
+---
+import { getImage } from 'astro:assets';
+import photo from '@/assets/emanuel.jpg';
+import { site } from '@/config/site';
+import Icon from '@/components/ui/Icon.astro';
+import { sortedAchievements } from '@/data/achievements';
+import { projects } from '@/data/projects';
+import { certifications, education, roles, skillGroups } from '@/data/resume';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { useTranslations } from '@/i18n';
+import { localePath, type Locale } from '@/i18n/locales';
+import { cvPdfPath } from '@/lib/cv';
+import { displayUrl, formatMonth, formatRange } from '@/lib/format';
+import { graph, organizationNodes, pageNode, personNode, websiteNode } from '@/lib/schema';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+
+const portrait = await getImage({ src: photo, width: 460, format: 'jpg' });
+const portraitUrl = new URL(portrait.src, Astro.site ?? site.url).href;
+
+const jsonLd = graph([
+  personNode(locale, portraitUrl),
+  ...organizationNodes(),
+  websiteNode(),
+  ...pageNode({
+    locale,
+    path: 'cv',
+    title: t.cv.title,
+    description: t.cv.description,
+    type: 'ProfilePage',
+    imageUrl: portraitUrl,
+    breadcrumb: [
+      { name: site.name, path: '' },
+      { name: t.cv.heading, path: 'cv' },
+    ],
+  }),
+]);
+
+const jobTitle = locale === 'es' ? 'Founder de Cosmos Pay · Desarrollador full stack' : 'Founder of Cosmos Pay · Full Stack Developer';
+const contactItems = [
+  { label: site.email, href: `mailto:${site.email}` },
+  { label: displayUrl(site.url), href: site.url },
+  { label: displayUrl(site.socials.linkedin), href: site.socials.linkedin },
+  { label: displayUrl(site.socials.github), href: site.socials.github },
+];
+---
+
+<BaseLayout locale={locale} path="cv" title={t.cv.title} description={t.cv.description} ogType="profile" jsonLd={jsonLd}>
+  <div class="container toolbar">
+    <a class="back" href={localePath(locale)}>
+      <Icon name="arrow-left" size={18} />
+      {t.cv.back}
+    </a>
+    <a class="btn btn--solid" href={cvPdfPath(locale)} download type="application/pdf">
+      <Icon name="download" />
+      {t.cv.download}
+    </a>
+  </div>
+
+  <article class="container cv" aria-labelledby="cv-name">
+    <header class="cv-header">
+      <div>
+        <p class="eyebrow">{t.cv.heading}</p>
+        <h1 id="cv-name">{site.name}</h1>
+        <p class="role">{jobTitle}</p>
+        <p class="place">
+          <Icon name="pin" size={14} />
+          {site.location.city}, Argentina
+        </p>
+      </div>
+      <ul class="contact-list" role="list" aria-label={t.cv.contactTitle}>
+        {
+          contactItems.map((item) => (
+            <li>
+              <a href={item.href}>{item.label}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </header>
+
+    <section class="block" aria-labelledby="cv-summary">
+      <h2 id="cv-summary">{t.cv.summaryTitle}</h2>
+      <p class="summary">{t.cv.summary}</p>
+    </section>
+
+    <section class="block" aria-labelledby="cv-experience">
+      <h2 id="cv-experience">{t.cv.experienceTitle}</h2>
+      <ol class="entries" role="list">
+        {
+          roles.map((role) => (
+            <li class="entry">
+              <div class="entry-head">
+                <h3>
+                  {role.title[locale]} · {role.companyUrl ? <a href={role.companyUrl}>{role.company}</a> : role.company}
+                </h3>
+                <p class="when">{formatRange(role.start, role.end, locale, t.cv.present)}</p>
+              </div>
+              <p class="where">{role.location[locale]}</p>
+              <p>{role.summary[locale]}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <section class="block" aria-labelledby="cv-projects">
+      <h2 id="cv-projects">{t.cv.projectsTitle}</h2>
+      <ul class="entries" role="list">
+        {
+          projects.map((project) => (
+            <li class="entry">
+              <div class="entry-head">
+                <h3>
+                  {project.url ? <a href={project.url}>{project.name}</a> : project.name}
+                  <span class="sub"> — {project.tagline[locale]}</span>
+                </h3>
+                <p class="when">{project.year}</p>
+              </div>
+              <p>{project.description[locale]}</p>
+              <p class="tech">{project.tech.join(' · ')}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section class="block" aria-labelledby="cv-achievements">
+      <h2 id="cv-achievements">{t.cv.achievementsTitle}</h2>
+      <ul class="compact" role="list">
+        {
+          sortedAchievements.map((item) => (
+            <li>
+              <span>
+                <strong>{item.title[locale]}</strong> — {item.detail[locale]} <span class="org">({item.org})</span>
+              </span>
+              <time datetime={item.date}>{formatMonth(item.date, locale)}</time>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <div class="split">
+      <section class="block" aria-labelledby="cv-education">
+        <h2 id="cv-education">{t.cv.educationTitle}</h2>
+        <ul class="compact" role="list">
+          {
+            education.map((item) => (
+              <li>
+                <span>
+                  <strong>{item.school}</strong> — {item.degree[locale]}
+                  {item.inProgress && <span class="org"> ({t.cv.inProgress})</span>}
+                </span>
+                <span class="when">
+                  {item.start === item.end ? item.start : `${item.start} – ${item.end}`}
+                </span>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+
+      <section class="block" aria-labelledby="cv-certs">
+        <h2 id="cv-certs">{t.cv.certificationsTitle}</h2>
+        <ul class="compact" role="list">
+          {
+            certifications.map((cert) => (
+              <li>
+                <span>
+                  <strong>{cert.name}</strong> — {cert.issuer}
+                </span>
+                <time datetime={cert.date}>{formatMonth(cert.date, locale)}</time>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+    </div>
+
+    <section class="block" aria-labelledby="cv-skills">
+      <h2 id="cv-skills">{t.cv.skillsTitle}</h2>
+      <dl class="skills">
+        {
+          skillGroups.map((group) => (
+            <div>
+              <dt>{group.label[locale]}</dt>
+              <dd>{group.items.join(' · ')}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </section>
+  </article>
+</BaseLayout>
+
+<style>
+  .toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding-block: 28px 8px;
+  }
+
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    font-size: 0.9rem;
+    text-decoration: none;
+    color: var(--ink-soft);
+  }
+
+  .back:hover {
+    color: var(--ink);
+  }
+
+  .cv {
+    max-width: calc(900px + var(--gutter) * 2);
+    padding-block: 24px clamp(64px, 8vw, 96px);
+  }
+
+  .cv-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    padding: clamp(24px, 4vw, 40px);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+  }
+
+  .eyebrow {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-soft);
+  }
+
+  h1 {
+    margin-top: 6px;
+    font-size: clamp(2.2rem, 5vw, 3.2rem);
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+  }
+
+  .role {
+    margin-top: 8px;
+    font-size: 1.05rem;
+    color: var(--ink-2);
+  }
+
+  .place {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    font-size: 0.875rem;
+    color: var(--ink-soft);
+  }
+
+  .contact-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 0;
+    font-size: 0.875rem;
+    text-align: right;
+  }
+
+  .contact-list a {
+    color: var(--ink-2);
+  }
+
+  .block {
+    margin-top: clamp(32px, 5vw, 48px);
+  }
+
+  .block h2 {
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1.5px solid var(--ink);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  .summary {
+    max-width: 48rem;
+    font-size: 1.05rem;
+    color: var(--ink-2);
+  }
+
+  .entries {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    margin: 0;
+  }
+
+  .entry {
+    break-inside: avoid;
+  }
+
+  .entry p {
+    color: var(--ink-2);
+    font-size: 0.95rem;
+  }
+
+  .entry-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 4px 16px;
+  }
+
+  .entry h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+  }
+
+  .entry h3 a {
+    text-decoration-color: var(--line);
+  }
+
+  .sub {
+    font-weight: 400;
+    color: var(--ink-soft);
+  }
+
+  .when,
+  time {
+    flex: none;
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    white-space: nowrap;
+  }
+
+  .entry .where,
+  .entry .tech {
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+  }
+
+  .entry .where {
+    margin-bottom: 4px;
+  }
+
+  .entry .tech {
+    margin-top: 4px;
+  }
+
+  .compact {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 0;
+  }
+
+  .compact li {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    font-size: 0.92rem;
+    color: var(--ink-2);
+    break-inside: avoid;
+  }
+
+  .compact strong {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .org {
+    color: var(--ink-soft);
+  }
+
+  .split {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 40px;
+  }
+
+  .skills {
+    display: grid;
+    gap: 10px;
+  }
+
+  .skills div {
+    display: grid;
+    grid-template-columns: 9rem 1fr;
+    gap: 16px;
+    font-size: 0.92rem;
+  }
+
+  .skills dt {
+    font-weight: 600;
+  }
+
+  .skills dd {
+    color: var(--ink-2);
+  }
+
+  @media (max-width: 720px) {
+    .split {
+      grid-template-columns: 1fr;
+    }
+
+    .contact-list {
+      text-align: left;
+    }
+
+    .compact li {
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .skills div {
+      grid-template-columns: 1fr;
+      gap: 2px;
+    }
+  }
+
+  /* Version imprimible / PDF */
+  @page {
+    size: A4;
+    margin: 12mm 13mm 12mm;
+  }
+
+  @media print {
+    :global(.site-header),
+    :global(.site-footer),
+    :global(.skip-link),
+    .toolbar {
+      display: none !important;
+    }
+
+    :global(body) {
+      font-size: 10pt;
+      line-height: 1.45;
+    }
+
+    .cv {
+      max-width: none;
+      padding: 0;
+    }
+
+    .cv-header {
+      padding: 0 0 12px;
+      border-radius: 0;
+      border-bottom: 1px solid #ddd;
+    }
+
+    h1 {
+      font-size: 24pt;
+    }
+
+    .block {
+      margin-top: 12px;
+    }
+
+    .block h2 {
+      margin-bottom: 6px;
+      padding-bottom: 4px;
+      font-size: 8pt;
+    }
+
+    .entries {
+      gap: 7px;
+    }
+
+    .compact {
+      gap: 5px;
+    }
+
+    .skills {
+      gap: 3px;
+      break-inside: avoid;
+    }
+
+    .entry p,
+    .compact li,
+    .skills div,
+    .summary {
+      font-size: 9pt;
+      line-height: 1.4;
+    }
+
+    .entry h3 {
+      font-size: 10.5pt;
+    }
+
+    a {
+      text-decoration: none;
+    }
+  }
+</style>

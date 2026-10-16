@@ -1,0 +1,33 @@
+# Emanuel Guzman
+
+> Desarrollador full stack y founder de Cosmos / Cosmos Pay, en Salta, Argentina. Construye pagos, SDKs y productos sobre Stellar, Solana y Monad para Latinoamérica.
+> Full stack developer and founder of Cosmos / Cosmos Pay, based in Salta, Argentina. Builds payments, SDKs and products on Stellar, Solana and Monad for Latin America.
+
+## Páginas / Pages
+
+- [Portfolio (español)](https://emanuel250.dev.ar/): proyectos, logros y contacto
+- [Portfolio (English)](https://emanuel250.dev.ar/en/): projects, achievements and contact
+- [CV (español)](https://emanuel250.dev.ar/cv/): experiencia, educación y certificaciones ([PDF](https://emanuel250.dev.ar/cv/emanuel-guzman-cv.pdf))
+- [CV (English)](https://emanuel250.dev.ar/en/cv/): experience, education and certifications ([PDF](https://emanuel250.dev.ar/en/cv/emanuel-guzman-cv.pdf))
+
+## Roles
+
+- Founder — Cosmos · Cosmos Pay (2026 – hoy): https://cosmospay.lat
+- CEO — CloudyCoding (2018 – hoy): https://cloudycoding.com
+- Full Stack Developer — SaltaDev (2025 – hoy): https://salta.dev.ar
+
+## Proyectos / Projects
+
+- [Cosmos Pay](https://cosmospay.lat): pasarela de pagos para desarrolladores en LATAM (payment intents, webhooks, stablecoins, rampas fiat)
+- [Cosmos Pay Wallet](https://github.com/CosmosPay/CosmosPay-Wallet): wallet no custodial de Stellar (extensión, Android, web, desktop)
+- BancaSDK: SDK multi-banco en TypeScript, evolución de MacroClickJS (15.000+ descargas en su primera semana)
+- [SolaDB](https://github.com/Emanuel250YT/SolaDB) y [MonaDB](https://github.com/Emanuel250YT/MonaDB): storage privado y replicado sobre Solana y Monad
+- [ASide](https://github.com/Emanuel250YT/ASide) y [ArkaCDN](https://github.com/Emanuel250YT/arka-cdn): SDKs para construir sobre Arkiv
+- [StellarOrchestra](https://github.com/Emanuel250YT/StellarOrchestra): orquestador de agentes de IA con pagos x402 en Stellar
+
+## Contacto / Contact
+
+- Email: emanuel@cloudycoding.com
+- GitHub: https://github.com/Emanuel250YT
+- LinkedIn: https://www.linkedin.com/in/emanuel250/
+- npm: https://www.npmjs.com/~emanuel250dev

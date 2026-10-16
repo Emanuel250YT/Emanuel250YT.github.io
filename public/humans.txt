@@ -1,0 +1,12 @@
+/* TEAM */
+Developer: Emanuel Guzman
+Role: Founder de Cosmos Pay, desarrollador full stack
+Site: https://emanuel250.dev.ar
+GitHub: https://github.com/Emanuel250YT
+LinkedIn: https://www.linkedin.com/in/emanuel250/
+From: Salta, Argentina
+
+/* SITE */
+Language: Español (es-AR) / English
+Standards: HTML5, CSS3, schema.org JSON-LD, WCAG 2.2 AA
+Software: Astro, TypeScript, GitHub Pages
