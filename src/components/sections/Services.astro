@@ -1,0 +1,176 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import SectionHeader from '@/components/ui/SectionHeader.astro';
+import { services } from '@/data/services';
+import { useTranslations } from '@/i18n';
+import type { Locale } from '@/i18n/locales';
+
+interface Props {
+  locale: Locale;
+  index: number;
+}
+
+const { locale, index } = Astro.props;
+const t = useTranslations(locale);
+---
+
+<section id="services" class="section services" aria-labelledby="services-title">
+  <div class="container">
+    <SectionHeader
+      index={index}
+      eyebrow={t.services.eyebrow}
+      title={t.services.title}
+      titleId="services-title"
+      intro={t.services.intro}
+      layout="split"
+    />
+
+    <ul class="grid" role="list" data-reveal-stagger>
+      {
+        services.map((service, position) => (
+          <li class="card" data-reveal>
+            <div class="card-top">
+              <span class="number" aria-hidden="true">
+                {String(position + 1).padStart(2, '0')}
+              </span>
+              <Icon name="arrow-up-right" size={18} class="corner" />
+            </div>
+            <h3>{service.title[locale]}</h3>
+            <p class="description">{service.description[locale]}</p>
+            <ul class="tags" role="list">
+              {service.tags.map((tag) => (
+                <li>{tag}</li>
+              ))}
+            </ul>
+            <a
+              class="link-arrow cta"
+              href="#contact"
+              data-service={service.id}
+              data-track="select_service"
+              data-track-service={service.id}
+            >
+              {t.services.cta}
+              <span class="visually-hidden">: {service.title[locale]}</span>
+              <Icon name="arrow-right" size={16} class="btn-arrow" />
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(16px, 2vw, 24px);
+    margin: 0;
+  }
+
+  .card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: clamp(24px, 3vw, 36px);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    overflow: hidden;
+    transition:
+      border-color 0.35s var(--ease),
+      box-shadow 0.35s var(--ease),
+      translate 0.35s var(--ease);
+  }
+
+  /* Ink wash that rises from the bottom on hover */
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: auto 0 0;
+    height: 3px;
+    background: var(--ink);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.5s var(--ease);
+  }
+
+  .card:hover,
+  .card:focus-within {
+    border-color: rgb(17 17 17 / 0.4);
+    box-shadow: 0 24px 48px -28px rgb(0 0 0 / 0.35);
+    translate: 0 -4px;
+  }
+
+  .card:hover::before,
+  .card:focus-within::before {
+    transform: scaleX(1);
+  }
+
+  .card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .number {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--ink-soft);
+  }
+
+  .card :global(.corner) {
+    color: var(--ink-soft);
+    transition:
+      transform 0.4s var(--ease),
+      color 0.3s var(--ease);
+  }
+
+  .card:hover :global(.corner) {
+    color: var(--ink);
+    transform: translate(3px, -3px);
+  }
+
+  h3 {
+    margin-top: 12px;
+    font-size: clamp(1.25rem, 2vw, 1.5rem);
+    font-weight: 500;
+    letter-spacing: var(--tracking-display);
+  }
+
+  .description {
+    color: var(--ink-soft);
+    font-size: 0.95rem;
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 4px 0 0;
+  }
+
+  .tags li {
+    padding: 4px 10px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--ink-2);
+  }
+
+  .cta {
+    margin-top: auto;
+    padding-top: 12px;
+    align-self: flex-start;
+    font-size: 0.9rem;
+  }
+
+  @media (max-width: 760px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

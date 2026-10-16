@@ -13,6 +13,11 @@ export interface Stat {
   detail: string;
 }
 
+export interface Step {
+  title: string;
+  body: string;
+}
+
 export interface Dictionary {
   meta: {
     title: string;
@@ -31,26 +36,45 @@ export interface Dictionary {
     language: string;
     newTab: string;
     scrollHint: string;
+    /** Prefix read before the list of rotating roles ("Roles"). */
+    rolesLabel: string;
   };
   nav: {
-    home: string;
+    services: string;
+    process: string;
     about: string;
     projects: string;
     achievements: string;
     contact: string;
+    /** Header call to action that jumps to the contact form. */
+    cta: string;
   };
   hero: {
-    badgeRole: string;
+    /** Roles that rotate inside the hero badge; the first one is the static fallback. */
+    roles: string[];
     title: RichText;
     lead: string;
-    ctaTalk: string;
-    ctaWork: string;
+    ctaPrimary: string;
+    ctaSecondary: string;
     stats: Stat[];
     photoAlt: string;
-    available: string;
-    basedIn: string;
+  };
+  services: {
+    eyebrow: string;
+    title: RichText;
+    intro: string;
+    /** Call to action on every service card. */
+    cta: string;
+  };
+  process: {
+    eyebrow: string;
+    title: RichText;
+    intro: string;
+    steps: Step[];
+    cta: string;
   };
   about: {
+    eyebrow: string;
     title: RichText;
     body: string[];
     rolesLabel: string;
@@ -59,8 +83,10 @@ export interface Dictionary {
     editorComment: string;
     editorResult: string;
     editorCaption: string;
+    cvCta: string;
   };
   projects: {
+    eyebrow: string;
     title: RichText;
     visit: string;
     code: string;
@@ -74,24 +100,73 @@ export interface Dictionary {
       balance: string;
       files: [string, string, string];
     };
+    ctaTitle: string;
   };
   achievements: {
+    eyebrow: string;
     title: RichText;
+    ecosystemsLabel: string;
   };
   contact: {
+    eyebrow: string;
     title: RichText;
     body: string;
-    ctaTalk: string;
+    nextTitle: string;
+    nextSteps: string[];
+    directTitle: string;
     ctaCv: string;
-    terminalTitle: string;
-    terminalLines: { prompt?: boolean; text: string }[];
     mailSubject: string;
+    form: {
+      name: string;
+      namePlaceholder: string;
+      email: string;
+      emailPlaceholder: string;
+      company: string;
+      companyPlaceholder: string;
+      website: string;
+      websitePlaceholder: string;
+      service: string;
+      servicePlaceholder: string;
+      serviceCosmos: string;
+      serviceOther: string;
+      budget: string;
+      budgetPlaceholder: string;
+      /** Five ranges, in the order of BUDGET_VALUES in src/data/contact.ts. */
+      budgetOptions: [string, string, string, string, string];
+      message: string;
+      messagePlaceholder: string;
+      optional: string;
+      privacy: string;
+      submit: string;
+      sending: string;
+      successTitle: string;
+      successBody: string;
+      error: string;
+      errorRequired: string;
+      errorEmail: string;
+    };
   };
   footer: {
     tagline: string;
-    open: string;
+    ctaTitle: string;
     rights: string;
     builtWith: string;
+    /** Button that reopens the analytics consent banner. */
+    cookies: string;
+  };
+  /** Analytics consent banner (only rendered when Google Analytics is configured). */
+  consent: {
+    text: string;
+    accept: string;
+    reject: string;
+  };
+  privacy: {
+    title: string;
+    description: string;
+    heading: string;
+    updated: string;
+    /** `{email}` inside a body is replaced with the contact email link. */
+    sections: Step[];
   };
   cv: {
     title: string;

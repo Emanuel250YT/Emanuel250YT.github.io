@@ -4,7 +4,7 @@ import avatar from '@/assets/avatar.png';
 import { site } from '@/config/site';
 import Icon, { type IconName } from '@/components/ui/Icon.astro';
 import { useTranslations } from '@/i18n';
-import type { Locale } from '@/i18n/locales';
+import { localePath, type Locale } from '@/i18n/locales';
 
 interface Props {
   locale: Locale;
@@ -13,6 +13,8 @@ interface Props {
 const { locale } = Astro.props;
 const t = useTranslations(locale);
 const year = new Date().getFullYear();
+const analyticsEnabled = Boolean(site.googleAnalyticsId);
+const home = localePath(locale);
 
 const socials: { label: string; href: string; icon: IconName }[] = [
   { label: 'github', href: site.socials.github, icon: 'github' },
@@ -42,8 +44,12 @@ const socials: { label: string; href: string; icon: IconName }[] = [
     </div>
 
     <div class="reach">
-      <p class="open">{t.footer.open}</p>
-      <a class="mail" href={`mailto:${site.email}`}>
+      <p class="cta-title">{t.footer.ctaTitle}</p>
+      <a class="btn btn--light" href={`${home}#contact`} data-track="cta_click" data-track-location="footer">
+        {t.nav.cta}
+        <Icon name="arrow-right" size={18} class="btn-arrow" />
+      </a>
+      <a class="mail" href={`mailto:${site.email}`} data-track="contact_click" data-track-method="email_footer">
         <Image src={avatar} alt="" width={30} height={30} densities={[1, 2]} class="mail-avatar" />
         {site.email}
       </a>
@@ -52,6 +58,18 @@ const socials: { label: string; href: string; icon: IconName }[] = [
 
   <div class="container bottom">
     <p>© {year} {site.name}. {t.footer.rights}</p>
+    <ul class="legal" role="list">
+      <li><a href={localePath(locale, 'privacy')}>{t.privacy.heading}</a></li>
+      {
+        analyticsEnabled && (
+          <li>
+            <button type="button" class="link-button" data-consent-open>
+              {t.footer.cookies}
+            </button>
+          </li>
+        )
+      }
+    </ul>
     <p class="built">{t.footer.builtWith}</p>
   </div>
 </footer>
@@ -135,9 +153,37 @@ const socials: { label: string; href: string; icon: IconName }[] = [
     gap: 12px;
   }
 
-  .open {
-    font-size: 0.95rem;
+  .cta-title {
+    font-size: clamp(1.25rem, 2.4vw, 1.75rem);
+    letter-spacing: var(--tracking-display);
+  }
+
+  .legal {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px 18px;
+    margin: 4px 0;
+  }
+
+  .legal a,
+  .link-button {
+    min-height: 32px;
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    font-size: 0.8rem;
     color: var(--on-dark-soft);
+    text-decoration: underline;
+    text-decoration-color: rgb(255 255 255 / 0.3);
+    text-underline-offset: 0.25em;
+  }
+
+  .legal a:hover,
+  .link-button:hover {
+    color: #fff;
+    text-decoration-color: currentColor;
   }
 
   .mail {

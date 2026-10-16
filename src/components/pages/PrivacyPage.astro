@@ -1,0 +1,115 @@
+---
+import { getImage } from 'astro:assets';
+import portrait from '@/assets/portrait.png';
+import { site } from '@/config/site';
+import Icon from '@/components/ui/Icon.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { useTranslations } from '@/i18n';
+import { localeMeta, localePath, type Locale } from '@/i18n/locales';
+import { graph, organizationNodes, pageNode, personNode, websiteNode } from '@/lib/schema';
+
+/** Bump when the policy text changes. */
+const UPDATED = '2026-10-16';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+const updated = new Intl.DateTimeFormat(localeMeta[locale].dateLocale, { dateStyle: 'long', timeZone: 'UTC' }).format(
+  new Date(`${UPDATED}T00:00:00Z`),
+);
+
+const portraitImage = await getImage({ src: portrait, width: 744, format: 'webp' });
+const portraitUrl = new URL(portraitImage.src, Astro.site ?? site.url).href;
+
+const jsonLd = graph([
+  personNode(locale, portraitUrl),
+  ...organizationNodes(),
+  websiteNode(),
+  ...pageNode({
+    locale,
+    path: 'privacy',
+    title: t.privacy.title,
+    description: t.privacy.description,
+    type: 'WebPage',
+    imageUrl: portraitUrl,
+    breadcrumb: [
+      { name: site.name, path: '' },
+      { name: t.privacy.heading, path: 'privacy' },
+    ],
+  }),
+]);
+
+/** Splits a body around the `{email}` token so the address renders as a link. */
+const parts = (body: string) => body.split('{email}');
+---
+
+<BaseLayout locale={locale} path="privacy" title={t.privacy.title} description={t.privacy.description} jsonLd={jsonLd}>
+  <article class="container privacy" aria-labelledby="privacy-title">
+    <a class="back link-arrow" href={localePath(locale)}>
+      <Icon name="arrow-left" size={18} />
+      {t.cv.back}
+    </a>
+    <h1 id="privacy-title" class="display" data-reveal>{t.privacy.heading}</h1>
+    <p class="updated" data-reveal>
+      {t.privacy.updated}: <time datetime={UPDATED}>{updated}</time>
+    </p>
+
+    {
+      t.privacy.sections.map((section) => (
+        <section class="block" data-reveal>
+          <h2>{section.title}</h2>
+          <p>
+            {parts(section.body).map((chunk, index) => (
+              <>
+                {index > 0 && <a href={`mailto:${site.email}`}>{site.email}</a>}
+                {chunk}
+              </>
+            ))}
+          </p>
+        </section>
+      ))
+    }
+  </article>
+</BaseLayout>
+
+<style>
+  .privacy {
+    max-width: calc(760px + var(--gutter) * 2);
+    padding-block: 40px clamp(72px, 9vw, 112px);
+  }
+
+  .back {
+    margin-bottom: 32px;
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+  }
+
+  h1 {
+    font-size: clamp(2.2rem, 5vw, 3.4rem);
+  }
+
+  .updated {
+    margin-top: 12px;
+    font-size: 0.875rem;
+    color: var(--ink-soft);
+  }
+
+  .block {
+    margin-top: 40px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+  }
+
+  h2 {
+    margin-bottom: 12px;
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+
+  .block p {
+    color: var(--ink-2);
+  }
+</style>

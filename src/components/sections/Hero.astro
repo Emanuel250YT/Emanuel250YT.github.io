@@ -18,34 +18,50 @@ const t = useTranslations(locale);
 <section id="home" class="hero" aria-labelledby="hero-title">
   <div class="container hero-grid">
     <div class="hero-copy">
-      <p class="badge">
+      <p class="badge enter" style="--enter-index: 0">
         <span class="badge-mark" aria-hidden="true">e.</span>
         <span class="badge-pill">
           <strong>{site.name}</strong>
           <span class="badge-sep" aria-hidden="true">/</span>
-          <span class="badge-role">{t.hero.badgeRole}</span>
+          <span class="visually-hidden">{t.a11y.rolesLabel}: {t.hero.roles.join(', ')}</span>
+          <!-- Rotating role: every role sits in the same grid cell, so the pill keeps the width of the longest one. -->
+          <span class="roles" aria-hidden="true" data-roles>
+            {
+              t.hero.roles.map((role, index) => (
+                <span class:list={['role', { 'is-active': index === 0 }]} data-role>
+                  {role}
+                </span>
+              ))
+            }
+          </span>
           <Icon name="cursor" size={18} class="badge-cursor" />
         </span>
       </p>
 
-      <RichHeading as="h1" id="hero-title" class="hero-title" parts={t.hero.title} />
-
-      <p class="lead">{t.hero.lead}</p>
-
-      <div class="actions">
-        <a class="btn btn--frame" href="#contact">
-          <Icon name="chat" />
-          {t.hero.ctaTalk}
-        </a>
-        <a class="btn btn--solid" href="#projects">{t.hero.ctaWork}</a>
+      <div class="enter" style="--enter-index: 1">
+        <RichHeading as="h1" id="hero-title" class="hero-title" parts={t.hero.title} />
       </div>
 
-      <dl class="stats">
+      <p class="lead enter" style="--enter-index: 2">{t.hero.lead}</p>
+
+      <div class="actions enter" style="--enter-index: 3">
+        <a class="btn btn--solid" href="#contact" data-track="cta_click" data-track-location="hero">
+          {t.hero.ctaPrimary}
+          <Icon name="arrow-right" size={18} class="btn-arrow" />
+        </a>
+        <a class="btn btn--frame" href="#services" data-track="cta_click" data-track-location="hero_services">
+          {t.hero.ctaSecondary}
+        </a>
+      </div>
+
+      <dl class="stats enter" style="--enter-index: 4" data-count-group>
         {
           t.hero.stats.map((stat) => (
             <div class="stat">
               <dt>
-                <span class="stat-value">{stat.value}</span>
+                <span class="stat-value" data-count>
+                  {stat.value}
+                </span>
                 <span class="stat-label">{stat.label}</span>
               </dt>
               <dd>{stat.detail}</dd>
@@ -55,7 +71,7 @@ const t = useTranslations(locale);
       </dl>
     </div>
 
-    <figure class="hero-photo">
+    <figure class="hero-photo enter enter--photo" style="--enter-index: 1">
       <Image
         src={portrait}
         alt={t.hero.photoAlt}
@@ -65,11 +81,6 @@ const t = useTranslations(locale);
         fetchpriority="high"
         class="photo"
       />
-      <span class="chip chip--place">
-        <Icon name="pin" size={14} />
-        {t.hero.basedIn}
-      </span>
-      <span class="chip chip--status"><span class="dot" aria-hidden="true"></span>{t.hero.available}</span>
       <span class="peer-cursor" aria-hidden="true">
         <Icon name="cursor" size={20} />
         <span>{site.givenName}</span>
@@ -77,6 +88,46 @@ const t = useTranslations(locale);
     </figure>
   </div>
 </section>
+
+<script>
+  /**
+   * Rotates the roles in the hero badge. Pauses on hover/focus and while the hero
+   * is off-screen and stops after a few cycles (WCAG 2.2.2). With
+   * prefers-reduced-motion the roles cross-fade instead of sliding (CSS).
+   * Screen readers get the full list once, statically.
+   */
+  const container = document.querySelector<HTMLElement>('[data-roles]');
+  const roles = container ? [...container.querySelectorAll<HTMLElement>('[data-role]')] : [];
+  if (container && roles.length > 1) {
+    const INTERVAL = 2600;
+    const MAX_STEPS = roles.length * 3;
+    let index = 0;
+    let steps = 0;
+    let paused = false;
+    let visible = true;
+
+    const show = (next: number) => {
+      const current = roles[index]!;
+      current.classList.remove('is-active');
+      current.classList.add('is-leaving');
+      window.setTimeout(() => current.classList.remove('is-leaving'), 600);
+      index = next;
+      roles[index]!.classList.add('is-active');
+    };
+
+    const timer = window.setInterval(() => {
+      if (paused || !visible) return;
+      steps += 1;
+      show((index + 1) % roles.length);
+      if (steps >= MAX_STEPS && index === 0) window.clearInterval(timer);
+    }, INTERVAL);
+
+    const badge = container.closest('.badge');
+    badge?.addEventListener('mouseenter', () => (paused = true));
+    badge?.addEventListener('mouseleave', () => (paused = false));
+    new IntersectionObserver(([entry]) => (visible = entry?.isIntersecting ?? true)).observe(container);
+  }
+</script>
 
 <style>
   .hero {
@@ -112,6 +163,55 @@ const t = useTranslations(locale);
 
   .hero-copy {
     padding-bottom: clamp(48px, 7vw, 88px);
+  }
+
+  /* Entrance on load, staggered. Starts at a tiny non-zero opacity so the text
+     still counts as painted for Largest Contentful Paint. Reduced motion: fade only. */
+  .enter {
+    animation: enter-fade 0.7s var(--ease) both;
+    animation-delay: calc(var(--enter-index, 0) * 90ms + 60ms);
+  }
+
+  @keyframes enter-fade {
+    from {
+      opacity: 0.01;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .enter {
+      animation-name: enter;
+      animation-duration: 0.9s;
+      animation-delay: calc(var(--enter-index, 0) * 110ms + 60ms);
+    }
+
+    .enter--photo {
+      animation-name: enter-photo;
+      animation-duration: 1.1s;
+    }
+
+    .peer-cursor {
+      animation: drift 7s ease-in-out 1.2s infinite;
+    }
+  }
+
+  @keyframes enter {
+    from {
+      opacity: 0.01;
+      transform: translate3d(0, 24px, 0);
+    }
+  }
+
+  @keyframes enter-photo {
+    from {
+      transform: translate3d(0, 48px, 0) scale(0.98);
+    }
+  }
+
+  @keyframes drift {
+    50% {
+      transform: translate(-10px, 8px);
+    }
   }
 
   /* Badge with cursor, like the Figma label in the design */
@@ -159,14 +259,56 @@ const t = useTranslations(locale);
   }
 
   .badge-sep,
-  .badge-role {
+  .roles {
     color: var(--ink-soft);
   }
 
-  .badge-role {
+  .roles {
     font-size: 0.72rem;
     text-transform: uppercase;
     letter-spacing: 0.06em;
+  }
+
+  .roles {
+    display: grid;
+    overflow: hidden;
+  }
+
+  .role {
+    grid-area: 1 / 1;
+    white-space: nowrap;
+  }
+
+  /* Without JS only the first role shows. */
+  .roles .role:not(.is-active) {
+    visibility: hidden;
+  }
+
+  :global(.js) .roles .role {
+    visibility: visible;
+    opacity: 0;
+    transform: translateY(110%);
+    transition:
+      opacity 0.45s var(--ease),
+      transform 0.6s var(--ease);
+  }
+
+  :global(.js) .roles .role.is-active {
+    opacity: 1;
+    transform: none;
+  }
+
+  :global(.js) .roles .role.is-leaving {
+    opacity: 0;
+    transform: translateY(-110%);
+  }
+
+  /* Reduced motion: the roles cross-fade in place instead of sliding. */
+  @media (prefers-reduced-motion: reduce) {
+    :global(.js) .roles .role,
+    :global(.js) .roles .role.is-leaving {
+      transform: none;
+    }
   }
 
   .badge-pill :global(.badge-cursor) {
@@ -224,6 +366,7 @@ const t = useTranslations(locale);
     font-weight: 400;
     line-height: 1;
     letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
   }
 
   .stat-label {
@@ -248,60 +391,6 @@ const t = useTranslations(locale);
     display: block;
     width: 100%;
     height: auto;
-  }
-
-  .chip {
-    position: absolute;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 14px;
-    border-radius: 999px;
-    background: var(--surface);
-    box-shadow: var(--shadow-card);
-    font-size: 0.8rem;
-    font-weight: 500;
-    white-space: nowrap;
-  }
-
-  .chip--place {
-    top: 16%;
-    right: 0;
-  }
-
-  .chip--status {
-    bottom: 14%;
-    left: -4%;
-  }
-
-  .dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #16a34a;
-    box-shadow: 0 0 0 4px rgb(22 163 74 / 0.18);
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    .dot {
-      animation: pulse 2.4s ease-in-out infinite;
-    }
-
-    .peer-cursor {
-      animation: drift 7s ease-in-out infinite;
-    }
-  }
-
-  @keyframes pulse {
-    50% {
-      box-shadow: 0 0 0 7px rgb(22 163 74 / 0.06);
-    }
-  }
-
-  @keyframes drift {
-    50% {
-      transform: translate(-10px, 8px);
-    }
   }
 
   /* Figma-style "collaborator" cursor */
@@ -342,14 +431,6 @@ const t = useTranslations(locale);
 
     .peer-cursor {
       left: -8%;
-    }
-
-    .chip--status {
-      left: -10%;
-    }
-
-    .chip--place {
-      right: -8%;
     }
   }
 

@@ -14,6 +14,9 @@ const sitemapLocales = {
   hi: 'hi',
 };
 
+// Every URL in the sitemap carries the build date as <lastmod>.
+const buildDate = new Date().toISOString();
+
 // Public domain (dev.ar -> GitHub Pages). Must match public/CNAME.
 // The rest of the code reads it through Astro.site / src/config/site.ts.
 export default defineConfig({
@@ -43,7 +46,10 @@ export default defineConfig({
       serialize(item) {
         const path = new URL(item.url).pathname;
         const isHome = path === '/' || locales.some((locale) => path === `/${locale}/`);
-        return isHome ? { ...item, priority: 1, changefreq: ChangeFreqEnum.WEEKLY } : item;
+        const withDate = { ...item, lastmod: buildDate };
+        if (isHome) return { ...withDate, priority: 1, changefreq: ChangeFreqEnum.WEEKLY };
+        if (path.endsWith('/privacy/')) return { ...withDate, priority: 0.3, changefreq: ChangeFreqEnum.YEARLY };
+        return withDate;
       },
     }),
   ],

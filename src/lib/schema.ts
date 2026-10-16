@@ -2,6 +2,7 @@ import { site } from '@/config/site';
 import { achievements } from '@/data/achievements';
 import { projects } from '@/data/projects';
 import { certifications, education, roles, skillGroups } from '@/data/resume';
+import { services } from '@/data/services';
 import { useTranslations } from '@/i18n';
 import { localeMeta, localePath, locales, type Locale } from '@/i18n/locales';
 
@@ -69,6 +70,34 @@ export function personNode(locale: Locale, imageUrl: string): JsonLd {
     knowsAbout: [...new Set(skillGroups.flatMap((group) => group.items))],
     knowsLanguage: ['es', 'en'],
     sameAs: [site.socials.github, site.socials.linkedin, site.socials.npm],
+    contactPoint: {
+      '@type': 'ContactPoint',
+      contactType: 'sales',
+      email: site.email,
+      url: abs(`${localePath(locale)}#contact`),
+      availableLanguage: ['es', 'en'],
+    },
+    makesOffer: { '@id': abs(`${localePath(locale)}#services`) },
+  };
+}
+
+/** The services on the home page, as an OfferCatalog the person provides. */
+export function serviceCatalogNode(locale: Locale): JsonLd {
+  return {
+    '@type': 'OfferCatalog',
+    '@id': abs(`${localePath(locale)}#services`),
+    name: useTranslations(locale).services.eyebrow,
+    itemListElement: services.map((service) => ({
+      '@type': 'Offer',
+      itemOffered: {
+        '@type': 'Service',
+        name: service.title[locale],
+        description: service.description[locale],
+        serviceType: service.formValue,
+        provider: { '@id': ids.person },
+        areaServed: [{ '@type': 'Place', name: 'Latin America' }, { '@type': 'Place', name: 'Worldwide' }],
+      },
+    })),
   };
 }
 

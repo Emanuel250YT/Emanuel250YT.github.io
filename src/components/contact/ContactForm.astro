@@ -1,0 +1,528 @@
+---
+import { site } from '@/config/site';
+import Icon from '@/components/ui/Icon.astro';
+import { BUDGET_VALUES, SERVICE_EXTRA_VALUES } from '@/data/contact';
+import { services } from '@/data/services';
+import { useTranslations } from '@/i18n';
+import { localePath, type Locale } from '@/i18n/locales';
+
+/**
+ * Lead form. Works without JavaScript (classic POST to FormSubmit, which
+ * redirects back to #contact-sent); with JavaScript it validates inline, sends
+ * JSON, shows the result in place and reports a GA4 `generate_lead` event.
+ */
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+const f = t.contact.form;
+const sentUrl = `${site.url}${localePath(locale)}#contact-sent`;
+
+const serviceOptions = [
+  ...services.map((service) => ({ value: service.formValue, label: service.title[locale], id: service.id })),
+  { value: SERVICE_EXTRA_VALUES.cosmos, label: f.serviceCosmos, id: 'cosmos' },
+  { value: SERVICE_EXTRA_VALUES.other, label: f.serviceOther, id: 'other' },
+];
+---
+
+<div class="form-card" data-reveal="scale">
+  <form
+    class="form"
+    action={site.contactForm.action}
+    method="POST"
+    data-contact-form
+    data-endpoint={site.contactForm.ajaxEndpoint}
+    data-error-required={f.errorRequired}
+    data-error-email={f.errorEmail}
+  >
+    <input type="hidden" name="_subject" value={`New inquiry from ${site.domain} (${locale})`} />
+    <input type="hidden" name="_template" value="table" />
+    <input type="hidden" name="_next" value={sentUrl} />
+    <input type="hidden" name="language" value={locale} />
+    <!-- Honeypot: humans never see or fill it; bots usually do. -->
+    <div class="honeypot" aria-hidden="true">
+      <label>
+        Leave this field empty
+        <input type="text" name="_honey" tabindex="-1" autocomplete="off" />
+      </label>
+    </div>
+
+    <div class="fields">
+      <div class="field">
+        <label for="cf-name">{f.name} <span class="req" aria-hidden="true">*</span></label>
+        <input id="cf-name" name="name" type="text" autocomplete="name" required placeholder={f.namePlaceholder} aria-describedby="cf-name-error" />
+        <p class="error" id="cf-name-error" hidden></p>
+      </div>
+
+      <div class="field">
+        <label for="cf-email">{f.email} <span class="req" aria-hidden="true">*</span></label>
+        <input
+          id="cf-email"
+          name="email"
+          type="email"
+          inputmode="email"
+          autocomplete="email"
+          required
+          placeholder={f.emailPlaceholder}
+          aria-describedby="cf-email-error"
+        />
+        <p class="error" id="cf-email-error" hidden></p>
+      </div>
+
+      <div class="field">
+        <label for="cf-company">{f.company} <span class="optional">({f.optional})</span></label>
+        <input id="cf-company" name="company" type="text" autocomplete="organization" placeholder={f.companyPlaceholder} />
+      </div>
+
+      <div class="field">
+        <label for="cf-website">{f.website} <span class="optional">({f.optional})</span></label>
+        <input id="cf-website" name="website" type="text" inputmode="url" autocomplete="url" placeholder={f.websitePlaceholder} />
+      </div>
+
+      <div class="field">
+        <label for="cf-service">{f.service} <span class="req" aria-hidden="true">*</span></label>
+        <div class="select">
+          <select id="cf-service" name="service" required aria-describedby="cf-service-error" data-service-select>
+            <option value="">{f.servicePlaceholder}</option>
+            {
+              serviceOptions.map((option) => (
+                <option value={option.value} data-service-id={option.id}>
+                  {option.label}
+                </option>
+              ))
+            }
+          </select>
+          <Icon name="chevron-down" size={16} class="select-icon" />
+        </div>
+        <p class="error" id="cf-service-error" hidden></p>
+      </div>
+
+      <div class="field">
+        <label for="cf-budget">{f.budget} <span class="optional">({f.optional})</span></label>
+        <div class="select">
+          <select id="cf-budget" name="budget">
+            <option value="">{f.budgetPlaceholder}</option>
+            {BUDGET_VALUES.map((value, index) => <option value={value}>{f.budgetOptions[index]}</option>)}
+          </select>
+          <Icon name="chevron-down" size={16} class="select-icon" />
+        </div>
+      </div>
+
+      <div class="field field--full">
+        <label for="cf-message">{f.message} <span class="req" aria-hidden="true">*</span></label>
+        <textarea id="cf-message" name="message" rows="5" required placeholder={f.messagePlaceholder} aria-describedby="cf-message-error"></textarea>
+        <p class="error" id="cf-message-error" hidden></p>
+      </div>
+    </div>
+
+    <div class="form-footer">
+      <p class="privacy">
+        {f.privacy} <a href={localePath(locale, 'privacy')}>{t.privacy.heading}</a>
+      </p>
+      <button type="submit" class="btn btn--solid submit" data-submit>
+        <span class="submit-label">{f.submit}</span>
+        <span class="submit-sending" hidden>{f.sending}</span>
+        <Icon name="send" size={18} class="btn-arrow" />
+      </button>
+    </div>
+
+    <p class="status" role="status" aria-live="polite" data-status></p>
+    <template data-error-template>
+      {f.error} <a href={`mailto:${site.email}`}>{site.email}</a>.
+    </template>
+  </form>
+
+  <!-- Shown in place by the script after a successful submission. -->
+  <div class="success" data-success hidden tabindex="-1">
+    <span class="success-icon" aria-hidden="true"><Icon name="check" size={28} /></span>
+    <p class="success-title">{f.successTitle}</p>
+    <p class="success-body">{f.successBody}</p>
+  </div>
+
+  <!-- Shown without JavaScript when FormSubmit redirects back to #contact-sent. -->
+  <div id="contact-sent" class="success success--target">
+    <span class="success-icon" aria-hidden="true"><Icon name="check" size={28} /></span>
+    <p class="success-title">{f.successTitle}</p>
+    <p class="success-body">{f.successBody}</p>
+  </div>
+</div>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-contact-form]');
+
+  if (form) {
+    const status = form.querySelector<HTMLElement>('[data-status]')!;
+    const submit = form.querySelector<HTMLButtonElement>('[data-submit]')!;
+    const success = form.parentElement!.querySelector<HTMLElement>('[data-success]')!;
+    const errorTemplate = form.querySelector<HTMLTemplateElement>('[data-error-template]')!;
+    const serviceSelect = form.querySelector<HTMLSelectElement>('[data-service-select]')!;
+    const messages = { required: form.dataset.errorRequired ?? '', email: form.dataset.errorEmail ?? '' };
+    let attempted = false;
+
+    // Native validation stays as the no-JS fallback; with JS we show our own messages.
+    form.noValidate = true;
+
+    const fieldError = (field: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement): string => {
+      if (field.validity.valueMissing) return messages.required;
+      if (field.validity.typeMismatch) return messages.email;
+      return '';
+    };
+
+    const showError = (field: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement): boolean => {
+      const output = form.querySelector<HTMLElement>(`#${field.id}-error`);
+      const message = fieldError(field);
+      field.setAttribute('aria-invalid', String(Boolean(message)));
+      if (output) {
+        output.textContent = message;
+        output.hidden = !message;
+      }
+      return !message;
+    };
+
+    const requiredFields = [...form.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>('[required]')];
+    requiredFields.forEach((field) => {
+      field.addEventListener('blur', () => attempted && showError(field));
+      field.addEventListener('input', () => attempted && showError(field));
+    });
+
+    // Service cards preselect the matching option before jumping to the form.
+    document.querySelectorAll<HTMLAnchorElement>('[data-service]').forEach((link) => {
+      link.addEventListener('click', () => {
+        const option = serviceSelect.querySelector<HTMLOptionElement>(`[data-service-id="${link.dataset.service}"]`);
+        if (!option) return;
+        serviceSelect.value = option.value;
+        serviceSelect.classList.remove('is-highlighted');
+        void serviceSelect.offsetWidth;
+        serviceSelect.classList.add('is-highlighted');
+      });
+    });
+
+    const setSending = (sending: boolean) => {
+      submit.disabled = sending;
+      submit.classList.toggle('is-sending', sending);
+      submit.querySelector<HTMLElement>('.submit-label')!.hidden = sending;
+      submit.querySelector<HTMLElement>('.submit-sending')!.hidden = !sending;
+    };
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      attempted = true;
+      const invalid = requiredFields.filter((field) => !showError(field));
+      if (invalid.length) {
+        invalid[0]!.focus();
+        return;
+      }
+
+      const data = Object.fromEntries(new FormData(form).entries());
+      if (data._honey) return;
+      delete data._next;
+
+      setSending(true);
+      status.textContent = '';
+      try {
+        const response = await fetch(form.dataset.endpoint!, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify(data),
+        });
+        const result = (await response.json().catch(() => ({}))) as { success?: string | boolean };
+        if (!response.ok || String(result.success) !== 'true') throw new Error('Submission rejected');
+
+        form.hidden = true;
+        success.hidden = false;
+        success.focus();
+        document.dispatchEvent(
+          new CustomEvent('analytics:event', {
+            detail: {
+              name: 'generate_lead',
+              params: { service: String(data.service ?? ''), budget: String(data.budget ?? ''), form_language: String(data.language ?? '') },
+            },
+          }),
+        );
+      } catch {
+        status.replaceChildren(errorTemplate.content.cloneNode(true));
+        status.classList.add('is-error');
+      } finally {
+        setSending(false);
+      }
+    });
+  }
+</script>
+
+<style>
+  .form-card {
+    position: relative;
+    padding: clamp(22px, 3.5vw, 40px);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    background: var(--surface);
+    box-shadow: 0 40px 80px -48px rgb(0 0 0 / 0.35);
+  }
+
+  .honeypot {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  .fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px 16px;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .field--full {
+    grid-column: 1 / -1;
+  }
+
+  label {
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .req {
+    color: var(--ink-soft);
+  }
+
+  .optional {
+    font-weight: 400;
+    color: var(--ink-soft);
+  }
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+    min-height: 48px;
+    padding: 12px 14px;
+    border: 1px solid rgb(17 17 17 / 0.22);
+    border-radius: 10px;
+    background: var(--bg);
+    color: var(--ink);
+    font: inherit;
+    font-size: 0.95rem;
+    transition:
+      border-color 0.25s var(--ease),
+      background-color 0.25s var(--ease),
+      box-shadow 0.25s var(--ease);
+  }
+
+  textarea {
+    min-height: 140px;
+    resize: vertical;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: #6b6b6b;
+  }
+
+  input:hover,
+  select:hover,
+  textarea:hover {
+    border-color: rgb(17 17 17 / 0.45);
+  }
+
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline: none;
+    border-color: var(--ink);
+    background: var(--surface);
+    box-shadow: 0 0 0 4px rgb(17 17 17 / 0.1);
+  }
+
+  [aria-invalid='true'] {
+    border-color: #b91c1c;
+  }
+
+  .select {
+    position: relative;
+  }
+
+  select {
+    appearance: none;
+    padding-right: 40px;
+    cursor: var(--cursor-pointer);
+  }
+
+  .select :global(.select-icon) {
+    position: absolute;
+    top: 50%;
+    right: 14px;
+    translate: 0 -50%;
+    pointer-events: none;
+    color: var(--ink-soft);
+  }
+
+  select.is-highlighted {
+    animation: highlight 1.2s var(--ease);
+  }
+
+  @keyframes highlight {
+    0%,
+    40% {
+      box-shadow: 0 0 0 4px rgb(17 17 17 / 0.18);
+      border-color: var(--ink);
+    }
+  }
+
+  .error {
+    font-size: 0.8rem;
+    color: #b91c1c;
+  }
+
+  .form-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px 24px;
+    margin-top: 24px;
+  }
+
+  .privacy {
+    flex: 1 1 16rem;
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+  }
+
+  .submit {
+    --btn-h: 52px;
+    padding-inline: 26px;
+  }
+
+  .submit:disabled {
+    opacity: 0.7;
+    cursor: progress;
+  }
+
+  .submit.is-sending :global(.btn-arrow) {
+    animation: sending-fade 0.9s var(--ease) infinite;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .submit.is-sending :global(.btn-arrow) {
+      animation-name: sending;
+    }
+  }
+
+  @keyframes sending-fade {
+    50% {
+      opacity: 0.35;
+    }
+  }
+
+  @keyframes sending {
+    50% {
+      transform: translate(4px, -4px);
+      opacity: 0.4;
+    }
+  }
+
+  .status:empty {
+    display: none;
+  }
+
+  .status {
+    margin-top: 16px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+  }
+
+  .status.is-error {
+    background: #fef2f2;
+    color: #991b1b;
+  }
+
+  .success {
+    display: grid;
+    justify-items: center;
+    gap: 10px;
+    padding: clamp(32px, 6vw, 64px) 12px;
+    text-align: center;
+  }
+
+  .success[hidden] {
+    display: none;
+  }
+
+  .success:focus {
+    outline: none;
+  }
+
+  .success:not([hidden]) {
+    animation: success-fade 0.6s var(--ease) both;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .success:not([hidden]) {
+      animation-name: success-in;
+      animation-duration: 0.7s;
+    }
+  }
+
+  @keyframes success-fade {
+    from {
+      opacity: 0;
+    }
+  }
+
+  .success-icon {
+    display: grid;
+    place-items: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: #fff;
+  }
+
+  .success-title {
+    margin-top: 8px;
+    font-size: 1.5rem;
+    font-weight: 500;
+  }
+
+  .success-body {
+    max-width: 24rem;
+    color: var(--ink-soft);
+  }
+
+  /* No-JS success: only visible when the URL hash is #contact-sent. */
+  .success--target {
+    display: none;
+  }
+
+  .success--target:target {
+    display: grid;
+  }
+
+  @keyframes success-in {
+    from {
+      opacity: 0;
+      transform: scale(0.96);
+    }
+  }
+
+  @media (max-width: 560px) {
+    .fields {
+      grid-template-columns: 1fr;
+    }
+
+    .submit {
+      width: 100%;
+    }
+  }
+</style>

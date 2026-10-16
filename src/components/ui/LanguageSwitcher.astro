@@ -133,7 +133,7 @@ const menuId = 'language-menu';
     font-weight: 600;
     letter-spacing: 0.04em;
     color: var(--ink);
-    cursor: pointer;
+    cursor: var(--cursor-pointer);
     list-style: none;
     user-select: none;
     transition: border-color 0.2s var(--ease);
@@ -220,7 +220,7 @@ const menuId = 'language-menu';
   }
 
   /* Inside the mobile menu the list flows in place as a two-column grid. */
-  @media (max-width: 860px) {
+  @media (max-width: 1024px) {
     .lang-menu {
       position: static;
       display: grid;

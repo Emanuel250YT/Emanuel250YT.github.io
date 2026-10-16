@@ -1,20 +1,22 @@
 # emanuel250.dev.ar
 
-Portfolio of **Emanuel Guzman**, founder of [Cosmos Pay](https://cosmospay.lat)
-and full stack developer from Salta, Argentina.
+Portfolio of **Emanuel Guzman** — full stack developer, product manager and founder of
+[Cosmos Pay](https://cosmospay.lat), from Salta, Argentina.
 
-- Site: **https://emanuel250.dev.ar** — available in Español, English, Português,
-  Français, Deutsch, 中文 and हिन्दी (`/`, `/en/`, `/pt/`, `/fr/`, `/de/`, `/zh/`, `/hi/`)
+- Site: **https://emanuel250.dev.ar** — in Español, English, Português, Français,
+  Deutsch, 中文 and हिन्दी (`/`, `/en/`, `/pt/`, `/fr/`, `/de/`, `/zh/`, `/hi/`)
 - CV: [/en/cv/](https://emanuel250.dev.ar/en/cv/) · [PDF](https://emanuel250.dev.ar/en/cv/emanuel-guzman-cv.pdf)
   (one HTML page and one PDF per language)
 
-Built with [Astro](https://astro.build) as a fully static site and published with
-GitHub Pages. No UI or CSS framework, almost no JavaScript, seven languages, and
+Built with [Astro](https://astro.build) as a fully static site on GitHub Pages and
+designed to turn visitors into leads: services with their own calls to action, a
+clear process, proof (projects and achievements) and a short contact form. No UI or
+CSS framework, seven languages, motion that respects reduced-motion preferences, and
 SEO + accessibility checks in CI.
 
-| Lighthouse (mobile) | `/` | `/zh/` | `/hi/` | `/fr/cv/` |
-| --- | --- | --- | --- | --- |
-| Performance · Accessibility · Best practices · SEO | 100 · 100 · 100 · 100 | 99 · 100 · 100 · 100 | 98 · 100 · 100 · 100 | 100 · 100 · 100 · 100 |
+| Lighthouse (mobile) | `/` | `/zh/` | `/hi/` | `/en/cv/` | `/privacy/` |
+| --- | --- | --- | --- | --- | --- |
+| Performance · Accessibility · Best practices · SEO | 99 · 100 · 100 · 100 | 99 · 100 · 100 · 100 | 98 · 100 · 100 · 100 | 100 · 100 · 100 · 100 | 100 · 100 · 100 · 100 |
 
 ## Development
 
@@ -28,92 +30,86 @@ npm run preview   # serves dist/ as production does
 npm run assets    # regenerates portraits, icons, Open Graph images and CV PDFs (needs Chrome)
 ```
 
+## Page structure
+
+Hero (rotating roles, primary CTA) → About → Services (4, each with its own CTA that
+preselects the service in the form) → Process (4 steps) → Projects → Achievements and
+ecosystems → Contact (form + what happens next + direct channels) → Footer.
+
 ## Editing content
 
 | To change… | Edit |
 | --- | --- |
 | Interface copy (per language) | `src/i18n/<locale>.ts` (`es`, `en`, `pt`, `fr`, `de`, `zh`, `hi`) |
-| Projects | `src/data/projects.ts` |
-| Achievements | `src/data/achievements.ts` |
+| Rotating roles in the hero | `hero.roles` in each dictionary |
+| Services | `src/data/services.ts` |
+| Projects / achievements | `src/data/projects.ts`, `src/data/achievements.ts` |
 | Experience, education, certifications, skills | `src/data/resume.ts` |
-| Name, email, socials, domain, Google/Bing verification | `src/config/site.ts` |
-| Portrait | `assets-src/portrait.png` (colour cut-out with transparent background) |
+| Form options (budget ranges, extra services), ecosystems strip | `src/data/contact.ts` |
+| Name, email, socials, domain, form endpoint, GA4, search-console tokens | `src/config/site.ts` |
+| Portrait | `assets-src/portrait.png` (colour cut-out, transparent background) |
 
-Every translatable field is typed as `Record<Locale, …>`, so `npm run check` fails
-if a language is missing. After changing the CV, the portrait or the identity, run
-`npm run assets` and commit `public/` and `src/assets/` (the portrait is converted to
-black & white automatically). If projects or roles change, update `public/llms.txt` too.
+Every translatable field is typed as `Record<Locale, …>`, so `npm run check` fails if a
+language is missing. After changing the CV, the portrait or the identity, run
+`npm run assets` and commit `public/` and `src/assets/`. Rules for design,
+accessibility, SEO, motion, i18n and analytics live in [`CLAUDE.md`](./CLAUDE.md).
 
-Design, accessibility, SEO and i18n rules live in [`CLAUDE.md`](./CLAUDE.md).
+## Owner setup (one-time)
 
-## Language switcher
+### 1 · Activate the contact form
 
-A native `<details>` dropdown with flags (Argentina for Spanish, Brazil for
-Portuguese, United States for English, France, Germany, China and India) and one
-real link per language. It works without JavaScript; with it, Escape, arrow keys
-and click-outside behave like a regular menu. Every page declares its translations
-with `hreflang` (plus `x-default` → English), and the sitemap carries the same alternates.
+The form posts to [FormSubmit](https://formsubmit.co), which forwards every message to
+`emanuel@cloudycoding.com` (`site.contactForm` in `src/config/site.ts`).
+
+1. Send one test message from the live site.
+2. Open the activation email FormSubmit sends to that inbox and click **Activate Form**.
+3. Optional: replace the email in both URLs of `site.contactForm` with the random alias
+   FormSubmit shows after activation (hides the address from scrapers).
+
+### 2 · Google Analytics 4
+
+1. In [analytics.google.com](https://analytics.google.com) create a property and a
+   **Web** data stream for `https://emanuel250.dev.ar`.
+2. Copy the **Measurement ID** (`G-…`) into `site.googleAnalyticsId` and push. The
+   consent banner appears automatically; GA4 only loads after a visitor accepts.
+3. In GA4 → Admin → Events, mark **`generate_lead`** as a key event (conversion).
+   Other events sent: `cta_click`, `select_service`, `contact_click`, `cv_download`.
+
+### 3 · Google Search Console (and Bing)
+
+1. Add the URL-prefix property `https://emanuel250.dev.ar/` and choose the **HTML tag**
+   method. Paste only the `content` value into `site.googleSiteVerification` and push.
+2. After verifying, submit `https://emanuel250.dev.ar/sitemap-index.xml`.
+3. Optional: link Search Console with GA4 (Admin → Product links).
+4. Bing Webmaster Tools: same idea with `site.bingSiteVerification` (or import from Search Console).
 
 ## Publishing (GitHub Pages + dev.ar)
 
-Every push to `main` runs `.github/workflows/deploy.yml`: install, audit, type
-check, build, SEO/accessibility checks, and publish `dist/` to GitHub Pages.
+Every push to `main` runs `.github/workflows/deploy.yml`: install, audit, type check,
+build, SEO/accessibility checks, and publish `dist/` to GitHub Pages.
 
-### 1 · GitHub Pages
-
-1. **Settings → Pages → Build and deployment → Source: GitHub Actions.**
-2. **Custom domain:** `emanuel250.dev.ar` (already declared by `public/CNAME`).
-3. **Settings → Environments → github-pages:** the `main` branch must be allowed to deploy.
-
-### 2 · dev.ar (https://home.dev.ar)
-
-In the `emanuel250.dev.ar` panel:
-
-| Field | Value |
-| --- | --- |
-| **Redirección** (redirect) | *(empty)* |
-| **DNS** | `emanuel250yt.github.io` |
-
-- The **DNS** field takes only the domain: **no** `https://`, **no** slashes or paths.
-  dev.ar creates a **CNAME** record pointing to GitHub Pages.
-- Only **one** setting can be active: redirect **or** DNS. Clear the redirect first if it has a value.
-- No NS records are involved. Propagation can take up to **48 h**.
-
-Check propagation:
-
-```bash
-nslookup -type=CNAME emanuel250.dev.ar   # should answer emanuel250yt.github.io
-```
-
-### 3 · HTTPS
-
-Once DNS resolves, GitHub issues the certificate automatically. Then: **Settings →
-Pages → Enforce HTTPS**.
-
-### Optional
-
-- **Verify the domain on GitHub** (prevents another repository from claiming it):
-  account Settings → Pages → *Add a domain*. GitHub asks for a TXT record
+- **GitHub Pages**: Settings → Pages → Source **GitHub Actions**, custom domain
+  `emanuel250.dev.ar` (declared by `public/CNAME`), **Enforce HTTPS** on. Settings →
+  Environments → `github-pages` must allow the `main` branch.
+- **dev.ar** (https://home.dev.ar): **DNS** = `emanuel250yt.github.io` (no `https://`,
+  no slashes), **Redirección** empty — only one of them can be active. Propagation can
+  take up to 48 h; check with `nslookup -type=CNAME emanuel250.dev.ar`.
+- **Optional domain verification on GitHub**: GitHub asks for a TXT record
   `_github-pages-challenge-Emanuel250YT.emanuel250.dev.ar`; on dev.ar, TXT records are
   requested by email to albo@pragmore.com with TYPE, NAME and CONTENT.
-- **Google Search Console / Bing Webmaster Tools**: use the *meta tag* method and paste
-  the value into `src/config/site.ts` (no DNS needed). Then submit
-  `https://emanuel250.dev.ar/sitemap-index.xml`.
 
 ## SEO included
 
-- Static HTML, one `<h1>` per page, validated heading hierarchy.
-- Unique `title`, `description` and `canonical` per page and language; `hreflang`
-  for all seven languages + `x-default`.
+- Static HTML, one `<h1>` per page, validated heading hierarchy, labelled form controls.
+- Unique `title`, `description` and `canonical` per page and language; `hreflang` for
+  all seven languages + `x-default`.
 - Open Graph and Twitter cards with a 1200×630 image per language.
-- JSON-LD (`Person`, `Organization`, `WebSite`, `ProfilePage`, `BreadcrumbList`,
-  `ItemList` of projects).
-- `sitemap-index.xml` with language alternates, `robots.txt`, `llms.txt`, `humans.txt`,
-  web manifest and icons.
-- Self-hosted font with preload (system fonts for Chinese and Devanagari),
-  responsive WebP images with dimensions (CLS 0).
+- JSON-LD: `Person` (with contact point and offers), `Organization`, `WebSite`,
+  `ProfilePage`, `BreadcrumbList`, `ItemList` of projects, `OfferCatalog` of services.
+- `sitemap-index.xml` with language alternates and `lastmod`, `robots.txt`, `llms.txt`,
+  `humans.txt`, web manifest, icons and a privacy policy per language.
 
 ## Dependency security
 
-Exact versions published at least 7 days ago, `ignore-scripts=true`, GitHub Actions
-pinned by SHA, Dependabot with a cooldown, and `npm audit signatures` in CI.
+Exact versions, `ignore-scripts=true`, GitHub Actions pinned by SHA, Dependabot with a
+7-day cooldown, and `npm audit signatures` in CI.

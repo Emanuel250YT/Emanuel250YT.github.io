@@ -1,0 +1,148 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import SectionHeader from '@/components/ui/SectionHeader.astro';
+import { useTranslations } from '@/i18n';
+import type { Locale } from '@/i18n/locales';
+
+interface Props {
+  locale: Locale;
+  index: number;
+}
+
+const { locale, index } = Astro.props;
+const t = useTranslations(locale);
+---
+
+<section id="process" class="section process" aria-labelledby="process-title">
+  <div class="container">
+    <SectionHeader
+      index={index}
+      eyebrow={t.process.eyebrow}
+      title={t.process.title}
+      titleId="process-title"
+      intro={t.process.intro}
+      layout="split"
+    />
+
+    <ol class="steps" role="list" data-reveal="fade" data-reveal-stagger>
+      {
+        t.process.steps.map((step, position) => (
+          <li class="step" data-reveal>
+            <span class="dot" aria-hidden="true">
+              {String(position + 1).padStart(2, '0')}
+            </span>
+            <h3>{step.title}</h3>
+            <p>{step.body}</p>
+          </li>
+        ))
+      }
+    </ol>
+
+    <div class="cta-row" data-reveal>
+      <a class="btn btn--solid" href="#contact" data-track="cta_click" data-track-location="process">
+        <Icon name="calendar" size={18} />
+        {t.process.cta}
+        <Icon name="arrow-right" size={18} class="btn-arrow" />
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .process {
+    border-block: 1px solid var(--line);
+    background:
+      radial-gradient(60% 80% at 100% 0%, rgb(17 17 17 / 0.04), transparent 70%),
+      var(--bg);
+  }
+
+  .steps {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: clamp(24px, 3vw, 40px);
+    margin: 0;
+  }
+
+  /* Line joining the numbered dots; it draws itself when the list is revealed. */
+  .steps::before {
+    content: '';
+    position: absolute;
+    top: 22px;
+    left: 22px;
+    right: 22px;
+    height: 1px;
+    background: var(--line-strong);
+    transform-origin: left;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    :global(.js) .steps::before {
+      transform: scaleX(0);
+      transition: transform 1.6s var(--ease) 0.2s;
+    }
+
+    :global(.js) .steps.is-revealed::before {
+      transform: scaleX(1);
+    }
+  }
+
+  .step {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .dot {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    margin-bottom: 10px;
+    border: 1.5px solid var(--ink);
+    border-radius: 50%;
+    background: var(--bg);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition:
+      background-color 0.3s var(--ease),
+      color 0.3s var(--ease);
+  }
+
+  .step:hover .dot {
+    background: var(--ink);
+    color: #fff;
+  }
+
+  h3 {
+    font-size: 1.15rem;
+    font-weight: 600;
+  }
+
+  p {
+    font-size: 0.92rem;
+    color: var(--ink-soft);
+  }
+
+  .cta-row {
+    margin-top: clamp(40px, 5vw, 56px);
+  }
+
+  @media (max-width: 900px) {
+    .steps {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .steps::before {
+      display: none;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .steps {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

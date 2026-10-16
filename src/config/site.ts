@@ -38,6 +38,26 @@ export const site = {
   },
 
   /**
+   * Contact form backend. FormSubmit forwards every submission to the email in
+   * the URL. The first submission triggers a one-time activation email: click
+   * the link in it and the form starts delivering. After activating, you can
+   * replace the address with the random alias FormSubmit gives you.
+   */
+  contactForm: {
+    /** JSON endpoint used by the enhanced (JavaScript) form. */
+    ajaxEndpoint: 'https://formsubmit.co/ajax/emanuel@cloudycoding.com',
+    /** Classic endpoint used when JavaScript is unavailable. */
+    action: 'https://formsubmit.co/emanuel@cloudycoding.com',
+  },
+
+  /**
+   * Google Analytics 4 measurement ID (e.g. "G-ABC123XYZ"). Empty = analytics
+   * and the consent banner are not rendered at all. GA only loads after the
+   * visitor accepts analytics cookies.
+   */
+  googleAnalyticsId: '',
+
+  /**
    * Google Search Console: paste the `content` of the verification meta tag
    * ("HTML tag" method). No DNS change in dev.ar is needed.
    */

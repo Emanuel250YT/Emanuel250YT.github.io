@@ -1,178 +1,155 @@
 ---
 import { site } from '@/config/site';
+import ContactForm from '@/components/contact/ContactForm.astro';
 import Icon from '@/components/ui/Icon.astro';
-import RichHeading from '@/components/ui/RichHeading.astro';
+import SectionHeader from '@/components/ui/SectionHeader.astro';
 import { useTranslations } from '@/i18n';
-import { localePath, type Locale } from '@/i18n/locales';
+import type { Locale } from '@/i18n/locales';
 import { cvPdfPath } from '@/lib/cv';
 
 interface Props {
   locale: Locale;
+  index: number;
 }
 
-const { locale } = Astro.props;
+const { locale, index } = Astro.props;
 const t = useTranslations(locale);
 const mailto = `mailto:${site.email}?subject=${encodeURIComponent(t.contact.mailSubject)}`;
 ---
 
 <section id="contact" class="section contact" aria-labelledby="contact-title">
   <div class="container contact-grid">
-    <div>
-      <RichHeading id="contact-title" class="contact-title" parts={t.contact.title} />
-      <p class="contact-text">{t.contact.body}</p>
-      <div class="actions">
-        <a class="btn btn--frame" href={mailto}>
-          <Icon name="chat" />
-          {t.contact.ctaTalk}
-        </a>
-        <a class="btn btn--solid" href={cvPdfPath(locale)} download type="application/pdf">
-          <Icon name="file" />
-          {t.contact.ctaCv}
-        </a>
+    <div class="contact-info">
+      <SectionHeader index={index} eyebrow={t.contact.eyebrow} title={t.contact.title} titleId="contact-title" intro={t.contact.body} />
+
+      <div class="next" data-reveal>
+        <h3 class="next-title">{t.contact.nextTitle}</h3>
+        <ol role="list" data-reveal-stagger>
+          {
+            t.contact.nextSteps.map((step, position) => (
+              <li data-reveal>
+                <span class="next-number" aria-hidden="true">
+                  {position + 1}
+                </span>
+                {step}
+              </li>
+            ))
+          }
+        </ol>
       </div>
-      <p class="cv-alt">
-        <a href={localePath(locale, 'cv')}>{t.cv.heading} (HTML)</a>
-      </p>
+
+      <div class="direct" data-reveal>
+        <h3 class="next-title">{t.contact.directTitle}</h3>
+        <ul role="list">
+          <li>
+            <a class="link-arrow" href={mailto} data-track="contact_click" data-track-method="email">
+              <Icon name="mail" size={18} />
+              {site.email}
+            </a>
+          </li>
+          <li>
+            <a
+              class="link-arrow"
+              href={site.socials.linkedin}
+              target="_blank"
+              rel="noopener"
+              data-track="contact_click"
+              data-track-method="linkedin"
+            >
+              <Icon name="linkedin" size={16} />
+              LinkedIn
+              <span class="visually-hidden"> {t.a11y.newTab}</span>
+            </a>
+          </li>
+          <li>
+            <a class="link-arrow" href={cvPdfPath(locale)} download type="application/pdf" data-track="cv_download">
+              <Icon name="download" size={18} />
+              {t.contact.ctaCv}
+            </a>
+          </li>
+        </ul>
+      </div>
     </div>
 
-    <figure class="terminal">
-      <div class="terminal-bar" aria-hidden="true">
-        <span class="lights"><i></i><i></i><i></i></span>
-        <span>{t.contact.terminalTitle}</span>
-      </div>
-      <div class="terminal-body">
-        {
-          t.contact.terminalLines.map((line) =>
-            line.prompt ? (
-              <p class="cmd">
-                <span aria-hidden="true">$ </span>
-                {line.text}
-              </p>
-            ) : (
-              <p class="out">{line.text}</p>
-            ),
-          )
-        }
-        <p class="cmd"><span aria-hidden="true">$ </span><span class="caret" aria-hidden="true"></span></p>
-      </div>
-    </figure>
+    <ContactForm locale={locale} />
   </div>
 </section>
 
 <style>
+  .contact {
+    position: relative;
+    background:
+      radial-gradient(50% 60% at 0% 100%, rgb(17 17 17 / 0.05), transparent 70%),
+      var(--bg);
+  }
+
   .contact-grid {
     display: grid;
-    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-    align-items: center;
-    gap: clamp(40px, 6vw, 80px);
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.2fr);
+    align-items: start;
+    gap: clamp(40px, 6vw, 88px);
   }
 
-  .contact :global(.contact-title) {
-    font-size: clamp(2.2rem, 4.6vw, 3.6rem);
-    line-height: var(--leading-hero);
+  .contact-info :global(.section-header) {
+    margin-bottom: 32px;
   }
 
-  .contact-text {
-    max-width: 30rem;
-    margin-top: 22px;
-    font-size: 1.05rem;
-    color: var(--ink-soft);
+  .next,
+  .direct {
+    padding-block: 24px;
+    border-top: 1px solid var(--line);
   }
 
-  .actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-    margin-top: 32px;
-  }
-
-  .cv-alt {
-    margin-top: 16px;
-    font-size: 0.85rem;
-    color: var(--ink-soft);
-  }
-
-  .cv-alt a:hover {
-    color: var(--ink);
-  }
-
-  .terminal {
-    overflow: hidden;
-    border-radius: var(--radius-lg);
-    background: var(--dark);
-    color: #e8e8e8;
-    box-shadow: 0 40px 70px -30px rgb(0 0 0 / 0.5);
-  }
-
-  .terminal-bar {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 12px 16px;
-    background: var(--dark-2);
-    border-bottom: 1px solid var(--on-dark-line);
+  .next-title {
+    margin-bottom: 14px;
     font-family: var(--font-mono);
     font-size: 0.75rem;
-    color: var(--on-dark-soft);
+    font-weight: 600;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--ink-soft);
   }
 
-  .lights {
+  .next ol {
+    display: grid;
+    gap: 12px;
+    margin: 0;
+  }
+
+  .next li {
     display: flex;
-    gap: 6px;
+    align-items: baseline;
+    gap: 14px;
+    font-size: 0.95rem;
   }
 
-  .lights i {
-    width: 10px;
-    height: 10px;
+  .next-number {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 26px;
+    height: 26px;
     border-radius: 50%;
-    background: #3a3a3a;
-  }
-
-  .terminal-body {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    min-height: 280px;
-    padding: clamp(20px, 3vw, 32px);
-    font-family: var(--font-mono);
-    font-size: clamp(0.8rem, 1.1vw, 0.9rem);
-    line-height: 1.6;
-  }
-
-  .cmd {
+    background: var(--ink);
     color: #fff;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+    translate: 0 2px;
   }
 
-  .cmd span[aria-hidden] {
-    color: #93c5fd;
+  .direct ul {
+    display: grid;
+    gap: 6px;
+    margin: 0;
   }
 
-  .out {
-    margin-bottom: 8px;
-    color: #a3a3a3;
+  .direct .link-arrow {
+    font-size: 0.95rem;
+    overflow-wrap: anywhere;
   }
 
-  .caret {
-    display: inline-block;
-    width: 0.6em;
-    height: 1.1em;
-    vertical-align: text-bottom;
-    background: #e8e8e8;
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    .caret {
-      animation: blink 1.1s steps(1) infinite;
-    }
-  }
-
-  @keyframes blink {
-    50% {
-      opacity: 0;
-    }
-  }
-
-  @media (max-width: 900px) {
+  @media (max-width: 960px) {
     .contact-grid {
       grid-template-columns: 1fr;
     }

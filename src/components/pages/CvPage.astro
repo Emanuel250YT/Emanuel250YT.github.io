@@ -11,7 +11,7 @@ import { useTranslations } from '@/i18n';
 import { localePath, type Locale } from '@/i18n/locales';
 import { cvPdfPath } from '@/lib/cv';
 import { displayUrl, formatMonth, formatRange } from '@/lib/format';
-import { graph, organizationNodes, pageNode, personNode, websiteNode } from '@/lib/schema';
+import { graph, organizationNodes, pageNode, personNode, serviceCatalogNode, websiteNode } from '@/lib/schema';
 
 interface Props {
   locale: Locale;
@@ -27,6 +27,7 @@ const jsonLd = graph([
   personNode(locale, portraitUrl),
   ...organizationNodes(),
   websiteNode(),
+  serviceCatalogNode(locale),
   ...pageNode({
     locale,
     path: 'cv',

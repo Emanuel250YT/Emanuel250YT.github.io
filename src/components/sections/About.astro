@@ -1,14 +1,16 @@
 ---
 import { coreStack, roles } from '@/data/resume';
+import Icon from '@/components/ui/Icon.astro';
 import RichHeading from '@/components/ui/RichHeading.astro';
 import { useTranslations } from '@/i18n';
-import type { Locale } from '@/i18n/locales';
+import { localePath, type Locale } from '@/i18n/locales';
 
 interface Props {
   locale: Locale;
+  index: number;
 }
 
-const { locale } = Astro.props;
+const { locale, index } = Astro.props;
 const t = useTranslations(locale);
 const currentRoles = roles.filter((role) => !role.end && role.id !== 'freelance');
 ---
@@ -17,10 +19,17 @@ const currentRoles = roles.filter((role) => !role.end && role.id !== 'freelance'
   <div class="container">
     <div class="about-grid">
       <div class="about-copy">
-        <RichHeading id="about-title" class="about-title" parts={t.about.title} />
-        {t.about.body.map((paragraph) => <p class="about-text">{paragraph}</p>)}
+        <p class="eyebrow" data-reveal="fade">
+          <span class="eyebrow-index" aria-hidden="true">{String(index).padStart(2, '0')}</span>
+          <span class="eyebrow-line" aria-hidden="true"></span>
+          {t.about.eyebrow}
+        </p>
+        <div data-reveal>
+          <RichHeading id="about-title" class="about-title" parts={t.about.title} />
+        </div>
+        {t.about.body.map((paragraph) => <p class="about-text" data-reveal>{paragraph}</p>)}
 
-        <div class="roles">
+        <div class="roles" data-reveal>
           <h3 class="roles-label">{t.about.rolesLabel}</h3>
           <ul role="list">
             {
@@ -42,9 +51,14 @@ const currentRoles = roles.filter((role) => !role.end && role.id !== 'freelance'
             }
           </ul>
         </div>
+
+        <a class="btn btn--light btn--sm cv-cta" href={localePath(locale, 'cv')} data-reveal data-track="cta_click" data-track-location="about_cv">
+          {t.about.cvCta}
+          <Icon name="arrow-right" size={16} class="btn-arrow" />
+        </a>
       </div>
 
-      <figure class="editor">
+      <figure class="editor" data-reveal="scale">
         <div class="editor-bar" aria-hidden="true">
           <span class="lights"><i></i><i></i><i></i></span>
           <span class="tab">{t.about.editorFile}</span>
@@ -69,8 +83,8 @@ pay.uri; <span class="tk-c">{t.about.editorResult}</span></code></pre>
 
     <div class="stack">
       <h3 class="visually-hidden">{t.about.skillsLabel}</h3>
-      <ul role="list">
-        {coreStack.map((skill) => <li>{skill}</li>)}
+      <ul role="list" data-reveal-stagger>
+        {coreStack.map((skill) => <li data-reveal>{skill}</li>)}
       </ul>
     </div>
   </div>
@@ -81,6 +95,18 @@ pay.uri; <span class="tk-c">{t.about.editorResult}</span></code></pre>
     background: var(--dark);
     color: var(--on-dark);
     padding-block: clamp(64px, 9vw, 112px) clamp(48px, 6vw, 72px);
+  }
+
+  .about .eyebrow {
+    color: var(--on-dark-soft);
+  }
+
+  .about .eyebrow-index {
+    color: var(--on-dark);
+  }
+
+  .cv-cta {
+    margin-top: 28px;
   }
 
   .about-grid {

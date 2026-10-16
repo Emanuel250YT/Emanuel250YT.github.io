@@ -1,0 +1,81 @@
+---
+import RichHeading from '@/components/ui/RichHeading.astro';
+import type { RichText } from '@/i18n/types';
+
+/**
+ * Section header: numbered eyebrow ("01 — Services"), two-tone title and an
+ * optional intro. `layout="split"` puts the intro on the right on wide screens.
+ */
+interface Props {
+  index: number;
+  eyebrow: string;
+  title: RichText;
+  titleId: string;
+  intro?: string;
+  layout?: 'stack' | 'split' | 'center';
+  class?: string;
+}
+
+const { index, eyebrow, title, titleId, intro, layout = 'stack', class: className } = Astro.props;
+const number = String(index).padStart(2, '0');
+---
+
+<header class:list={['section-header', `section-header--${layout}`, className]}>
+  <div class="section-header-main">
+    <p class="eyebrow" data-reveal="fade">
+      <span class="eyebrow-index" aria-hidden="true">{number}</span>
+      <span class="eyebrow-line" aria-hidden="true"></span>
+      {eyebrow}
+    </p>
+    <div data-reveal>
+      <RichHeading id={titleId} class="section-title" parts={title} />
+    </div>
+  </div>
+  {
+    intro && (
+      <p class="section-intro" data-reveal>
+        {intro}
+      </p>
+    )
+  }
+</header>
+
+<style>
+  .section-header {
+    display: grid;
+    gap: 20px;
+    margin-bottom: clamp(40px, 5vw, 64px);
+  }
+
+  .section-header--split {
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    align-items: end;
+    gap: 24px clamp(32px, 6vw, 96px);
+  }
+
+  .section-header--center {
+    justify-items: center;
+    text-align: center;
+  }
+
+  .section-header--center .eyebrow {
+    justify-content: center;
+  }
+
+  .section-header :global(.section-title) {
+    max-width: 46rem;
+    font-size: clamp(1.9rem, 3.6vw, 2.75rem);
+  }
+
+  .section-intro {
+    max-width: 30rem;
+    font-size: 1rem;
+    color: var(--ink-soft);
+  }
+
+  @media (max-width: 860px) {
+    .section-header--split {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

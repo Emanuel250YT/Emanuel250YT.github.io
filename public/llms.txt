@@ -1,6 +1,6 @@
 # Emanuel Guzman
 
-> Full stack developer and founder of Cosmos / Cosmos Pay, based in Salta, Argentina. Builds payments, SDKs and products on Stellar, Solana and Monad for Latin America.
+> Full stack developer, product manager and founder of Cosmos / Cosmos Pay, based in Salta, Argentina. Designs and builds custom software, payment integrations and blockchain products for companies and startups across Latin America.
 
 The site is available in Spanish (default), English, Portuguese, French, German, Chinese and Hindi. Every page links to its translations with hreflang.
 
@@ -8,7 +8,17 @@ The site is available in Spanish (default), English, Portuguese, French, German,
 
 - [Portfolio](https://emanuel250.dev.ar/en/): projects, achievements and contact (English)
 - [CV](https://emanuel250.dev.ar/en/cv/): experience, education and certifications ([PDF](https://emanuel250.dev.ar/en/cv/emanuel-guzman-cv.pdf))
+- [Privacy policy](https://emanuel250.dev.ar/en/privacy/)
 - Other languages: [Español](https://emanuel250.dev.ar/), [Português](https://emanuel250.dev.ar/pt/), [Français](https://emanuel250.dev.ar/fr/), [Deutsch](https://emanuel250.dev.ar/de/), [中文](https://emanuel250.dev.ar/zh/), [हिन्दी](https://emanuel250.dev.ar/hi/)
+
+## Services
+
+- Custom software: web platforms, dashboards, APIs and backends (TypeScript, Node.js, Astro/React, PostgreSQL)
+- Payment integrations: local gateways, banks and stablecoins — checkout, payment links, webhooks, reconciliation (Mercado Pago, USDC, Cosmos Pay)
+- Blockchain products: wallets, smart contracts and dApps on Stellar, Solana and EVM chains
+- SDKs and APIs for developers: libraries, docs and developer platforms
+
+How to hire: use the contact form at https://emanuel250.dev.ar/en/#contact (reply within 48 hours) or email emanuel@cloudycoding.com.
 
 ## Roles
 

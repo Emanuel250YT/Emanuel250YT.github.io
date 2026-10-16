@@ -22,7 +22,7 @@ const LOCALES = {
   zh: { hreflang: 'zh-CN', prefix: 'zh/' },
   hi: { hreflang: 'hi', prefix: 'hi/' },
 };
-const ROUTES = ['', 'cv/'];
+const ROUTES = ['', 'cv/', 'privacy/'];
 
 const errors = [];
 const warnings = [];
@@ -188,6 +188,26 @@ for (const { prefix } of Object.values(LOCALES)) {
   }
 }
 if (sitemap.includes('404')) fail('sitemap-0.xml', 'includes the 404 page');
+if (!sitemap.includes('<lastmod>')) fail('sitemap-0.xml', 'URLs have no <lastmod>');
+
+// Conversion essentials on every home page
+for (const { prefix } of Object.values(LOCALES)) {
+  const file = path.join(dist, prefix, 'index.html');
+  if (!existsSync(file)) continue;
+  const html = await readFile(file, 'utf8');
+  for (const id of ['services', 'process', 'about', 'projects', 'achievements', 'contact']) {
+    if (!html.includes(`id="${id}"`)) fail(`/${prefix}`, `missing section #${id}`);
+  }
+  if (!/<form[^>]*data-contact-form/.test(html)) fail(`/${prefix}`, 'missing contact form');
+  for (const field of ['name', 'email', 'service', 'message']) {
+    const control = html.match(new RegExp(`<(input|select|textarea)[^>]*name="${field}"[^>]*>`))?.[0];
+    if (!control) fail(`/${prefix}`, `contact form has no "${field}" field`);
+    else {
+      const id = attr(control, 'id');
+      if (!id || !html.includes(`for="${id}"`)) fail(`/${prefix}`, `field "${field}" has no <label for>`);
+    }
+  }
+}
 
 for (const message of warnings) console.warn(`⚠ ${message}`);
 if (errors.length) {

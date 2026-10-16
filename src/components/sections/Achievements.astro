@@ -1,30 +1,38 @@
 ---
-import RichHeading from '@/components/ui/RichHeading.astro';
+import SectionHeader from '@/components/ui/SectionHeader.astro';
 import { sortedAchievements } from '@/data/achievements';
+import { ecosystems } from '@/data/contact';
 import { useTranslations } from '@/i18n';
 import type { Locale } from '@/i18n/locales';
 import { formatMonth } from '@/lib/format';
 
 interface Props {
   locale: Locale;
+  index: number;
 }
 
-const { locale } = Astro.props;
+const { locale, index } = Astro.props;
 const t = useTranslations(locale);
 ---
 
 <section id="achievements" class="section achievements" aria-labelledby="achievements-title">
   <div class="rings" aria-hidden="true"></div>
   <div class="container">
-    <RichHeading id="achievements-title" class="achievements-title" parts={t.achievements.title} />
+    <SectionHeader
+      index={index}
+      eyebrow={t.achievements.eyebrow}
+      title={t.achievements.title}
+      titleId="achievements-title"
+      layout="center"
+    />
   </div>
 
   <!-- Scrollable region reachable by keyboard (WCAG 2.1.1) -->
   <div class="rail" role="region" aria-label={t.a11y.scrollHint} tabindex="0">
-    <ol class="track" role="list">
+    <ol class="track" role="list" data-reveal-stagger>
       {
         sortedAchievements.map((item) => (
-          <li class="card">
+          <li class="card" data-reveal>
             <div class="top">
               <span class="mark" aria-hidden="true">
                 {item.mark}
@@ -38,6 +46,19 @@ const t = useTranslations(locale);
         ))
       }
     </ol>
+  </div>
+
+  <!-- Ecosystems strip: it moves with the page scroll (no autoplay), where scroll-driven animations exist. -->
+  <div class="ecosystems">
+    <p class="container ecosystems-label">{t.achievements.ecosystemsLabel}</p>
+    <div class="marquee">
+      <ul class="marquee-track" role="list">
+        {ecosystems.map((name) => <li>{name}</li>)}
+      </ul>
+      <ul class="marquee-track" role="list" aria-hidden="true">
+        {ecosystems.map((name) => <li>{name}</li>)}
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -58,12 +79,71 @@ const t = useTranslations(locale);
       radial-gradient(circle at 50% 120%, transparent 319px, rgb(17 17 17 / 0.04) 320px, transparent 321px);
   }
 
-  .achievements :global(.achievements-title) {
-    position: relative;
-    max-width: 40rem;
-    margin: 0 auto clamp(40px, 5vw, 56px);
-    font-size: clamp(1.9rem, 3.6vw, 2.75rem);
+  .ecosystems {
+    margin-top: clamp(48px, 6vw, 72px);
+  }
+
+  .ecosystems-label {
+    margin-bottom: 18px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--ink-soft);
     text-align: center;
+  }
+
+  .marquee {
+    display: flex;
+    overflow: hidden;
+    border-block: 1px solid var(--line);
+    mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  }
+
+  .marquee-track {
+    display: flex;
+    flex: none;
+    gap: clamp(32px, 5vw, 64px);
+    margin: 0;
+    padding: 22px clamp(16px, 2.5vw, 32px);
+    font-size: clamp(1.1rem, 2vw, 1.5rem);
+    font-weight: 500;
+    letter-spacing: var(--tracking-display);
+    white-space: nowrap;
+    color: var(--ink-2);
+  }
+
+  .marquee-track li {
+    display: flex;
+    align-items: center;
+    gap: clamp(32px, 5vw, 64px);
+  }
+
+  .marquee-track li::after {
+    content: '✦';
+    font-size: 0.7em;
+    color: var(--muted);
+  }
+
+  /* Scroll-linked: the strip slides while the section crosses the viewport. */
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .marquee-track {
+        animation: marquee linear both;
+        animation-timeline: view();
+        animation-range: entry 0% exit 100%;
+      }
+    }
+  }
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-60%);
+    }
   }
 
   .rail {
@@ -103,12 +183,12 @@ const t = useTranslations(locale);
     box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
     scroll-snap-align: start;
     transition:
-      transform 0.3s var(--ease),
+      translate 0.3s var(--ease),
       box-shadow 0.3s var(--ease);
   }
 
   .card:hover {
-    transform: translateY(-4px);
+    translate: 0 -4px;
     box-shadow: var(--shadow-card);
   }
 

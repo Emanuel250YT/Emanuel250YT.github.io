@@ -1,0 +1,102 @@
+---
+import { site } from '@/config/site';
+import { useTranslations } from '@/i18n';
+import { localePath, type Locale } from '@/i18n/locales';
+
+/**
+ * Analytics consent banner (GDPR "basic" mode): Google Analytics is not loaded
+ * at all until the visitor accepts. Rendered only when a GA4 ID is configured.
+ * Accept and decline have the same weight, as consent rules require.
+ */
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+const measurementId: string = site.googleAnalyticsId;
+---
+
+{
+  measurementId && (
+    <div class="consent" role="region" aria-label={t.footer.cookies} data-consent data-ga-id={measurementId} hidden>
+      <p class="consent-text">
+        {t.consent.text} <a href={localePath(locale, 'privacy')}>{t.privacy.heading}</a>
+      </p>
+      <div class="consent-actions">
+        <button type="button" class="btn btn--sm btn--light" data-consent-choice="denied">
+          {t.consent.reject}
+        </button>
+        <button type="button" class="btn btn--sm btn--light" data-consent-choice="granted">
+          {t.consent.accept}
+        </button>
+      </div>
+    </div>
+  )
+}
+
+<script>
+  import { initAnalytics } from '@/scripts/analytics';
+
+  initAnalytics();
+</script>
+
+<style>
+  .consent {
+    position: fixed;
+    left: max(16px, env(safe-area-inset-left));
+    bottom: max(16px, env(safe-area-inset-bottom));
+    z-index: 80;
+    display: grid;
+    gap: 14px;
+    width: min(420px, calc(100vw - 32px));
+    padding: 18px 18px 16px;
+    border-radius: var(--radius-lg);
+    background: var(--ink);
+    color: #fff;
+    box-shadow: 0 24px 60px -20px rgb(0 0 0 / 0.5);
+  }
+
+  .consent[hidden] {
+    display: none;
+  }
+
+  .consent:not([hidden]) {
+    animation: consent-in 0.5s var(--ease) both;
+  }
+
+  .consent-text {
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--on-dark-soft);
+  }
+
+  .consent-text a {
+    color: #fff;
+  }
+
+  .consent-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .consent:not([hidden]) {
+      animation-name: consent-fade;
+    }
+  }
+
+  @keyframes consent-fade {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @keyframes consent-in {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+  }
+</style>
