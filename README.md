@@ -80,8 +80,8 @@ Both load only after a visitor accepts analytics cookies.
 
 ### 3 · Google Search Console (and Bing)
 
-1. Add the URL-prefix property `https://emanuel250.dev.ar/` and choose the **HTML tag**
-   method. Paste only the `content` value into `site.googleSiteVerification` and push.
+1. The URL-prefix property `https://emanuel250.dev.ar/` is verified with the HTML file
+   `public/google4180448db7220be0.html`, served at the site root. Never delete it.
 2. After verifying, submit `https://emanuel250.dev.ar/sitemap-index.xml`.
 3. Optional: link Search Console with GA4 (Admin → Product links).
 4. Bing Webmaster Tools: same idea with `site.bingSiteVerification` (or import from Search Console).

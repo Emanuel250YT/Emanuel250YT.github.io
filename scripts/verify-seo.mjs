@@ -11,6 +11,8 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const dist = path.join(root, 'dist');
 const SITE = 'https://emanuel250.dev.ar';
+/** Google Search Console HTML-file verification: must stay deployed, is not a page. */
+const SEARCH_CONSOLE_FILE = 'google4180448db7220be0.html';
 
 // Keep in sync with src/i18n/locales.ts.
 const LOCALES = {
@@ -35,7 +37,7 @@ async function htmlFiles(dir) {
     entries.map((entry) => {
       const full = path.join(dir, entry.name);
       if (entry.isDirectory()) return htmlFiles(full);
-      return entry.name.endsWith('.html') ? [full] : [];
+      return entry.name.endsWith('.html') && entry.name !== SEARCH_CONSOLE_FILE ? [full] : [];
     }),
   );
   return files.flat();
@@ -165,7 +167,7 @@ for (const file of files) {
 }
 
 // Site-level files
-for (const required of ['CNAME', 'robots.txt', 'sitemap-index.xml', 'favicon.ico', 'favicon.svg', 'site.webmanifest', '404.html', 'llms.txt']) {
+for (const required of ['CNAME', 'robots.txt', 'sitemap-index.xml', 'favicon.ico', 'favicon.svg', 'site.webmanifest', '404.html', 'llms.txt', SEARCH_CONSOLE_FILE]) {
   if (!existsSync(path.join(dist, required))) fail('dist', `missing ${required}`);
 }
 for (const [locale, { prefix }] of Object.entries(LOCALES)) {

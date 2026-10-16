@@ -174,8 +174,10 @@ Every indexable page has, and `scripts/verify-seo.mjs` enforces:
   every form control with a `<label for>`, and on each home page all sections + the form.
 - Sitemap: every URL with `<lastmod>` (build date), alternates per language, home
   pages at priority 1, privacy at 0.3; the 404 is `noindex` and excluded.
-- Search Console / Bing verification via meta tag (`site.ts`), no DNS change needed.
-  Submit `https://emanuel250.dev.ar/sitemap-index.xml` once verified.
+- Google Search Console is verified with the **HTML file**
+  `public/google4180448db7220be0.html`: never delete or rename it (Google re-checks it);
+  `verify-seo.mjs` fails if it is missing. Bing can use the meta tag in `site.ts`.
+  The sitemap to submit is `https://emanuel250.dev.ar/sitemap-index.xml`.
 
 ## 9 · Accessibility (WCAG 2.2 AA, also non-negotiable)
 
