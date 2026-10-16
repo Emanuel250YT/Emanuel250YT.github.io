@@ -1,26 +1,48 @@
 ---
+import Flag from '@/components/ui/Flag.astro';
 import Icon from '@/components/ui/Icon.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { useTranslations } from '@/i18n';
-import { localePath } from '@/i18n/locales';
+import { defaultLocale, localeMeta, localePath, locales } from '@/i18n/locales';
 
-// GitHub Pages sirve este archivo para cualquier ruta inexistente, en ambos idiomas.
-const es = useTranslations('es');
-const en = useTranslations('en');
+// GitHub Pages serves this file for every missing path, whatever the language,
+// so it is written in the default locale and links to every home page.
+const t = useTranslations(defaultLocale);
 ---
 
-<BaseLayout locale="es" path="404" title={es.notFound.title} description={es.notFound.description} noindex alternates={false}>
+<BaseLayout
+  locale={defaultLocale}
+  path="404"
+  title={t.notFound.title}
+  description={t.notFound.description}
+  noindex
+  alternates={false}
+>
   <section class="container not-found" aria-labelledby="nf-title">
     <p class="code" aria-hidden="true">404</p>
-    <h1 id="nf-title" class="display">{es.notFound.heading}</h1>
-    <p class="text">{es.notFound.body}</p>
+    <h1 id="nf-title" class="display">{t.notFound.heading}</h1>
+    <p class="text">{t.notFound.body}</p>
     <div class="actions">
-      <a class="btn btn--solid" href={localePath('es')}>
+      <a class="btn btn--solid" href={localePath(defaultLocale)}>
         <Icon name="arrow-left" />
-        {es.notFound.back}
+        {t.notFound.back}
       </a>
-      <a class="btn btn--frame" href={localePath('en')} lang="en" hreflang="en">{en.notFound.back} (English)</a>
     </div>
+
+    <nav class="languages" aria-label={t.a11y.language}>
+      <ul role="list">
+        {
+          locales.map((code) => (
+            <li>
+              <a href={localePath(code)} hreflang={localeMeta[code].hreflang} lang={localeMeta[code].htmlLang}>
+                <Flag code={localeMeta[code].flag} />
+                {useTranslations(code).notFound.back}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
   </section>
 </BaseLayout>
 
@@ -57,9 +79,26 @@ const en = useTranslations('en');
   }
 
   .actions {
+    margin-top: 32px;
+  }
+
+  .languages ul {
     display: flex;
     flex-wrap: wrap;
-    gap: 16px;
-    margin-top: 32px;
+    gap: 8px 20px;
+    margin: 40px 0 0;
+  }
+
+  .languages a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 32px;
+    font-size: 0.875rem;
+    color: var(--ink-soft);
+  }
+
+  .languages a:hover {
+    color: var(--ink);
   }
 </style>

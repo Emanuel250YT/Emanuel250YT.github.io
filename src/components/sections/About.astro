@@ -11,8 +11,6 @@ interface Props {
 const { locale } = Astro.props;
 const t = useTranslations(locale);
 const currentRoles = roles.filter((role) => !role.end && role.id !== 'freelance');
-const caption =
-  locale === 'es' ? 'Ejemplo: crear un cobro con el SDK de Cosmos Pay' : 'Example: creating a payment with the Cosmos Pay SDK';
 ---
 
 <section id="about" class="about" aria-labelledby="about-title">
@@ -65,7 +63,7 @@ const caption =
 {'}'});
 
 pay.uri; <span class="tk-c">{t.about.editorResult}</span></code></pre>
-        <figcaption class="visually-hidden">{caption}</figcaption>
+        <figcaption class="visually-hidden">{t.about.editorCaption}</figcaption>
       </figure>
     </div>
 
@@ -118,7 +116,7 @@ pay.uri; <span class="tk-c">{t.about.editorResult}</span></code></pre>
     font-size: 0.75rem;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.12em;
+    letter-spacing: var(--tracking-label);
     color: var(--on-dark-soft);
   }
 
@@ -153,7 +151,7 @@ pay.uri; <span class="tk-c">{t.about.editorResult}</span></code></pre>
     text-decoration-color: currentColor;
   }
 
-  /* Ventana de editor (reemplaza la captura de Figma del diseno) */
+  /* Editor window (stands in for the Figma screenshot of the design) */
   .editor {
     overflow: hidden;
     border-radius: 10px;
@@ -195,7 +193,7 @@ pay.uri; <span class="tk-c">{t.about.editorResult}</span></code></pre>
   .editor-code {
     margin: 0;
     padding: clamp(16px, 2.5vw, 28px);
-    /* Sin scroll horizontal: una region scrolleable necesitaria foco de teclado. */
+    /* No horizontal scroll: a scrollable region would need keyboard focus. */
     white-space: pre-wrap;
     overflow-wrap: anywhere;
     font-family: var(--font-mono);

@@ -1,7 +1,7 @@
 :root {
   color-scheme: light;
 
-  /* Base monocroma del diseno */
+  /* Monochrome base from the design */
   --bg: #f3f3f3;
   --surface: #ffffff;
   --ink: #111111;
@@ -17,7 +17,7 @@
   --on-dark-soft: rgb(255 255 255 / 0.72);
   --on-dark-line: rgb(255 255 255 / 0.18);
 
-  /* Acento de marca Cosmos, solo en ilustraciones */
+  /* Cosmos brand accent, illustrations only */
   --cosmic: #000877;
   --navy: #05064f;
 
@@ -33,6 +33,38 @@
 
   --shadow-card: 0 1px 2px rgb(0 0 0 / 0.04), 0 8px 24px rgb(0 0 0 / 0.06);
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Display typography tokens, retuned per script below */
+  --tracking-display: -0.025em;
+  --tracking-hero: -0.035em;
+  --tracking-label: 0.12em;
+  --leading-display: 1.12;
+  --leading-hero: 1.08;
+}
+
+/*
+ * Space Grotesk only covers Latin scripts. Chinese and Devanagari fall back to
+ * the platform's own fonts (no extra downloads), and drop the negative tracking
+ * and tight leading that only suit Latin display type.
+ */
+:lang(zh) {
+  --font-sans: 'Space Grotesk Variable', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans SC',
+    'Noto Sans CJK SC', ui-sans-serif, system-ui, sans-serif;
+  --tracking-display: 0;
+  --tracking-hero: 0;
+  --tracking-label: 0.04em;
+  --leading-display: 1.3;
+  --leading-hero: 1.25;
+}
+
+:lang(hi) {
+  --font-sans: 'Space Grotesk Variable', 'Kohinoor Devanagari', 'Nirmala UI', 'Noto Sans Devanagari', Mangal,
+    ui-sans-serif, system-ui, sans-serif;
+  --tracking-display: 0;
+  --tracking-hero: 0;
+  --tracking-label: 0.02em;
+  --leading-display: 1.4;
+  --leading-hero: 1.35;
 }
 
 *,
@@ -138,11 +170,11 @@ button {
   border: 0;
 }
 
-/* Titulos de seccion con dos tonos (ver RichHeading.astro) */
+/* Two-tone section headings (see RichHeading.astro) */
 .display {
   font-weight: 400;
-  letter-spacing: -0.025em;
-  line-height: 1.12;
+  letter-spacing: var(--tracking-display);
+  line-height: var(--leading-display);
   text-wrap: balance;
 }
 
@@ -155,7 +187,7 @@ button {
   padding-block: clamp(72px, 10vw, 128px);
 }
 
-/* Botones del diseno: contorno con esquinas y solido negro */
+/* Buttons from the design: corner-framed outline and solid black */
 .btn {
   --btn-h: 44px;
   position: relative;
@@ -203,7 +235,7 @@ button {
   background: transparent;
 }
 
-/* Marco de "seleccion" como en el boton del diseno */
+/* "Selection" frame, as on the design's button */
 .btn--frame::before,
 .btn--frame::after {
   content: '';

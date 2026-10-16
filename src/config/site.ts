@@ -1,12 +1,12 @@
 /**
- * Datos de identidad del sitio. Todo lo que es "de Emanuel" (nombre, mail,
- * redes) se cambia aca y se propaga a la UI, al SEO y al JSON-LD.
+ * Site identity. Everything that belongs to Emanuel (name, email, socials) is
+ * changed here and flows into the UI, the SEO tags and the JSON-LD.
  */
 export const site = {
-  /** Debe coincidir con `site` en astro.config.mjs y con public/CNAME. */
+  /** Must match `site` in astro.config.mjs and public/CNAME. */
   url: 'https://emanuel250.dev.ar',
   domain: 'emanuel250.dev.ar',
-  /** Repositorio de GitHub Pages y destino del registro CNAME en dev.ar. */
+  /** GitHub Pages host: the CNAME target configured in dev.ar. */
   githubPagesHost: 'emanuel250yt.github.io',
   repository: 'https://github.com/Emanuel250YT/Emanuel250YT.github.io',
 
@@ -38,11 +38,11 @@ export const site = {
   },
 
   /**
-   * Google Search Console: pega aca el "content" del meta tag de verificacion
-   * (metodo "Etiqueta HTML"), no hace falta tocar el DNS de dev.ar.
+   * Google Search Console: paste the `content` of the verification meta tag
+   * ("HTML tag" method). No DNS change in dev.ar is needed.
    */
   googleSiteVerification: '',
-  /** Bing Webmaster Tools: idem, metodo "Meta tag". */
+  /** Bing Webmaster Tools: same idea, "Meta tag" method. */
   bingSiteVerification: '',
 } as const;
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * Verificacion estatica de SEO y accesibilidad sobre dist/ (corre despues del build).
- * Falla (exit 1) si alguna pagina indexable rompe una regla; ver CLAUDE.md.
+ * Static SEO and accessibility checks over dist/ (runs after the build).
+ * Exits with code 1 when any page breaks a rule; see CLAUDE.md.
  */
 import { existsSync } from 'node:fs';
 import { readFile, readdir } from 'node:fs/promises';
@@ -11,6 +11,18 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const dist = path.join(root, 'dist');
 const SITE = 'https://emanuel250.dev.ar';
+
+// Keep in sync with src/i18n/locales.ts.
+const LOCALES = {
+  es: { hreflang: 'es-AR', prefix: '' },
+  en: { hreflang: 'en', prefix: 'en/' },
+  pt: { hreflang: 'pt-BR', prefix: 'pt/' },
+  fr: { hreflang: 'fr', prefix: 'fr/' },
+  de: { hreflang: 'de', prefix: 'de/' },
+  zh: { hreflang: 'zh-CN', prefix: 'zh/' },
+  hi: { hreflang: 'hi', prefix: 'hi/' },
+};
+const ROUTES = ['', 'cv/'];
 
 const errors = [];
 const warnings = [];
@@ -40,9 +52,11 @@ const text = (html) =>
     .replace(/&[a-z]+;|&#\d+;/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
+/** Approximate rendered width: CJK characters take about two Latin ones in a SERP. */
+const visualLength = (value) => [...value].reduce((sum, char) => sum + (/[　-鿿＀-￯]/.test(char) ? 2 : 1), 0);
 
 if (!existsSync(dist)) {
-  console.error('No existe dist/. Corre `npm run build` primero.');
+  console.error('dist/ does not exist. Run `npm run build` first.');
   process.exit(1);
 }
 
@@ -55,121 +69,130 @@ for (const file of files) {
   const html = await readFile(file, 'utf8');
   const noindex = /<meta name="robots" content="noindex/.test(html);
 
-  // Documento
-  if (!/^<!DOCTYPE html>/i.test(html)) fail(rel, 'falta <!doctype html>');
+  // Document
+  if (!/^<!DOCTYPE html>/i.test(html)) fail(rel, 'missing <!doctype html>');
   const lang = html.match(/<html[^>]*\slang="([^"]+)"/)?.[1];
-  if (!lang) fail(rel, '<html> sin lang');
-  if (!/<meta name="viewport"/.test(html)) fail(rel, 'falta meta viewport');
+  if (!lang) fail(rel, '<html> has no lang');
+  if (!/<meta name="viewport"/.test(html)) fail(rel, 'missing meta viewport');
 
   // Title + description
   const title = html.match(/<title>([^<]*)<\/title>/)?.[1]?.trim();
-  if (!title) fail(rel, 'falta <title>');
+  if (!title) fail(rel, 'missing <title>');
   else {
-    if (title.length > 70) warn(rel, `title largo (${title.length} caracteres)`);
+    if (visualLength(title) > 72) warn(rel, `long title (${visualLength(title)} chars)`);
     if (!noindex) {
-      if (titles.has(title)) fail(rel, `title duplicado con ${titles.get(title)}`);
+      if (titles.has(title)) fail(rel, `title duplicated in ${titles.get(title)}`);
       titles.set(title, rel);
     }
   }
   const description = metaContent(html, 'name', 'description');
-  if (!description) fail(rel, 'falta meta description');
+  if (!description) fail(rel, 'missing meta description');
   else {
-    if (!noindex && (description.length < 70 || description.length > 170))
-      warn(rel, `description de ${description.length} caracteres (ideal 120-160)`);
+    const length = visualLength(description);
+    if (!noindex && (length < 70 || length > 175)) warn(rel, `description is ${length} chars (aim for 120-160)`);
     if (!noindex) {
-      if (descriptions.has(description)) fail(rel, `description duplicada con ${descriptions.get(description)}`);
+      if (descriptions.has(description)) fail(rel, `description duplicated in ${descriptions.get(description)}`);
       descriptions.set(description, rel);
     }
   }
 
-  // Encabezados
+  // Headings
   const h1s = html.match(/<h1[\s>]/g) ?? [];
-  if (h1s.length !== 1) fail(rel, `tiene ${h1s.length} <h1> (debe ser 1)`);
+  if (h1s.length !== 1) fail(rel, `has ${h1s.length} <h1> (must be 1)`);
   const levels = [...html.matchAll(/<h([1-6])[\s>]/g)].map((match) => Number(match[1]));
   levels.forEach((level, index) => {
-    if (index > 0 && level > levels[index - 1] + 1) fail(rel, `salto de encabezado h${levels[index - 1]} -> h${level}`);
+    if (index > 0 && level > levels[index - 1] + 1) fail(rel, `heading level jumps h${levels[index - 1]} -> h${level}`);
   });
 
-  // Imagenes y enlaces
+  // Images and links
   for (const img of html.match(/<img\b[^>]*>/g) ?? []) {
-    // alt vacio (alt / alt="") es valido para imagenes decorativas.
-    if (!/\salt(="|\s|>|\/)/.test(img)) fail(rel, `<img> sin alt: ${img.slice(0, 80)}`);
-    if (!/\swidth="/.test(img) || !/\sheight="/.test(img)) fail(rel, `<img> sin width/height (CLS): ${img.slice(0, 80)}`);
+    // An empty alt (alt / alt="") is valid for decorative images.
+    if (!/\salt(="|\s|>|\/)/.test(img)) fail(rel, `<img> without alt: ${img.slice(0, 80)}`);
+    if (!/\swidth="/.test(img) || !/\sheight="/.test(img)) fail(rel, `<img> without width/height (CLS): ${img.slice(0, 80)}`);
   }
   for (const link of html.match(/<a\b[^>]*>[\s\S]*?<\/a>/g) ?? []) {
     const open = link.match(/<a\b[^>]*>/)[0];
     const label = attr(open, 'aria-label') ?? text(link);
-    if (!label) fail(rel, `enlace sin texto accesible: ${open.slice(0, 80)}`);
+    if (!label) fail(rel, `link without accessible text: ${open.slice(0, 80)}`);
     if (attr(open, 'target') === '_blank' && !/noopener/.test(attr(open, 'rel') ?? ''))
-      fail(rel, `target=_blank sin rel=noopener: ${open.slice(0, 80)}`);
+      fail(rel, `target=_blank without rel=noopener: ${open.slice(0, 80)}`);
   }
   const ids = [...html.matchAll(/\sid="([^"]+)"/g)].map((match) => match[1]);
   const dupes = ids.filter((id, index) => ids.indexOf(id) !== index);
-  if (dupes.length) fail(rel, `ids duplicados: ${[...new Set(dupes)].join(', ')}`);
-  if (!/class="skip-link"/.test(html)) fail(rel, 'falta el skip link');
-  if (!/<main\b/.test(html)) fail(rel, 'falta <main>');
+  if (dupes.length) fail(rel, `duplicate ids: ${[...new Set(dupes)].join(', ')}`);
+  if (!/class="skip-link"/.test(html)) fail(rel, 'missing skip link');
+  if (!/<main\b/.test(html)) fail(rel, 'missing <main>');
 
   if (noindex) continue;
 
   // Canonical, hreflang, Open Graph
   const canonical = html.match(/<link rel="canonical" href="([^"]+)"/)?.[1];
-  if (!canonical) fail(rel, 'falta canonical');
+  if (!canonical) fail(rel, 'missing canonical');
   else {
-    if (!canonical.startsWith(SITE)) fail(rel, `canonical fuera del dominio: ${canonical}`);
-    if (!canonical.endsWith('/')) fail(rel, `canonical sin barra final: ${canonical}`);
+    if (!canonical.startsWith(SITE)) fail(rel, `canonical outside the domain: ${canonical}`);
+    if (!canonical.endsWith('/')) fail(rel, `canonical without trailing slash: ${canonical}`);
     const expected = `${SITE}/${rel.replace(/index\.html$/, '')}`;
-    if (canonical !== expected) fail(rel, `canonical ${canonical} no coincide con la ruta ${expected}`);
+    if (canonical !== expected) fail(rel, `canonical ${canonical} does not match the route ${expected}`);
   }
-  for (const hreflang of ['es-AR', 'en', 'x-default']) {
-    if (!html.includes(`hreflang="${hreflang}"`)) fail(rel, `falta hreflang ${hreflang}`);
+  for (const { hreflang } of Object.values(LOCALES)) {
+    if (!html.includes(`hreflang="${hreflang}"`)) fail(rel, `missing hreflang ${hreflang}`);
   }
+  if (!html.includes('hreflang="x-default"')) fail(rel, 'missing hreflang x-default');
   for (const property of ['og:title', 'og:description', 'og:image', 'og:url', 'og:type', 'og:locale']) {
-    if (!metaContent(html, 'property', property)) fail(rel, `falta ${property}`);
+    if (!metaContent(html, 'property', property)) fail(rel, `missing ${property}`);
   }
+  const alternates = html.match(/property="og:locale:alternate"/g) ?? [];
+  if (alternates.length !== Object.keys(LOCALES).length - 1) fail(rel, `expected ${Object.keys(LOCALES).length - 1} og:locale:alternate`);
   const ogImage = metaContent(html, 'property', 'og:image');
   if (ogImage) {
     const local = path.join(dist, new URL(ogImage).pathname);
-    if (!existsSync(local)) fail(rel, `og:image no existe en dist: ${ogImage}`);
+    if (!existsSync(local)) fail(rel, `og:image missing from dist: ${ogImage}`);
   }
-  if (!metaContent(html, 'name', 'twitter:card')) fail(rel, 'falta twitter:card');
+  if (!metaContent(html, 'name', 'twitter:card')) fail(rel, 'missing twitter:card');
 
   // JSON-LD
   const blocks = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)];
-  if (!blocks.length) fail(rel, 'falta JSON-LD');
+  if (!blocks.length) fail(rel, 'missing JSON-LD');
   for (const [, json] of blocks) {
     try {
       const data = JSON.parse(json);
       const types = (data['@graph'] ?? [data]).map((node) => node['@type']);
-      if (!types.includes('Person')) fail(rel, 'JSON-LD sin Person');
+      if (!types.includes('Person')) fail(rel, 'JSON-LD without Person');
     } catch (error) {
-      fail(rel, `JSON-LD invalido: ${error.message}`);
+      fail(rel, `invalid JSON-LD: ${error.message}`);
     }
   }
 }
 
-// Archivos del sitio
+// Site-level files
 for (const required of ['CNAME', 'robots.txt', 'sitemap-index.xml', 'favicon.ico', 'favicon.svg', 'site.webmanifest', '404.html', 'llms.txt']) {
-  if (!existsSync(path.join(dist, required))) fail('dist', `falta ${required}`);
+  if (!existsSync(path.join(dist, required))) fail('dist', `missing ${required}`);
 }
-for (const pdf of ['cv/emanuel-guzman-cv.pdf', 'en/cv/emanuel-guzman-cv.pdf']) {
-  if (!existsSync(path.join(dist, pdf))) fail('dist', `falta ${pdf} (npm run assets)`);
+for (const [locale, { prefix }] of Object.entries(LOCALES)) {
+  for (const route of ROUTES) {
+    if (!existsSync(path.join(dist, prefix, route, 'index.html'))) fail('dist', `missing /${prefix}${route}`);
+  }
+  if (!existsSync(path.join(dist, prefix, 'cv/emanuel-guzman-cv.pdf'))) fail('dist', `missing /${prefix}cv/emanuel-guzman-cv.pdf (npm run assets)`);
+  if (!existsSync(path.join(dist, `og/og-${locale}.png`))) fail('dist', `missing og/og-${locale}.png (npm run assets)`);
 }
 if (existsSync(path.join(dist, 'CNAME'))) {
   const cname = (await readFile(path.join(dist, 'CNAME'), 'utf8')).trim();
-  if (`https://${cname}` !== SITE) fail('CNAME', `"${cname}" no coincide con ${SITE}`);
+  if (`https://${cname}` !== SITE) fail('CNAME', `"${cname}" does not match ${SITE}`);
 }
 const robots = existsSync(path.join(dist, 'robots.txt')) ? await readFile(path.join(dist, 'robots.txt'), 'utf8') : '';
-if (!robots.includes(`Sitemap: ${SITE}/sitemap-index.xml`)) fail('robots.txt', 'no declara el sitemap');
+if (!robots.includes(`Sitemap: ${SITE}/sitemap-index.xml`)) fail('robots.txt', 'does not declare the sitemap');
 const sitemap = existsSync(path.join(dist, 'sitemap-0.xml')) ? await readFile(path.join(dist, 'sitemap-0.xml'), 'utf8') : '';
-for (const url of ['/', '/en/', '/cv/', '/en/cv/']) {
-  if (!sitemap.includes(`<loc>${SITE}${url}</loc>`)) fail('sitemap-0.xml', `falta ${url}`);
+for (const { prefix } of Object.values(LOCALES)) {
+  for (const route of ROUTES) {
+    if (!sitemap.includes(`<loc>${SITE}/${prefix}${route}</loc>`)) fail('sitemap-0.xml', `missing /${prefix}${route}`);
+  }
 }
-if (sitemap.includes('404')) fail('sitemap-0.xml', 'incluye la pagina 404');
+if (sitemap.includes('404')) fail('sitemap-0.xml', 'includes the 404 page');
 
 for (const message of warnings) console.warn(`⚠ ${message}`);
 if (errors.length) {
   for (const message of errors) console.error(`✗ ${message}`);
-  console.error(`\n${errors.length} problema(s) de SEO/a11y.`);
+  console.error(`\n${errors.length} SEO/a11y problem(s).`);
   process.exit(1);
 }
-console.log(`✓ SEO/a11y OK en ${files.length} paginas`);
+console.log(`✓ SEO/a11y OK on ${files.length} pages`);

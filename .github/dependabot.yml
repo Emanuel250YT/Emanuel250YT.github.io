@@ -4,14 +4,14 @@ updates:
     directory: /
     schedule:
       interval: weekly
-    # No adoptar versiones con menos de 7 dias publicadas (ataques de supply chain).
+    # Never adopt versions published less than 7 days ago (supply-chain attacks).
     cooldown:
       default-days: 7
     groups:
       astro:
         patterns: ['astro', '@astrojs/*']
     ignore:
-      # @astrojs/check 0.9 solo soporta TypeScript ^5 || ^6 (peerDependencies).
+      # @astrojs/check 0.9 only supports TypeScript ^5 || ^6 (peerDependencies).
       - dependency-name: typescript
         update-types: ['version-update:semver-major']
     open-pull-requests-limit: 5

@@ -3,12 +3,12 @@ import { achievements } from '@/data/achievements';
 import { projects } from '@/data/projects';
 import { certifications, education, roles, skillGroups } from '@/data/resume';
 import { useTranslations } from '@/i18n';
-import { localeMeta, localePath, type Locale } from '@/i18n/locales';
+import { localeMeta, localePath, locales, type Locale } from '@/i18n/locales';
 
 /**
- * Datos estructurados (schema.org, JSON-LD). Un solo @graph por pagina con
- * identificadores estables (#person, #website...) para que Google relacione
- * la persona, el sitio y sus proyectos como una sola entidad.
+ * Structured data (schema.org JSON-LD). One @graph per page with stable @ids
+ * (#person, #website...) so search engines merge the person, the site and the
+ * projects into a single entity across every language.
  */
 
 export type JsonLd = Record<string, unknown>;
@@ -24,7 +24,6 @@ export const ids = {
 
 export function personNode(locale: Locale, imageUrl: string): JsonLd {
   const t = useTranslations(locale);
-  const jobTitle = locale === 'es' ? 'Founder de Cosmos Pay y desarrollador full stack' : 'Founder of Cosmos Pay & Full Stack Developer';
 
   return {
     '@type': 'Person',
@@ -40,7 +39,7 @@ export function personNode(locale: Locale, imageUrl: string): JsonLd {
       caption: t.hero.photoAlt,
     },
     email: `mailto:${site.email}`,
-    jobTitle,
+    jobTitle: t.meta.jobTitle,
     description: t.meta.description,
     address: {
       '@type': 'PostalAddress',
@@ -100,7 +99,7 @@ export function websiteNode(): JsonLd {
     url: abs('/'),
     name: site.name,
     alternateName: site.domain,
-    inLanguage: ['es-AR', 'en'],
+    inLanguage: locales.map((locale) => localeMeta[locale].htmlLang),
     publisher: { '@id': ids.person },
     author: { '@id': ids.person },
   };
@@ -110,7 +109,7 @@ export function projectListNode(locale: Locale): JsonLd {
   return {
     '@type': 'ItemList',
     '@id': abs(`${localePath(locale)}#projects`),
-    name: locale === 'es' ? 'Proyectos de Emanuel Guzman' : 'Projects by Emanuel Guzman',
+    name: useTranslations(locale).projects.listName,
     itemListElement: projects.map((project, index) => ({
       '@type': 'ListItem',
       position: index + 1,

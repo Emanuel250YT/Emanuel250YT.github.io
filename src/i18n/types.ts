@@ -1,8 +1,10 @@
 /**
- * Titulo con dos tonos, como en el diseno: palabras "apagadas" (gris, peso
- * liviano) y palabras fuertes. `br` corta la linea solo en pantallas anchas.
+ * Two-tone heading, as in the design: "muted" words (grey, light weight) and
+ * strong words. `br` breaks the line on wide screens only; on narrow screens
+ * it collapses into a space, or into nothing when `space` is false (languages
+ * written without spaces between words, such as Chinese).
  */
-export type RichPart = { text: string; muted?: boolean } | { br: true };
+export type RichPart = { text: string; muted?: boolean } | { br: true; space?: boolean };
 export type RichText = RichPart[];
 
 export interface Stat {
@@ -16,6 +18,8 @@ export interface Dictionary {
     title: string;
     description: string;
     ogAlt: string;
+    /** Job title used in structured data and on the CV. */
+    jobTitle: string;
     keywords: string[];
   };
   a11y: {
@@ -23,7 +27,8 @@ export interface Dictionary {
     menu: string;
     closeMenu: string;
     primaryNav: string;
-    switchLanguage: string;
+    /** Label of the language switcher ("Language"). */
+    language: string;
     newTab: string;
     scrollHint: string;
   };
@@ -53,12 +58,22 @@ export interface Dictionary {
     editorFile: string;
     editorComment: string;
     editorResult: string;
+    editorCaption: string;
   };
   projects: {
     title: RichText;
     visit: string;
     code: string;
     private: string;
+    /** Name of the project ItemList in structured data. */
+    listName: string;
+    /** Words drawn inside the decorative project covers. */
+    cover: {
+      total: string;
+      pay: string;
+      balance: string;
+      files: [string, string, string];
+    };
   };
   achievements: {
     title: RichText;

@@ -1,31 +1,31 @@
 # Emanuel Guzman
 
-> Desarrollador full stack y founder de Cosmos / Cosmos Pay, en Salta, Argentina. Construye pagos, SDKs y productos sobre Stellar, Solana y Monad para Latinoamérica.
 > Full stack developer and founder of Cosmos / Cosmos Pay, based in Salta, Argentina. Builds payments, SDKs and products on Stellar, Solana and Monad for Latin America.
 
-## Páginas / Pages
+The site is available in Spanish (default), English, Portuguese, French, German, Chinese and Hindi. Every page links to its translations with hreflang.
 
-- [Portfolio (español)](https://emanuel250.dev.ar/): proyectos, logros y contacto
-- [Portfolio (English)](https://emanuel250.dev.ar/en/): projects, achievements and contact
-- [CV (español)](https://emanuel250.dev.ar/cv/): experiencia, educación y certificaciones ([PDF](https://emanuel250.dev.ar/cv/emanuel-guzman-cv.pdf))
-- [CV (English)](https://emanuel250.dev.ar/en/cv/): experience, education and certifications ([PDF](https://emanuel250.dev.ar/en/cv/emanuel-guzman-cv.pdf))
+## Pages
+
+- [Portfolio](https://emanuel250.dev.ar/en/): projects, achievements and contact (English)
+- [CV](https://emanuel250.dev.ar/en/cv/): experience, education and certifications ([PDF](https://emanuel250.dev.ar/en/cv/emanuel-guzman-cv.pdf))
+- Other languages: [Español](https://emanuel250.dev.ar/), [Português](https://emanuel250.dev.ar/pt/), [Français](https://emanuel250.dev.ar/fr/), [Deutsch](https://emanuel250.dev.ar/de/), [中文](https://emanuel250.dev.ar/zh/), [हिन्दी](https://emanuel250.dev.ar/hi/)
 
 ## Roles
 
-- Founder — Cosmos · Cosmos Pay (2026 – hoy): https://cosmospay.lat
-- CEO — CloudyCoding (2018 – hoy): https://cloudycoding.com
-- Full Stack Developer — SaltaDev (2025 – hoy): https://salta.dev.ar
+- Founder — Cosmos · Cosmos Pay (2026 – present): https://cosmospay.lat
+- CEO — CloudyCoding (2018 – present): https://cloudycoding.com
+- Full Stack Developer — SaltaDev (2025 – present): https://salta.dev.ar
 
-## Proyectos / Projects
+## Projects
 
-- [Cosmos Pay](https://cosmospay.lat): pasarela de pagos para desarrolladores en LATAM (payment intents, webhooks, stablecoins, rampas fiat)
-- [Cosmos Pay Wallet](https://github.com/CosmosPay/CosmosPay-Wallet): wallet no custodial de Stellar (extensión, Android, web, desktop)
-- BancaSDK: SDK multi-banco en TypeScript, evolución de MacroClickJS (15.000+ descargas en su primera semana)
-- [SolaDB](https://github.com/Emanuel250YT/SolaDB) y [MonaDB](https://github.com/Emanuel250YT/MonaDB): storage privado y replicado sobre Solana y Monad
-- [ASide](https://github.com/Emanuel250YT/ASide) y [ArkaCDN](https://github.com/Emanuel250YT/arka-cdn): SDKs para construir sobre Arkiv
-- [StellarOrchestra](https://github.com/Emanuel250YT/StellarOrchestra): orquestador de agentes de IA con pagos x402 en Stellar
+- [Cosmos Pay](https://cosmospay.lat): payment gateway for developers in Latin America (payment intents, webhooks, stablecoins, fiat ramps)
+- [Cosmos Pay Wallet](https://github.com/CosmosPay/CosmosPay-Wallet): non-custodial Stellar wallet (browser extension, Android, web, desktop)
+- BancaSDK: multi-bank TypeScript SDK, the evolution of MacroClickJS (15,000+ downloads in its first week)
+- [SolaDB](https://github.com/Emanuel250YT/SolaDB) and [MonaDB](https://github.com/Emanuel250YT/MonaDB): private, replicated storage on Solana and Monad
+- [ASide](https://github.com/Emanuel250YT/ASide) and [ArkaCDN](https://github.com/Emanuel250YT/arka-cdn): SDKs to build on Arkiv
+- [StellarOrchestra](https://github.com/Emanuel250YT/StellarOrchestra): AI agent orchestrator with x402 payments on Stellar
 
-## Contacto / Contact
+## Contact
 
 - Email: emanuel@cloudycoding.com
 - GitHub: https://github.com/Emanuel250YT

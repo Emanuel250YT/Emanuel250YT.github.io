@@ -1,6 +1,6 @@
 ---
 import { Image } from 'astro:assets';
-import photo from '@/assets/emanuel.jpg';
+import portrait from '@/assets/portrait.png';
 import { site } from '@/config/site';
 import Icon from '@/components/ui/Icon.astro';
 import RichHeading from '@/components/ui/RichHeading.astro';
@@ -56,17 +56,15 @@ const t = useTranslations(locale);
     </div>
 
     <figure class="hero-photo">
-      <div class="photo-frame">
-        <Image
-          src={photo}
-          alt={t.hero.photoAlt}
-          widths={[320, 460]}
-          sizes="(max-width: 860px) 80vw, 460px"
-          loading="eager"
-          fetchpriority="high"
-          class="photo"
-        />
-      </div>
+      <Image
+        src={portrait}
+        alt={t.hero.photoAlt}
+        widths={[340, 460, 600, 744]}
+        sizes="(max-width: 860px) min(80vw, 380px), 460px"
+        loading="eager"
+        fetchpriority="high"
+        class="photo"
+      />
       <span class="chip chip--place">
         <Icon name="pin" size={14} />
         {t.hero.basedIn}
@@ -93,7 +91,7 @@ const t = useTranslations(locale);
     overflow: hidden;
   }
 
-  /* El cuadriculado se desvanece hacia abajo como en el diseno */
+  /* The grid fades out towards the bottom, as in the design */
   .hero::after {
     content: '';
     position: absolute;
@@ -107,7 +105,7 @@ const t = useTranslations(locale);
     position: relative;
     z-index: 1;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(280px, 420px);
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 460px);
     align-items: end;
     gap: clamp(32px, 4.5vw, 56px);
   }
@@ -116,7 +114,7 @@ const t = useTranslations(locale);
     padding-bottom: clamp(48px, 7vw, 88px);
   }
 
-  /* Insignia con cursor, como la etiqueta de Figma del diseno */
+  /* Badge with cursor, like the Figma label in the design */
   .badge {
     position: relative;
     display: inline-flex;
@@ -181,8 +179,8 @@ const t = useTranslations(locale);
 
   .hero :global(.hero-title) {
     font-size: clamp(2.3rem, 4.4vw, 3.75rem);
-    line-height: 1.08;
-    letter-spacing: -0.035em;
+    line-height: var(--leading-hero);
+    letter-spacing: var(--tracking-hero);
   }
 
   .lead {
@@ -239,29 +237,17 @@ const t = useTranslations(locale);
     color: var(--ink-soft);
   }
 
-  /* Foto */
+  /* Black & white cut-out portrait that "stands" on the dark section, as in the design */
   .hero-photo {
     position: relative;
     justify-self: end;
     width: 100%;
   }
 
-  /* La foto "apoya" sobre la seccion oscura, como el recorte del diseno */
-  .photo-frame {
-    position: relative;
-    overflow: hidden;
-    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-    background: #121212;
-    aspect-ratio: 9 / 10;
-    box-shadow:
-      0 30px 60px -20px rgb(0 0 0 / 0.35),
-      0 0 0 1px rgb(0 0 0 / 0.06);
-  }
-
-  .photo-frame :global(.photo) {
+  .hero-photo :global(.photo) {
+    display: block;
     width: 100%;
-    height: 100%;
-    object-fit: cover;
+    height: auto;
   }
 
   .chip {
@@ -279,13 +265,13 @@ const t = useTranslations(locale);
   }
 
   .chip--place {
-    top: 20px;
-    right: -14px;
+    top: 16%;
+    right: 0;
   }
 
   .chip--status {
-    bottom: 28px;
-    left: -24px;
+    bottom: 14%;
+    left: -4%;
   }
 
   .dot {
@@ -318,11 +304,11 @@ const t = useTranslations(locale);
     }
   }
 
-  /* Cursor de "colaborador" estilo Figma */
+  /* Figma-style "collaborator" cursor */
   .peer-cursor {
     position: absolute;
-    top: 42%;
-    left: -36px;
+    top: 44%;
+    left: -6%;
     display: flex;
     align-items: flex-start;
     color: var(--ink);
@@ -350,20 +336,20 @@ const t = useTranslations(locale);
 
     .hero-photo {
       justify-self: center;
-      width: min(86%, 400px);
+      width: min(80%, 380px);
       margin-top: 8px;
     }
 
     .peer-cursor {
-      left: -20px;
+      left: -8%;
     }
 
     .chip--status {
-      left: -12px;
+      left: -10%;
     }
 
     .chip--place {
-      right: -10px;
+      right: -8%;
     }
   }
 

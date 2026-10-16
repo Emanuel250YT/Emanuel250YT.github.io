@@ -1,6 +1,6 @@
 ---
 import { getImage } from 'astro:assets';
-import photo from '@/assets/emanuel.jpg';
+import portrait from '@/assets/portrait.png';
 import { site } from '@/config/site';
 import Icon from '@/components/ui/Icon.astro';
 import { sortedAchievements } from '@/data/achievements';
@@ -20,8 +20,8 @@ interface Props {
 const { locale } = Astro.props;
 const t = useTranslations(locale);
 
-const portrait = await getImage({ src: photo, width: 460, format: 'jpg' });
-const portraitUrl = new URL(portrait.src, Astro.site ?? site.url).href;
+const portraitImage = await getImage({ src: portrait, width: 744, format: 'webp' });
+const portraitUrl = new URL(portraitImage.src, Astro.site ?? site.url).href;
 
 const jsonLd = graph([
   personNode(locale, portraitUrl),
@@ -41,7 +41,6 @@ const jsonLd = graph([
   }),
 ]);
 
-const jobTitle = locale === 'es' ? 'Founder de Cosmos Pay · Desarrollador full stack' : 'Founder of Cosmos Pay · Full Stack Developer';
 const contactItems = [
   { label: site.email, href: `mailto:${site.email}` },
   { label: displayUrl(site.url), href: site.url },
@@ -67,7 +66,7 @@ const contactItems = [
       <div>
         <p class="eyebrow">{t.cv.heading}</p>
         <h1 id="cv-name">{site.name}</h1>
-        <p class="role">{jobTitle}</p>
+        <p class="role">{t.meta.jobTitle}</p>
         <p class="place">
           <Icon name="pin" size={14} />
           {site.location.city}, Argentina
@@ -242,7 +241,7 @@ const contactItems = [
     font-size: 0.75rem;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.12em;
+    letter-spacing: var(--tracking-label);
     color: var(--ink-soft);
   }
 
@@ -293,7 +292,7 @@ const contactItems = [
     font-size: 0.8rem;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.12em;
+    letter-spacing: var(--tracking-label);
   }
 
   .summary {
@@ -433,7 +432,7 @@ const contactItems = [
     }
   }
 
-  /* Version imprimible / PDF */
+  /* Print / PDF version */
   @page {
     size: A4;
     margin: 12mm 13mm 12mm;

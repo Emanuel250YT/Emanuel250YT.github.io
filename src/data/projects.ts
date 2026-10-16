@@ -1,6 +1,6 @@
 import type { Localized } from '@/i18n/locales';
 
-/** Cada portada se dibuja en HTML/CSS (sin imagenes): ver ProjectCover.astro. */
+/** Every cover is drawn in HTML/CSS (no images): see ProjectCover.astro. */
 export type CoverKind = 'checkout' | 'wallet' | 'code' | 'storage' | 'social' | 'terminal';
 
 export interface Project {
@@ -9,7 +9,7 @@ export interface Project {
   tagline: Localized;
   description: Localized;
   tags: Localized<[string, string, string]>;
-  /** Enlace principal de la tarjeta (sitio o repo). */
+  /** Main link of the card (site or repository). */
   url?: string;
   repo?: string;
   year: string;
@@ -21,14 +21,32 @@ export const projects: Project[] = [
   {
     id: 'cosmos-pay',
     name: 'Cosmos Pay',
-    tagline: { es: 'Pasarela de pagos para LATAM', en: 'Payment gateway for LATAM' },
+    tagline: {
+      es: 'Pasarela de pagos para LATAM',
+      en: 'Payment gateway for LATAM',
+      pt: 'Gateway de pagamentos para a LATAM',
+      fr: 'Passerelle de paiement pour la LATAM',
+      de: 'Zahlungs-Gateway für LATAM',
+      zh: '面向拉美的支付网关',
+      hi: 'LATAM के लिए पेमेंट गेटवे',
+    },
     description: {
       es: 'Infraestructura de pagos para desarrolladores: payment intents, webhooks, stablecoins y rampas fiat, con liquidación en segundos y comisiones de fracciones de centavo.',
       en: 'Payments infrastructure for developers: payment intents, webhooks, stablecoins and fiat ramps, settling in seconds for fractions of a cent.',
+      pt: 'Infraestrutura de pagamentos para desenvolvedores: payment intents, webhooks, stablecoins e rampas fiat, com liquidação em segundos e taxas de frações de centavo.',
+      fr: 'Une infrastructure de paiement pour les développeurs : payment intents, webhooks, stablecoins et rampes fiat, avec un règlement en quelques secondes pour une fraction de centime.',
+      de: 'Zahlungsinfrastruktur für Entwickler: Payment Intents, Webhooks, Stablecoins und Fiat-Rampen, mit Abwicklung in Sekunden für Bruchteile eines Cents.',
+      zh: '面向开发者的支付基础设施：支付意图、Webhook、稳定币和法币出入金通道，数秒内完成结算，手续费不到一美分。',
+      hi: 'डेवलपर्स के लिए पेमेंट इंफ्रास्ट्रक्चर: पेमेंट इंटेंट्स, वेबहुक्स, स्टेबलकॉइन्स और फ़िएट रैंप्स — सेकंडों में सेटलमेंट और एक सेंट से भी कम फ़ीस।',
     },
     tags: {
       es: ['Founder', 'Producto', 'Stellar · Solana · Monad'],
       en: ['Founder', 'Product', 'Stellar · Solana · Monad'],
+      pt: ['Founder', 'Produto', 'Stellar · Solana · Monad'],
+      fr: ['Fondateur', 'Produit', 'Stellar · Solana · Monad'],
+      de: ['Gründer', 'Produkt', 'Stellar · Solana · Monad'],
+      zh: ['创始人', '产品', 'Stellar · Solana · Monad'],
+      hi: ['फाउंडर', 'प्रोडक्ट', 'Stellar · Solana · Monad'],
     },
     url: 'https://cosmospay.lat',
     repo: 'https://github.com/CosmosPay',
@@ -39,14 +57,32 @@ export const projects: Project[] = [
   {
     id: 'cosmos-pay-wallet',
     name: 'Cosmos Pay Wallet',
-    tagline: { es: 'Wallet no custodial multiplataforma', en: 'Cross-platform non-custodial wallet' },
+    tagline: {
+      es: 'Wallet no custodial multiplataforma',
+      en: 'Cross-platform non-custodial wallet',
+      pt: 'Wallet não custodial multiplataforma',
+      fr: 'Wallet non custodial multiplateforme',
+      de: 'Plattformübergreifende Non-Custodial-Wallet',
+      zh: '跨平台非托管钱包',
+      hi: 'क्रॉस-प्लेटफ़ॉर्म नॉन-कस्टोडियल वॉलेट',
+    },
     description: {
       es: 'Wallet de Stellar como extensión de navegador, app Android, web y desktop: enviar, hacer swaps y seguir tu actividad, con tus 12 palabras como única llave.',
       en: 'A Stellar wallet shipped as a browser extension, Android app, web and desktop: send, swap and track activity, with your 12 words as the only key.',
+      pt: 'Wallet Stellar como extensão de navegador, app Android, web e desktop: enviar, fazer swaps e acompanhar sua atividade, com suas 12 palavras como única chave.',
+      fr: 'Un wallet Stellar en extension de navigateur, app Android, web et desktop : envoyer, échanger et suivre son activité, avec ses 12 mots comme seule clé.',
+      de: 'Eine Stellar-Wallet als Browser-Erweiterung, Android-App, Web- und Desktop-App: senden, tauschen und Aktivitäten verfolgen – mit deinen 12 Wörtern als einzigem Schlüssel.',
+      zh: 'Stellar 钱包，提供浏览器扩展、Android 应用、网页版和桌面版：转账、兑换、查看动态，你的 12 个助记词就是唯一的钥匙。',
+      hi: 'ब्राउज़र एक्सटेंशन, Android ऐप, वेब और डेस्कटॉप के रूप में Stellar वॉलेट: भेजें, स्वैप करें और अपनी गतिविधि देखें — आपके 12 शब्द ही एकमात्र चाबी हैं।',
     },
     tags: {
       es: ['Extensión', 'Android', 'Desktop'],
       en: ['Extension', 'Android', 'Desktop'],
+      pt: ['Extensão', 'Android', 'Desktop'],
+      fr: ['Extension', 'Android', 'Desktop'],
+      de: ['Erweiterung', 'Android', 'Desktop'],
+      zh: ['浏览器扩展', 'Android', '桌面端'],
+      hi: ['एक्सटेंशन', 'Android', 'डेस्कटॉप'],
     },
     url: 'https://github.com/CosmosPay/CosmosPay-Wallet',
     repo: 'https://github.com/CosmosPay/CosmosPay-Wallet',
@@ -57,14 +93,32 @@ export const projects: Project[] = [
   {
     id: 'bancasdk',
     name: 'BancaSDK',
-    tagline: { es: 'SDK multi-banco en TypeScript', en: 'Multi-bank TypeScript SDK' },
+    tagline: {
+      es: 'SDK multi-banco en TypeScript',
+      en: 'Multi-bank TypeScript SDK',
+      pt: 'SDK multibanco em TypeScript',
+      fr: 'SDK multibanque en TypeScript',
+      de: 'Multibank-SDK in TypeScript',
+      zh: 'TypeScript 多银行 SDK',
+      hi: 'TypeScript में मल्टी-बैंक SDK',
+    },
     description: {
       es: 'Evolución de MacroClickJS, la librería para integrar la pasarela de Banco Macro que superó las 15.000 descargas en su primera semana. Un cliente unificado para integraciones bancarias.',
       en: 'The evolution of MacroClickJS, the library for Banco Macro’s payment gateway that passed 15,000 downloads in its first week. One client for banking integrations.',
+      pt: 'Evolução do MacroClickJS, a biblioteca para integrar o gateway do Banco Macro que passou de 15.000 downloads na primeira semana. Um cliente unificado para integrações bancárias.',
+      fr: 'L’évolution de MacroClickJS, la bibliothèque d’intégration de la passerelle de Banco Macro qui a dépassé 15 000 téléchargements dès sa première semaine. Un client unique pour les intégrations bancaires.',
+      de: 'Die Weiterentwicklung von MacroClickJS, der Bibliothek für das Gateway der Banco Macro, die in der ersten Woche über 15.000 Downloads erreichte. Ein Client für Bankintegrationen.',
+      zh: 'MacroClickJS 的演进版本——这个用于对接 Banco Macro 支付网关的库在首周下载量就超过 15,000 次。一个统一的银行集成客户端。',
+      hi: 'MacroClickJS का अगला रूप — Banco Macro के पेमेंट गेटवे से जुड़ने वाली लाइब्रेरी, जिसके पहले हफ़्ते में 15,000 से ज़्यादा डाउनलोड हुए। बैंकिंग इंटीग्रेशन के लिए एक यूनिफ़ाइड क्लाइंट।',
     },
     tags: {
       es: ['Open source', 'npm', '15k+ descargas'],
       en: ['Open source', 'npm', '15k+ downloads'],
+      pt: ['Open source', 'npm', '15k+ downloads'],
+      fr: ['Open source', 'npm', '15k+ téléchargements'],
+      de: ['Open Source', 'npm', '15k+ Downloads'],
+      zh: ['开源', 'npm', '15k+ 下载'],
+      hi: ['ओपन सोर्स', 'npm', '15k+ डाउनलोड'],
     },
     year: '2026',
     tech: ['TypeScript', 'Zod', 'Vitest'],
@@ -73,14 +127,32 @@ export const projects: Project[] = [
   {
     id: 'soladb-monadb',
     name: 'SolaDB & MonaDB',
-    tagline: { es: 'Storage privado y replicado on-chain', en: 'Private, replicated on-chain storage' },
+    tagline: {
+      es: 'Storage privado y replicado on-chain',
+      en: 'Private, replicated on-chain storage',
+      pt: 'Storage privado e replicado on-chain',
+      fr: 'Stockage privé et répliqué on-chain',
+      de: 'Privater, replizierter On-Chain-Speicher',
+      zh: '私密、多副本的链上存储',
+      hi: 'प्राइवेट, रेप्लिकेटेड ऑन-चेन स्टोरेज',
+    },
     description: {
       es: 'Archivos cifrados en el navegador, fragmentados con Reed-Solomon y guardados por nodos que cobran por cada copia, verificada con pruebas de almacenamiento on-chain.',
       en: 'Files encrypted in the browser, sharded with Reed-Solomon and kept by nodes paid for every copy, checked with on-chain storage proofs.',
+      pt: 'Arquivos criptografados no navegador, fragmentados com Reed-Solomon e guardados por nós que recebem por cada cópia, verificada com provas de armazenamento on-chain.',
+      fr: 'Des fichiers chiffrés dans le navigateur, fragmentés avec Reed-Solomon et conservés par des nœuds rémunérés pour chaque copie, vérifiée par des preuves de stockage on-chain.',
+      de: 'Dateien werden im Browser verschlüsselt, mit Reed-Solomon fragmentiert und von Nodes gespeichert, die für jede Kopie bezahlt werden – geprüft mit On-Chain-Speichernachweisen.',
+      zh: '文件在浏览器中加密，经 Reed-Solomon 分片后由节点保存；每份副本都通过链上存储证明验证，节点按副本获得报酬。',
+      hi: 'फ़ाइलें ब्राउज़र में एन्क्रिप्ट होती हैं, Reed-Solomon से टुकड़ों में बँटती हैं और ऐसे नोड्स पर रखी जाती हैं जिन्हें हर कॉपी का भुगतान मिलता है — ऑन-चेन स्टोरेज प्रूफ़ से सत्यापित।',
     },
     tags: {
       es: ['Protocolo', 'Solana', 'Monad'],
       en: ['Protocol', 'Solana', 'Monad'],
+      pt: ['Protocolo', 'Solana', 'Monad'],
+      fr: ['Protocole', 'Solana', 'Monad'],
+      de: ['Protokoll', 'Solana', 'Monad'],
+      zh: ['协议', 'Solana', 'Monad'],
+      hi: ['प्रोटोकॉल', 'Solana', 'Monad'],
     },
     url: 'https://github.com/Emanuel250YT/SolaDB',
     repo: 'https://github.com/Emanuel250YT/SolaDB',
@@ -91,14 +163,32 @@ export const projects: Project[] = [
   {
     id: 'aside-arkacdn',
     name: 'ASide & ArkaCDN',
-    tagline: { es: 'SDKs para construir sobre Arkiv', en: 'SDKs to build on Arkiv' },
+    tagline: {
+      es: 'SDKs para construir sobre Arkiv',
+      en: 'SDKs to build on Arkiv',
+      pt: 'SDKs para construir sobre a Arkiv',
+      fr: 'Des SDK pour construire sur Arkiv',
+      de: 'SDKs zum Bauen auf Arkiv',
+      zh: '基于 Arkiv 构建的 SDK',
+      hi: 'Arkiv पर बनाने के लिए SDK',
+    },
     description: {
       es: 'ArkaCDN convierte a Arkiv en una capa de distribución de contenido; ASide suma perfiles, grafo social, feed, eventos y más de 70 features. Más de 1.000 descargas en 3 días.',
       en: 'ArkaCDN turns Arkiv into a content distribution layer; ASide adds profiles, a social graph, feeds, events and 70+ features. Over 1,000 downloads in 3 days.',
+      pt: 'O ArkaCDN transforma a Arkiv em uma camada de distribuição de conteúdo; o ASide adiciona perfis, grafo social, feed, eventos e mais de 70 recursos. Mais de 1.000 downloads em 3 dias.',
+      fr: 'ArkaCDN fait d’Arkiv une couche de distribution de contenu ; ASide ajoute profils, graphe social, fil d’actualité, événements et plus de 70 fonctionnalités. Plus de 1 000 téléchargements en 3 jours.',
+      de: 'ArkaCDN macht Arkiv zur Content-Distributionsschicht; ASide ergänzt Profile, Social Graph, Feed, Events und über 70 Features. Mehr als 1.000 Downloads in 3 Tagen.',
+      zh: 'ArkaCDN 把 Arkiv 变成内容分发层；ASide 在此之上提供个人资料、社交关系、动态流、活动等 70 多项功能。3 天内下载量超过 1,000 次。',
+      hi: 'ArkaCDN, Arkiv को कंटेंट डिस्ट्रीब्यूशन लेयर बनाता है; ASide उसमें प्रोफ़ाइल, सोशल ग्राफ़, फ़ीड, इवेंट्स और 70 से ज़्यादा फ़ीचर्स जोड़ता है। 3 दिनों में 1,000 से अधिक डाउनलोड।',
     },
     tags: {
       es: ['Open source', 'npm', 'Arkiv'],
       en: ['Open source', 'npm', 'Arkiv'],
+      pt: ['Open source', 'npm', 'Arkiv'],
+      fr: ['Open source', 'npm', 'Arkiv'],
+      de: ['Open Source', 'npm', 'Arkiv'],
+      zh: ['开源', 'npm', 'Arkiv'],
+      hi: ['ओपन सोर्स', 'npm', 'Arkiv'],
     },
     url: 'https://aside.cloudycoding.com',
     repo: 'https://github.com/Emanuel250YT/ASide',
@@ -109,14 +199,32 @@ export const projects: Project[] = [
   {
     id: 'stellar-orchestra',
     name: 'StellarOrchestra',
-    tagline: { es: 'Agentes de IA que cobran con x402', en: 'AI agents that get paid via x402' },
+    tagline: {
+      es: 'Agentes de IA que cobran con x402',
+      en: 'AI agents that get paid via x402',
+      pt: 'Agentes de IA que cobram com x402',
+      fr: 'Des agents IA payés via x402',
+      de: 'KI-Agenten, die per x402 bezahlt werden',
+      zh: '通过 x402 收费的 AI 智能体',
+      hi: 'x402 से भुगतान पाने वाले AI एजेंट',
+    },
     description: {
       es: 'Orquestador self-hosted de agentes de IA: registrás tus agentes, compartís API keys y cobrás por tarea con pagos x402 sobre Stellar.',
       en: 'A self-hosted AI agent orchestrator: register your agents, share API keys and charge per task with x402 payments on Stellar.',
+      pt: 'Orquestrador self-hosted de agentes de IA: você registra seus agentes, compartilha API keys e cobra por tarefa com pagamentos x402 na Stellar.',
+      fr: 'Un orchestrateur d’agents IA auto-hébergé : enregistrez vos agents, partagez des clés d’API et facturez chaque tâche avec des paiements x402 sur Stellar.',
+      de: 'Ein selbst gehosteter Orchestrator für KI-Agenten: Agenten registrieren, API-Keys teilen und pro Aufgabe mit x402-Zahlungen auf Stellar abrechnen.',
+      zh: '可自托管的 AI 智能体编排器：注册你的智能体、分享 API 密钥，并通过 Stellar 上的 x402 支付按任务收费。',
+      hi: 'सेल्फ़-होस्टेड AI एजेंट ऑर्केस्ट्रेटर: अपने एजेंट रजिस्टर करें, API कीज़ साझा करें और Stellar पर x402 पेमेंट्स से हर टास्क का शुल्क लें।',
     },
     tags: {
       es: ['IA', 'Stellar', 'x402'],
       en: ['AI', 'Stellar', 'x402'],
+      pt: ['IA', 'Stellar', 'x402'],
+      fr: ['IA', 'Stellar', 'x402'],
+      de: ['KI', 'Stellar', 'x402'],
+      zh: ['AI', 'Stellar', 'x402'],
+      hi: ['AI', 'Stellar', 'x402'],
     },
     url: 'https://github.com/Emanuel250YT/StellarOrchestra',
     repo: 'https://github.com/Emanuel250YT/StellarOrchestra',

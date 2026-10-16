@@ -24,7 +24,7 @@ const t = useTranslations(locale);
           <li>
             <article class:list={['card', { 'card--linked': project.url }]} aria-labelledby={`project-${project.id}`}>
               <div class="media">
-                <ProjectCover kind={project.cover} />
+                <ProjectCover kind={project.cover} locale={locale} />
                 {project.url && (
                   <span class="go" aria-hidden="true">
                     <Icon name="arrow-up-right" size={16} />
@@ -135,7 +135,7 @@ const t = useTranslations(locale);
     text-decoration: none;
   }
 
-  /* Toda la tarjeta es clickeable sin anidar contenido dentro del <a>. */
+  /* The whole card is clickable without nesting content inside the <a>. */
   .stretched::after {
     content: '';
     position: absolute;

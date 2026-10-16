@@ -1,14 +1,15 @@
 #!/usr/bin/env node
 /**
- * Genera los assets binarios que viven en public/ y se commitean:
- *   - favicon.ico, apple-touch-icon.png, icon-192/512.png, icon-maskable-512.png
- *   - og/og-es.png y og/og-en.png (1200x630, para redes y buscadores)
- *   - cv/emanuel-guzman-cv.pdf y en/cv/emanuel-guzman-cv.pdf (desde /cv/ impreso)
+ * Generates the binary assets that are committed to the repository:
+ *   - src/assets/portrait.png, src/assets/avatar.png  (black & white, from assets-src/portrait.png)
+ *   - public/favicon.ico, apple-touch-icon.png, icon-192/512.png, icon-maskable-512.png
+ *   - public/og/og-<locale>.png                        (1200x630, one per locale)
+ *   - public/[<locale>/]cv/emanuel-guzman-cv.pdf        (printed from /cv/, one per locale)
  *
- * Uso: npm run assets            (todo)
- *      npm run assets -- --no-cv (sin PDFs, no necesita build)
+ * Usage: npm run assets              (everything)
+ *        npm run assets -- --no-cv   (skip the PDFs, no build needed)
  *
- * Requiere Google Chrome / Chromium / Edge instalado (CHROME_PATH para forzar uno).
+ * Requires Google Chrome / Chromium / Edge (set CHROME_PATH to force one).
  */
 import { spawn } from 'node:child_process';
 import { existsSync } from 'node:fs';
@@ -22,9 +23,14 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const pub = path.join(root, 'public');
 const withCv = !process.argv.includes('--no-cv');
 
+// Keep in sync with src/i18n/locales.ts (plain Node cannot import TS sources).
+const LOCALES = ['es', 'en', 'pt', 'fr', 'de', 'zh', 'hi'];
+const DEFAULT_LOCALE = 'es';
+const localePrefix = (locale) => (locale === DEFAULT_LOCALE ? '' : `${locale}/`);
+
 const BRAND_BG = '#111111';
 const glyph = (scale = 1) => {
-  // La "e." del logo, centrada en un lienzo de 64x64.
+  // The "e." of the logo, centred on a 64x64 canvas.
   const t = (64 - 64 * scale) / 2;
   return `<g transform="translate(${t} ${t}) scale(${scale})"><path d="M17 33h23a11.5 11.5 0 1 0-3.4 8.2" fill="none" stroke="#fff" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="48" cy="43.5" r="3.8" fill="#fff"/></g>`;
 };
@@ -45,7 +51,7 @@ function findChrome() {
     '/usr/bin/chromium-browser',
   ].filter(Boolean);
   const found = candidates.find((candidate) => existsSync(candidate));
-  if (!found) throw new Error('No encontre Chrome/Chromium. Defini CHROME_PATH.');
+  if (!found) throw new Error('Chrome/Chromium not found. Set CHROME_PATH.');
   return found;
 }
 
@@ -56,11 +62,24 @@ function run(command, args, options = {}) {
     child.stdout.on('data', (chunk) => (output += chunk));
     child.stderr.on('data', (chunk) => (output += chunk));
     child.on('error', reject);
-    child.on('close', (code) => (code === 0 ? resolve(output) : reject(new Error(`${command} salio con ${code}\n${output}`))));
+    child.on('close', (code) => (code === 0 ? resolve(output) : reject(new Error(`${command} exited with ${code}\n${output}`))));
   });
 }
 
-/** ICO con PNGs embebidos (soportado desde Windows Vista y por todos los navegadores). */
+/** Black & white hero portrait and footer avatar, both keeping the transparent background. */
+async function portraits() {
+  const source = path.join(root, 'assets-src', 'portrait.png');
+  const bw = (image) => image.grayscale().linear(1.06, -6);
+  const trimmed = await sharp(source).trim({ threshold: 1 }).toBuffer();
+  await bw(sharp(trimmed)).png({ compressionLevel: 9 }).toFile(path.join(root, 'src/assets/portrait.png'));
+  await bw(sharp(source).extract({ left: 240, top: 35, width: 300, height: 300 }))
+    .resize(160, 160)
+    .png({ compressionLevel: 9 })
+    .toFile(path.join(root, 'src/assets/avatar.png'));
+  console.log('✓ portraits');
+}
+
+/** ICO with embedded PNGs (supported since Windows Vista and by every browser). */
 function buildIco(pngs) {
   const header = Buffer.alloc(6);
   header.writeUInt16LE(0, 0);
@@ -88,18 +107,19 @@ async function icons() {
   const png = (svg, size) => sharp(svg, { density: 512 }).resize(size, size).png({ compressionLevel: 9 }).toBuffer();
   await writeFile(path.join(pub, 'icon-192.png'), await png(iconSvg(), 192));
   await writeFile(path.join(pub, 'icon-512.png'), await png(iconSvg(), 512));
-  // iOS redondea solo: fondo lleno, sin esquinas transparentes.
+  // iOS rounds the corners itself: full background, no transparent corners.
   await writeFile(path.join(pub, 'apple-touch-icon.png'), await png(iconSvg({ radius: 0, scale: 0.86 }), 180));
-  // Maskable: el glifo dentro de la zona segura (80 %).
+  // Maskable: the glyph stays inside the 80 % safe zone.
   await writeFile(path.join(pub, 'icon-maskable-512.png'), await png(iconSvg({ radius: 0, scale: 0.7 }), 512));
   const ico = buildIco([
     { size: 32, data: await png(iconSvg(), 32) },
     { size: 48, data: await png(iconSvg(), 48) },
   ]);
   await writeFile(path.join(pub, 'favicon.ico'), ico);
-  console.log('✓ iconos');
+  console.log('✓ icons');
 }
 
+/** End-user copy of the Open Graph cards (this is content, hence localized). */
 const OG_COPY = {
   es: {
     lang: 'es-AR',
@@ -113,33 +133,65 @@ const OG_COPY = {
     title: '<span class="m">Turning</span> complex ideas<br><span class="m">into</span> real products.',
     sub: 'Full stack developer · Payments, SDKs and products on Stellar, Solana and Monad',
   },
+  pt: {
+    lang: 'pt-BR',
+    role: 'FOUNDER · COSMOS PAY',
+    title: '<span class="m">De</span> ideias complexas<br><span class="m">a</span> produtos reais.',
+    sub: 'Desenvolvedor full stack · Pagamentos, SDKs e produtos em Stellar, Solana e Monad',
+  },
+  fr: {
+    lang: 'fr',
+    role: 'FONDATEUR · COSMOS PAY',
+    title: '<span class="m">Des</span> idées complexes<br><span class="m">aux</span> produits réels.',
+    sub: 'Développeur full stack · Paiements, SDK et produits sur Stellar, Solana et Monad',
+  },
+  de: {
+    lang: 'de',
+    role: 'GRÜNDER · COSMOS PAY',
+    title: '<span class="m">Von</span> komplexen Ideen<br><span class="m">zu</span> echten Produkten.',
+    sub: 'Full-Stack-Entwickler · Zahlungen, SDKs und Produkte auf Stellar, Solana und Monad',
+  },
+  zh: {
+    lang: 'zh-CN',
+    role: '创始人 · COSMOS PAY',
+    title: '<span class="m">从</span>复杂的想法<br><span class="m">到</span>真实的产品。',
+    sub: '全栈开发者 · 在 Stellar、Solana 和 Monad 上构建支付、SDK 与产品',
+  },
+  hi: {
+    lang: 'hi',
+    role: 'फाउंडर · COSMOS PAY',
+    title: 'जटिल विचारों<span class="m"> से</span><br>असली प्रोडक्ट्स<span class="m"> तक।</span>',
+    sub: 'फुल स्टैक डेवलपर · Stellar, Solana और Monad पर पेमेंट्स, SDK और प्रोडक्ट्स',
+  },
 };
 
 async function ogImages(chrome) {
   const fontUrl = pathToFileURL(
     path.join(root, 'node_modules/@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2'),
   ).href;
-  const photo = await sharp(path.join(root, 'src/assets/emanuel.jpg')).resize(460).jpeg({ quality: 88 }).toBuffer();
-  const photoUrl = `data:image/jpeg;base64,${photo.toString('base64')}`;
+  const photo = await sharp(path.join(root, 'src/assets/portrait.png')).resize({ height: 640 }).png().toBuffer();
+  const photoUrl = `data:image/png;base64,${photo.toString('base64')}`;
   const work = await mkdtemp(path.join(tmpdir(), 'og-'));
   await mkdir(path.join(pub, 'og'), { recursive: true });
 
-  for (const [locale, copy] of Object.entries(OG_COPY)) {
+  for (const locale of LOCALES) {
+    const copy = OG_COPY[locale];
     const html = `<!doctype html><html lang="${copy.lang}"><head><meta charset="utf-8"><style>
       @font-face{font-family:SG;src:url('${fontUrl}') format('woff2');font-weight:300 700}
       *{box-sizing:border-box;margin:0}
       html,body{width:1200px;height:630px;overflow:hidden}
-      body{font-family:SG,sans-serif;color:#111;background:#f3f3f3;
+      body{font-family:SG,'Microsoft YaHei','PingFang SC','Noto Sans SC','Nirmala UI','Noto Sans Devanagari',sans-serif;color:#111;background:#f3f3f3;
         background-image:linear-gradient(rgb(17 17 17/.06) 1px,transparent 1px),linear-gradient(90deg,rgb(17 17 17/.06) 1px,transparent 1px);
         background-size:28px 28px;display:flex;align-items:stretch;padding:0 0 0 72px;position:relative}
-      .copy{flex:1;display:flex;flex-direction:column;justify-content:center;padding:56px 0}
+      .copy{flex:1;display:flex;flex-direction:column;justify-content:center;padding:56px 0;position:relative;z-index:1}
       .badge{display:inline-flex;align-self:flex-start;gap:8px;align-items:center;padding:9px 20px;border:2px solid #111;border-radius:999px;background:#fff;font-size:20px}
       .badge b{font-weight:600}.badge span{color:#555;font-size:16px;letter-spacing:.06em}
-      h1{margin-top:30px;font-size:70px;line-height:1.06;font-weight:400;letter-spacing:-.035em}
+      h1{margin-top:30px;font-size:66px;line-height:1.1;font-weight:400;letter-spacing:-.03em}
+      :lang(zh) h1,:lang(hi) h1{letter-spacing:0;line-height:1.3}
       .m{color:#858585;font-weight:300}
-      p{margin-top:26px;font-size:24px;color:#444;max-width:640px;line-height:1.35}
+      p{margin-top:26px;font-size:24px;color:#444;max-width:640px;line-height:1.4}
       .url{margin-top:auto;font-size:22px;font-weight:600;letter-spacing:-.01em}
-      .photo{width:400px;flex:none;align-self:flex-end;height:520px;margin-right:72px;border-radius:22px 22px 0 0;overflow:hidden;background:#121212 url('${photoUrl}') center/cover}
+      .photo{position:absolute;right:56px;bottom:10px;height:600px}
       .bar{position:absolute;left:0;right:0;bottom:0;height:10px;background:#111}
     </style></head><body>
       <div class="copy">
@@ -148,7 +200,7 @@ async function ogImages(chrome) {
         <p>${copy.sub}</p>
         <div class="url">emanuel250.dev.ar</div>
       </div>
-      <div class="photo"></div>
+      <img class="photo" src="${photoUrl}" alt="">
       <div class="bar"></div>
     </body></html>`;
     const htmlPath = path.join(work, `og-${locale}.html`);
@@ -167,12 +219,12 @@ async function ogImages(chrome) {
     ]);
     const out = await sharp(await readFile(shotPath))
       .extract({ left: 0, top: 0, width: 1200, height: 630 })
-      .png({ compressionLevel: 9, palette: false })
+      .png({ compressionLevel: 9 })
       .toBuffer();
     await writeFile(path.join(pub, 'og', `og-${locale}.png`), out);
   }
   await rm(work, { recursive: true, force: true });
-  console.log('✓ imagenes Open Graph');
+  console.log(`✓ Open Graph images (${LOCALES.length})`);
 }
 
 async function waitFor(url, timeoutMs = 30000) {
@@ -182,16 +234,16 @@ async function waitFor(url, timeoutMs = 30000) {
       const response = await fetch(url);
       if (response.ok) return;
     } catch {
-      // el servidor todavia no esta listo
+      // the server is not ready yet
     }
     await new Promise((resolve) => setTimeout(resolve, 300));
   }
-  throw new Error(`Timeout esperando ${url}`);
+  throw new Error(`Timed out waiting for ${url}`);
 }
 
 async function cvPdfs(chrome) {
   const astro = path.join(root, 'node_modules/astro/bin/astro.mjs');
-  console.log('… build para imprimir el CV');
+  console.log('… building the site to print the CV');
   await run(process.execPath, [astro, 'build'], { cwd: root });
 
   const port = 4399;
@@ -201,10 +253,9 @@ async function cvPdfs(chrome) {
   });
   try {
     await waitFor(`http://127.0.0.1:${port}/cv/`);
-    for (const [prefix, outDir] of [
-      ['/cv/', path.join(pub, 'cv')],
-      ['/en/cv/', path.join(pub, 'en', 'cv')],
-    ]) {
+    for (const locale of LOCALES) {
+      const prefix = localePrefix(locale);
+      const outDir = path.join(pub, prefix, 'cv');
       await mkdir(outDir, { recursive: true });
       await run(chrome, [
         '--headless=new',
@@ -212,16 +263,17 @@ async function cvPdfs(chrome) {
         '--no-pdf-header-footer',
         '--virtual-time-budget=4000',
         `--print-to-pdf=${path.join(outDir, 'emanuel-guzman-cv.pdf')}`,
-        `http://127.0.0.1:${port}${prefix}`,
+        `http://127.0.0.1:${port}/${prefix}cv/`,
       ]);
     }
   } finally {
     preview.kill();
   }
-  console.log('✓ CV en PDF (corre `npm run build` para incluirlos en dist/)');
+  console.log(`✓ CV PDFs (${LOCALES.length}) — run \`npm run build\` to include them in dist/`);
 }
 
 const chrome = findChrome();
+await portraits();
 await icons();
 await ogImages(chrome);
 if (withCv) await cvPdfs(chrome);

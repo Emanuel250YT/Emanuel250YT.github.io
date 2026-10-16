@@ -1,7 +1,8 @@
 ---
 /**
- * Iconos inline (sin dependencias ni requests extra). Los de trazo siguen la
- * grilla 24x24 de Lucide; las marcas (github, linkedin, npm) son rellenas.
+ * Inline icons (no dependencies, no extra requests). Stroke icons follow
+ * Lucide's 24x24 grid; brand marks (github, linkedin, npm) are filled.
+ * Decorative by default (aria-hidden); pass `label` to expose one.
  */
 const strokeIcons = {
   chat: '<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>',
@@ -13,6 +14,7 @@ const strokeIcons = {
   globe: '<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>',
   menu: '<path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/>',
   close: '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+  'chevron-down': '<path d="m6 9 6 6 6-6"/>',
   pin: '<path d="M20 10c0 5-5.54 10.19-7.4 11.8a1 1 0 0 1-1.2 0C9.54 20.19 4 15 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/>',
   lock: '<rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
   check: '<path d="M20 6 9 17l-5-5"/>',

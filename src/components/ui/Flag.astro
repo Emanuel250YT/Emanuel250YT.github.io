@@ -1,0 +1,81 @@
+---
+import type { FlagId } from '@/i18n/locales';
+
+/**
+ * Simplified 3:2 inline SVG flags for the language switcher. Always decorative:
+ * the language name next to the flag is the accessible text.
+ */
+interface Props {
+  code: FlagId;
+  width?: number;
+  class?: string;
+}
+
+const { code, width = 20, class: className } = Astro.props;
+const height = Math.round((width * 2) / 3);
+
+/** Five-pointed star centred at (cx, cy) with outer radius r. */
+function star(cx: number, cy: number, r: number, rotation = 0): string {
+  const points: string[] = [];
+  for (let i = 0; i < 10; i++) {
+    const radius = i % 2 === 0 ? r : r * 0.382;
+    const angle = ((-90 + rotation + i * 36) * Math.PI) / 180;
+    points.push(`${(cx + radius * Math.cos(angle)).toFixed(2)},${(cy + radius * Math.sin(angle)).toFixed(2)}`);
+  }
+  return points.join(' ');
+}
+
+const usStripes = Array.from({ length: 13 }, (_, i) => i)
+  .filter((i) => i % 2 === 0)
+  .map((i) => `<rect y="${((i * 20) / 13).toFixed(3)}" width="30" height="${(20 / 13).toFixed(3)}" fill="#B22234"/>`)
+  .join('');
+const usStars = Array.from({ length: 4 }, (_, row) =>
+  Array.from({ length: 5 }, (_, col) => `<circle cx="${1.4 + col * 2.3}" cy="${1.3 + row * 2.6}" r="0.45" fill="#fff"/>`).join(''),
+).join('');
+
+const flags: Record<FlagId, string> = {
+  ar:
+    '<rect width="30" height="20" fill="#74ACDF"/><rect y="6.667" width="30" height="6.667" fill="#fff"/>' +
+    '<circle cx="15" cy="10" r="2.3" fill="#F6B40E" stroke="#85340A" stroke-width="0.35"/>',
+  us: `<rect width="30" height="20" fill="#fff"/>${usStripes}<rect width="12" height="10.77" fill="#3C3B6E"/>${usStars}`,
+  br:
+    '<rect width="30" height="20" fill="#009C3B"/><path d="M15 2.4 27.4 10 15 17.6 2.6 10Z" fill="#FFDF00"/>' +
+    '<circle cx="15" cy="10" r="4.3" fill="#002776"/>' +
+    '<path d="M10.8 10.6A11 11 0 0 1 19.2 10.2" fill="none" stroke="#fff" stroke-width="0.9"/>',
+  fr: '<rect width="30" height="20" fill="#fff"/><rect width="10" height="20" fill="#002395"/><rect x="20" width="10" height="20" fill="#ED2939"/>',
+  de: '<rect width="30" height="20" fill="#000"/><rect y="6.667" width="30" height="6.667" fill="#DD0000"/><rect y="13.333" width="30" height="6.667" fill="#FFCE00"/>',
+  cn:
+    `<rect width="30" height="20" fill="#EE1C25"/><polygon points="${star(5, 5, 3)}" fill="#FFDE00"/>` +
+    [
+      [10, 2, 23],
+      [12, 4, 45],
+      [12, 7, 70],
+      [10, 9, 20],
+    ]
+      .map(([cx, cy, rot]) => `<polygon points="${star(cx!, cy!, 1, rot)}" fill="#FFDE00"/>`)
+      .join(''),
+  in:
+    '<rect width="30" height="20" fill="#fff"/><rect width="30" height="6.667" fill="#FF9933"/>' +
+    '<rect y="13.333" width="30" height="6.667" fill="#138808"/>' +
+    '<circle cx="15" cy="10" r="2.6" fill="none" stroke="#000080" stroke-width="0.45"/><circle cx="15" cy="10" r="0.6" fill="#000080"/>',
+};
+---
+
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 30 20"
+  width={width}
+  height={height}
+  class:list={['flag', className]}
+  aria-hidden="true"
+  focusable="false"
+  set:html={flags[code]}
+/>
+
+<style>
+  .flag {
+    flex: none;
+    border-radius: 3px;
+    box-shadow: 0 0 0 1px rgb(17 17 17 / 0.14);
+  }
+</style>

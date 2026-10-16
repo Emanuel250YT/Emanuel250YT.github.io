@@ -1,6 +1,6 @@
 ---
 import { Image } from 'astro:assets';
-import photo from '@/assets/emanuel.jpg';
+import avatar from '@/assets/avatar.png';
 import { site } from '@/config/site';
 import Icon, { type IconName } from '@/components/ui/Icon.astro';
 import { useTranslations } from '@/i18n';
@@ -44,7 +44,7 @@ const socials: { label: string; href: string; icon: IconName }[] = [
     <div class="reach">
       <p class="open">{t.footer.open}</p>
       <a class="mail" href={`mailto:${site.email}`}>
-        <Image src={photo} alt="" width={28} height={28} class="mail-avatar" />
+        <Image src={avatar} alt="" width={30} height={30} densities={[1, 2]} class="mail-avatar" />
         {site.email}
       </a>
     </div>
@@ -66,7 +66,7 @@ const socials: { label: string; href: string; icon: IconName }[] = [
     isolation: isolate;
   }
 
-  /* Halo de luz desde abajo, como en el diseno */
+  /* Light halo rising from the bottom, as in the design */
   .site-footer::before {
     content: '';
     position: absolute;

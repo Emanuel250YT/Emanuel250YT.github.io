@@ -1,6 +1,6 @@
 ---
 import { getImage } from 'astro:assets';
-import photo from '@/assets/emanuel.jpg';
+import portrait from '@/assets/portrait.png';
 import { site } from '@/config/site';
 import About from '@/components/sections/About.astro';
 import Achievements from '@/components/sections/Achievements.astro';
@@ -19,8 +19,8 @@ interface Props {
 const { locale } = Astro.props;
 const t = useTranslations(locale);
 
-const portrait = await getImage({ src: photo, width: 460, format: 'jpg' });
-const portraitUrl = new URL(portrait.src, Astro.site ?? site.url).href;
+const portraitImage = await getImage({ src: portrait, width: 744, format: 'webp' });
+const portraitUrl = new URL(portraitImage.src, Astro.site ?? site.url).href;
 
 const jsonLd = graph([
   personNode(locale, portraitUrl),

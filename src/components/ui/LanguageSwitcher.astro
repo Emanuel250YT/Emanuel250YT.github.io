@@ -1,0 +1,233 @@
+---
+import Flag from '@/components/ui/Flag.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { useTranslations } from '@/i18n';
+import { localeMeta, localePath, locales, type Locale } from '@/i18n/locales';
+
+/**
+ * Language switcher: a native <details> disclosure (works without JS and is
+ * announced as expanded/collapsed) holding one real link per language, so every
+ * translation is crawlable. The script only adds dropdown ergonomics: close on
+ * outside click / Escape / focus leaving, and arrow-key navigation.
+ */
+interface Props {
+  locale: Locale;
+  /** Route without the locale prefix: '' for home, 'cv' for /cv/. */
+  path: string;
+}
+
+const { locale, path } = Astro.props;
+const t = useTranslations(locale);
+const current = localeMeta[locale];
+const menuId = 'language-menu';
+---
+
+<details class="lang-switcher" data-lang-switcher>
+  <summary class="lang-trigger" aria-controls={menuId}>
+    <Flag code={current.flag} />
+    <span class="lang-code">{current.short}</span>
+    <span class="visually-hidden"> — {t.a11y.language}: {current.nativeName}</span>
+    <Icon name="chevron-down" size={14} class="lang-chevron" />
+  </summary>
+
+  <ul id={menuId} class="lang-menu" role="list">
+    {
+      locales.map((code) => {
+        const meta = localeMeta[code];
+        const isCurrent = code === locale;
+        return (
+          <li>
+            <a
+              href={localePath(code, path)}
+              hreflang={meta.hreflang}
+              lang={meta.htmlLang}
+              aria-current={isCurrent ? 'page' : undefined}
+              data-lang-option
+            >
+              <Flag code={meta.flag} />
+              <span class="lang-name">{meta.nativeName}</span>
+              {isCurrent && <Icon name="check" size={16} class="lang-check" />}
+            </a>
+          </li>
+        );
+      })
+    }
+  </ul>
+</details>
+
+<script>
+  for (const switcher of document.querySelectorAll<HTMLDetailsElement>('[data-lang-switcher]')) {
+    const trigger = switcher.querySelector<HTMLElement>('summary')!;
+    const options = () => [...switcher.querySelectorAll<HTMLAnchorElement>('[data-lang-option]')];
+    const focusOption = (index: number) => {
+      const list = options();
+      list[(index + list.length) % list.length]?.focus();
+    };
+    const close = (returnFocus = false) => {
+      if (!switcher.open) return;
+      switcher.open = false;
+      if (returnFocus) trigger.focus();
+    };
+
+    trigger.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+        event.preventDefault();
+        switcher.open = true;
+        const list = options();
+        const currentIndex = list.findIndex((option) => option.getAttribute('aria-current') === 'page');
+        focusOption(event.key === 'ArrowUp' ? list.length - 1 : Math.max(currentIndex, 0));
+      }
+    });
+
+    switcher.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && switcher.open) {
+        event.preventDefault();
+        close(true);
+        return;
+      }
+      // Keys pressed on the trigger are handled above; they bubble up here too.
+      if (event.target === trigger) return;
+      const list = options();
+      const index = list.indexOf(document.activeElement as HTMLAnchorElement);
+      if (index >= 0 && event.key === 'ArrowDown') {
+        event.preventDefault();
+        focusOption(index + 1);
+      } else if (index >= 0 && event.key === 'ArrowUp') {
+        event.preventDefault();
+        focusOption(index - 1);
+      } else if (index >= 0 && event.key === 'Home') {
+        event.preventDefault();
+        focusOption(0);
+      } else if (index >= 0 && event.key === 'End') {
+        event.preventDefault();
+        focusOption(list.length - 1);
+      }
+    });
+
+    switcher.addEventListener('focusout', (event) => {
+      const next = event.relatedTarget as Node | null;
+      if (next && !switcher.contains(next)) close();
+    });
+
+    document.addEventListener('click', (event) => {
+      if (!switcher.contains(event.target as Node)) close();
+    });
+  }
+</script>
+
+<style>
+  .lang-switcher {
+    position: relative;
+  }
+
+  .lang-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 36px;
+    padding: 6px 10px 6px 8px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--surface);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--ink);
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+    transition: border-color 0.2s var(--ease);
+  }
+
+  .lang-trigger::-webkit-details-marker {
+    display: none;
+  }
+
+  .lang-trigger:hover,
+  .lang-switcher[open] .lang-trigger {
+    border-color: var(--ink);
+  }
+
+  .lang-trigger :global(.lang-chevron) {
+    transition: transform 0.2s var(--ease);
+  }
+
+  .lang-switcher[open] .lang-trigger :global(.lang-chevron) {
+    transform: rotate(180deg);
+  }
+
+  .lang-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    z-index: 60;
+    min-width: 200px;
+    margin: 0;
+    padding: 6px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--surface);
+    box-shadow: 0 18px 40px -12px rgb(0 0 0 / 0.22);
+  }
+
+  .lang-menu a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 40px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: var(--ink-2);
+    text-decoration: none;
+  }
+
+  .lang-menu a:hover,
+  .lang-menu a:focus-visible {
+    background: var(--bg);
+    color: var(--ink);
+  }
+
+  .lang-menu a:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: -2px;
+  }
+
+  .lang-menu a[aria-current] {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .lang-name {
+    flex: 1;
+  }
+
+  .lang-menu :global(.lang-check) {
+    color: var(--ink);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .lang-switcher[open] .lang-menu {
+      animation: menu-in 0.18s var(--ease);
+    }
+  }
+
+  @keyframes menu-in {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+  }
+
+  /* Inside the mobile menu the list flows in place as a two-column grid. */
+  @media (max-width: 860px) {
+    .lang-menu {
+      position: static;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 2px;
+      margin-top: 10px;
+      box-shadow: none;
+    }
+  }
+</style>

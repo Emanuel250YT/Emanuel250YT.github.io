@@ -2,7 +2,7 @@
   "name": "emanuel250-portfolio",
   "version": "1.0.0",
   "private": true,
-  "description": "Portfolio de Emanuel Guzman, founder de Cosmos y desarrollador full stack. Publicado en https://emanuel250.dev.ar con GitHub Pages.",
+  "description": "Portfolio of Emanuel Guzman, founder of Cosmos Pay and full stack developer. Published at https://emanuel250.dev.ar with GitHub Pages in 7 languages.",
   "type": "module",
   "engines": {
     "node": ">=22.12.0"

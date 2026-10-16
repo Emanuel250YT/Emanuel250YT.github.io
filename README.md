@@ -1,106 +1,119 @@
 # emanuel250.dev.ar
 
-Portfolio de **Emanuel Guzman**, founder de [Cosmos Pay](https://cosmospay.lat) y
-desarrollador full stack en Salta, Argentina.
+Portfolio of **Emanuel Guzman**, founder of [Cosmos Pay](https://cosmospay.lat)
+and full stack developer from Salta, Argentina.
 
-- Sitio: **https://emanuel250.dev.ar** (español) · **https://emanuel250.dev.ar/en/** (English)
-- CV: [/cv/](https://emanuel250.dev.ar/cv/) · [PDF](https://emanuel250.dev.ar/cv/emanuel-guzman-cv.pdf)
+- Site: **https://emanuel250.dev.ar** — available in Español, English, Português,
+  Français, Deutsch, 中文 and हिन्दी (`/`, `/en/`, `/pt/`, `/fr/`, `/de/`, `/zh/`, `/hi/`)
+- CV: [/en/cv/](https://emanuel250.dev.ar/en/cv/) · [PDF](https://emanuel250.dev.ar/en/cv/emanuel-guzman-cv.pdf)
+  (one HTML page and one PDF per language)
 
-Hecho con [Astro](https://astro.build) como sitio 100 % estático y publicado con
-GitHub Pages. Sin frameworks de UI ni de CSS, casi sin JavaScript, bilingüe
-(es/en) y con SEO y accesibilidad verificados en CI.
+Built with [Astro](https://astro.build) as a fully static site and published with
+GitHub Pages. No UI or CSS framework, almost no JavaScript, seven languages, and
+SEO + accessibility checks in CI.
 
-| Lighthouse (mobile) | `/` | `/en/` | `/cv/` |
-| --- | --- | --- | --- |
-| Performance · Accesibilidad · Buenas prácticas · SEO | 100 · 100 · 100 · 100 | 100 · 100 · 100 · 100 | 100 · 100 · 100 · 100 |
+| Lighthouse (mobile) | `/` | `/zh/` | `/hi/` | `/fr/cv/` |
+| --- | --- | --- | --- | --- |
+| Performance · Accessibility · Best practices · SEO | 100 · 100 · 100 · 100 | 99 · 100 · 100 · 100 | 98 · 100 · 100 · 100 | 100 · 100 · 100 · 100 |
 
-## Desarrollo
+## Development
 
-Requiere Node ≥ 22.12 (CI usa la versión de `.nvmrc`).
+Requires Node ≥ 22.12 (CI uses the version in `.nvmrc`).
 
 ```bash
-npm ci            # instala exactamente lo del lockfile (sin scripts de instalación)
+npm ci            # installs exactly what the lockfile says (no install scripts)
 npm run dev       # http://localhost:4321
-npm run verify    # tipos + build + verificación de SEO/accesibilidad
-npm run preview   # sirve dist/ como en producción
-npm run assets    # regenera favicons, imágenes Open Graph y PDFs del CV (necesita Chrome)
+npm run verify    # types + build + static SEO/accessibility checks
+npm run preview   # serves dist/ as production does
+npm run assets    # regenerates portraits, icons, Open Graph images and CV PDFs (needs Chrome)
 ```
 
-## Cómo editar el contenido
+## Editing content
 
-| Quiero cambiar… | Archivo |
+| To change… | Edit |
 | --- | --- |
-| Textos de la interfaz (es / en) | `src/i18n/es.ts`, `src/i18n/en.ts` |
-| Proyectos | `src/data/projects.ts` |
-| Logros | `src/data/achievements.ts` |
-| Experiencia, educación, certificaciones, skills | `src/data/resume.ts` |
-| Nombre, email, redes, dominio, verificación de Google/Bing | `src/config/site.ts` |
-| Foto | `src/assets/emanuel.jpg` (cuadrada, idealmente ≥ 900 px) |
+| Interface copy (per language) | `src/i18n/<locale>.ts` (`es`, `en`, `pt`, `fr`, `de`, `zh`, `hi`) |
+| Projects | `src/data/projects.ts` |
+| Achievements | `src/data/achievements.ts` |
+| Experience, education, certifications, skills | `src/data/resume.ts` |
+| Name, email, socials, domain, Google/Bing verification | `src/config/site.ts` |
+| Portrait | `assets-src/portrait.png` (colour cut-out with transparent background) |
 
-Después de cambiar el CV, la foto o la identidad: `npm run assets` y commitear
-`public/` (PDFs, imágenes OG e iconos). Si cambian proyectos o roles, actualizar
-también `public/llms.txt`.
+Every translatable field is typed as `Record<Locale, …>`, so `npm run check` fails
+if a language is missing. After changing the CV, the portrait or the identity, run
+`npm run assets` and commit `public/` and `src/assets/` (the portrait is converted to
+black & white automatically). If projects or roles change, update `public/llms.txt` too.
 
-Las reglas de diseño, accesibilidad y SEO están en [`CLAUDE.md`](./CLAUDE.md).
+Design, accessibility, SEO and i18n rules live in [`CLAUDE.md`](./CLAUDE.md).
 
-## Publicación (GitHub Pages + dev.ar)
+## Language switcher
 
-Cada push a `main` corre `.github/workflows/deploy.yml`: instala, audita, verifica
-tipos, construye, valida SEO/accesibilidad y publica `dist/` en GitHub Pages.
+A native `<details>` dropdown with flags (Argentina for Spanish, Brazil for
+Portuguese, United States for English, France, Germany, China and India) and one
+real link per language. It works without JavaScript; with it, Escape, arrow keys
+and click-outside behave like a regular menu. Every page declares its translations
+with `hreflang` (plus `x-default` → English), and the sitemap carries the same alternates.
+
+## Publishing (GitHub Pages + dev.ar)
+
+Every push to `main` runs `.github/workflows/deploy.yml`: install, audit, type
+check, build, SEO/accessibility checks, and publish `dist/` to GitHub Pages.
 
 ### 1 · GitHub Pages
 
 1. **Settings → Pages → Build and deployment → Source: GitHub Actions.**
-2. **Custom domain:** `emanuel250.dev.ar` (el archivo `public/CNAME` ya lo declara).
+2. **Custom domain:** `emanuel250.dev.ar` (already declared by `public/CNAME`).
+3. **Settings → Environments → github-pages:** the `main` branch must be allowed to deploy.
 
 ### 2 · dev.ar (https://home.dev.ar)
 
-En el panel de `emanuel250.dev.ar`:
+In the `emanuel250.dev.ar` panel:
 
-| Campo | Valor |
+| Field | Value |
 | --- | --- |
-| **Redirección** | *(vacío)* |
+| **Redirección** (redirect) | *(empty)* |
 | **DNS** | `emanuel250yt.github.io` |
 
-- En **DNS** va solo el dominio: **sin** `https://`, **sin** barras ni rutas. dev.ar
-  crea un registro **CNAME** hacia GitHub Pages.
-- Solo puede haber **una** configuración activa: Redirección **o** DNS. Si la
-  redirección tuviera algo, primero vaciarla.
-- No hay que tocar servidores NS. La propagación puede tardar hasta **48 h**.
+- The **DNS** field takes only the domain: **no** `https://`, **no** slashes or paths.
+  dev.ar creates a **CNAME** record pointing to GitHub Pages.
+- Only **one** setting can be active: redirect **or** DNS. Clear the redirect first if it has a value.
+- No NS records are involved. Propagation can take up to **48 h**.
 
-Comprobar la propagación:
+Check propagation:
 
 ```bash
-nslookup -type=CNAME emanuel250.dev.ar   # debe responder emanuel250yt.github.io
+nslookup -type=CNAME emanuel250.dev.ar   # should answer emanuel250yt.github.io
 ```
 
 ### 3 · HTTPS
 
-Cuando el DNS propague, GitHub emite el certificado solo. Después: **Settings →
+Once DNS resolves, GitHub issues the certificate automatically. Then: **Settings →
 Pages → Enforce HTTPS**.
 
-### Opcional
+### Optional
 
-- **Verificar el dominio en GitHub** (protege contra que otro repo lo tome):
-  Settings de la cuenta → Pages → *Add a domain*. GitHub pide un registro TXT
-  `_github-pages-challenge-Emanuel250YT.emanuel250.dev.ar`; en dev.ar los TXT se
-  piden por mail a albo@pragmore.com indicando TYPE, NAME y CONTENT.
-- **Google Search Console / Bing Webmaster Tools**: usar el método *meta tag* y
-  pegar el valor en `src/config/site.ts` (no requiere DNS). Después, enviar
+- **Verify the domain on GitHub** (prevents another repository from claiming it):
+  account Settings → Pages → *Add a domain*. GitHub asks for a TXT record
+  `_github-pages-challenge-Emanuel250YT.emanuel250.dev.ar`; on dev.ar, TXT records are
+  requested by email to albo@pragmore.com with TYPE, NAME and CONTENT.
+- **Google Search Console / Bing Webmaster Tools**: use the *meta tag* method and paste
+  the value into `src/config/site.ts` (no DNS needed). Then submit
   `https://emanuel250.dev.ar/sitemap-index.xml`.
 
-## SEO incluido
+## SEO included
 
-- HTML estático, un `<h1>` por página, jerarquía de encabezados validada.
-- `title`, `description` y `canonical` únicos por página; `hreflang` es-AR / en / x-default.
-- Open Graph y Twitter Card con imágenes 1200×630 por idioma.
+- Static HTML, one `<h1>` per page, validated heading hierarchy.
+- Unique `title`, `description` and `canonical` per page and language; `hreflang`
+  for all seven languages + `x-default`.
+- Open Graph and Twitter cards with a 1200×630 image per language.
 - JSON-LD (`Person`, `Organization`, `WebSite`, `ProfilePage`, `BreadcrumbList`,
-  `ItemList` de proyectos).
-- `sitemap-index.xml` con alternates de idioma, `robots.txt`, `llms.txt`, `humans.txt`,
-  manifest e iconos.
-- Fuente autoalojada con preload, imágenes WebP responsivas con dimensiones (CLS 0).
+  `ItemList` of projects).
+- `sitemap-index.xml` with language alternates, `robots.txt`, `llms.txt`, `humans.txt`,
+  web manifest and icons.
+- Self-hosted font with preload (system fonts for Chinese and Devanagari),
+  responsive WebP images with dimensions (CLS 0).
 
-## Seguridad de dependencias
+## Dependency security
 
-Versiones exactas y con ≥ 7 días publicadas, `ignore-scripts=true`, acciones de
-GitHub fijadas por SHA, Dependabot con cooldown y `npm audit signatures` en CI.
+Exact versions published at least 7 days ago, `ignore-scripts=true`, GitHub Actions
+pinned by SHA, Dependabot with a cooldown, and `npm audit signatures` in CI.

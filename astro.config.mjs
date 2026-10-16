@@ -2,11 +2,23 @@
 import { defineConfig } from 'astro/config';
 import sitemap, { ChangeFreqEnum } from '@astrojs/sitemap';
 
-// Dominio publico (dev.ar -> GitHub Pages). Debe coincidir con public/CNAME.
-// El resto del codigo lo lee con import.meta.env.SITE / Astro.site.
+// Keep in sync with src/i18n/locales.ts (Astro config cannot import TS sources).
+const locales = ['es', 'en', 'pt', 'fr', 'de', 'zh', 'hi'];
+const sitemapLocales = {
+  es: 'es-AR',
+  en: 'en',
+  pt: 'pt-BR',
+  fr: 'fr',
+  de: 'de',
+  zh: 'zh-CN',
+  hi: 'hi',
+};
+
+// Public domain (dev.ar -> GitHub Pages). Must match public/CNAME.
+// The rest of the code reads it through Astro.site / src/config/site.ts.
 export default defineConfig({
   site: 'https://emanuel250.dev.ar',
-  // GitHub Pages sirve /en/ desde /en/index.html: todas las URLs canonicas terminan en "/".
+  // GitHub Pages serves /en/ from /en/index.html: every canonical URL ends in "/".
   trailingSlash: 'always',
   build: {
     format: 'directory',
@@ -14,7 +26,7 @@ export default defineConfig({
   },
   i18n: {
     defaultLocale: 'es',
-    locales: ['es', 'en'],
+    locales,
     routing: {
       prefixDefaultLocale: false,
     },
@@ -23,20 +35,15 @@ export default defineConfig({
     sitemap({
       i18n: {
         defaultLocale: 'es',
-        locales: {
-          es: 'es-AR',
-          en: 'en',
-        },
+        locales: sitemapLocales,
       },
       filter: (page) => !page.includes('/404'),
       changefreq: ChangeFreqEnum.MONTHLY,
       priority: 0.8,
       serialize(item) {
         const path = new URL(item.url).pathname;
-        if (path === '/' || path === '/en/') {
-          return { ...item, priority: 1, changefreq: ChangeFreqEnum.WEEKLY };
-        }
-        return item;
+        const isHome = path === '/' || locales.some((locale) => path === `/${locale}/`);
+        return isHome ? { ...item, priority: 1, changefreq: ChangeFreqEnum.WEEKLY } : item;
       },
     }),
   ],

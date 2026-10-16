@@ -1,8 +1,9 @@
 ---
 import { site } from '@/config/site';
 import Icon from '@/components/ui/Icon.astro';
+import LanguageSwitcher from '@/components/ui/LanguageSwitcher.astro';
 import { useTranslations } from '@/i18n';
-import { localeMeta, localePath, otherLocale, type Locale } from '@/i18n/locales';
+import { localePath, type Locale } from '@/i18n/locales';
 
 interface Props {
   locale: Locale;
@@ -22,8 +23,6 @@ const links = [
   { id: 'achievements', label: t.nav.achievements },
   { id: 'contact', label: t.nav.contact },
 ];
-
-const alt = otherLocale(locale);
 ---
 
 <header class="site-header" data-header>
@@ -51,15 +50,7 @@ const alt = otherLocale(locale);
           ))
         }
         <li class="lang">
-          <a
-            href={localePath(alt, path)}
-            hreflang={localeMeta[alt].hreflang}
-            data-lang-link
-          >
-            <Icon name="globe" size={16} />
-            {alt.toUpperCase()}
-            <span class="visually-hidden"> — {t.a11y.switchLanguage}</span>
-          </a>
+          <LanguageSwitcher locale={locale} path={path} />
         </li>
       </ul>
     </nav>
@@ -95,7 +86,8 @@ const alt = otherLocale(locale);
     toggle.addEventListener('click', () => setOpen(!header.classList.contains('is-open')));
     header.querySelectorAll('.nav a').forEach((link) => link.addEventListener('click', () => setOpen(false)));
     document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape' && header.classList.contains('is-open')) {
+      // The language switcher handles its own Escape first (and prevents default).
+      if (event.key === 'Escape' && !event.defaultPrevented && header.classList.contains('is-open')) {
         setOpen(false);
         toggle.focus();
       }
@@ -106,7 +98,7 @@ const alt = otherLocale(locale);
     window.addEventListener('scroll', onScroll, { passive: true });
   }
 
-  // Resalta la seccion visible en la navegacion (solo en la pagina de inicio).
+  // Highlights the section currently in view (home page only).
   const navLinks = [...document.querySelectorAll<HTMLAnchorElement>('[data-nav-link]')];
   const sections = navLinks
     .map((link) => document.getElementById(link.dataset.navLink ?? ''))
@@ -185,20 +177,6 @@ const alt = otherLocale(locale);
 
   .nav a[aria-current] {
     font-weight: 600;
-  }
-
-  .lang a {
-    padding: 6px 10px;
-    border: 1px solid var(--line);
-    border-radius: 999px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    color: var(--ink);
-  }
-
-  .lang a:hover {
-    border-color: var(--ink);
   }
 
   .menu-toggle {

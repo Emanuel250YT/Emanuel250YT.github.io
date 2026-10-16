@@ -16,7 +16,7 @@ const { as: Tag = 'h2', parts, class: className, id } = Astro.props;
     parts.map((part) =>
       'br' in part ? (
         <Fragment>
-          {' '}
+          {part.space !== false && ' '}
           <br class="rich-br" />
         </Fragment>
       ) : part.muted ? (
@@ -29,7 +29,7 @@ const { as: Tag = 'h2', parts, class: className, id } = Astro.props;
 </Tag>
 
 <style>
-  /* En pantallas angostas el texto fluye libre; el corte es solo de escritorio. */
+  /* On narrow screens the text flows freely; the break is a desktop-only layout choice. */
   @media (max-width: 720px) {
     .rich-br {
       display: none;

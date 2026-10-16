@@ -6,6 +6,7 @@ export const en: Dictionary = {
     description:
       'Portfolio of Emanuel Guzman, full stack developer and founder of Cosmos Pay from Salta, Argentina. Payments, SDKs and products on Stellar, Solana and Monad.',
     ogAlt: 'Emanuel Guzman — Founder of Cosmos Pay & Full Stack Developer',
+    jobTitle: 'Founder of Cosmos Pay & Full Stack Developer',
     keywords: [
       'Emanuel Guzman',
       'Cosmos Pay',
@@ -25,7 +26,7 @@ export const en: Dictionary = {
     menu: 'Open menu',
     closeMenu: 'Close menu',
     primaryNav: 'Main navigation',
-    switchLanguage: 'View the site in Spanish',
+    language: 'Language',
     newTab: '(opens in a new tab)',
     scrollHint: 'Achievements, scroll horizontally to see more',
   },
@@ -68,6 +69,7 @@ export const en: Dictionary = {
     editorFile: 'checkout.ts',
     editorComment: '// Charge in USDC on Stellar',
     editorResult: '// settled in ~5 s',
+    editorCaption: 'Example: creating a payment with the Cosmos Pay SDK',
   },
   projects: {
     title: [
@@ -77,6 +79,8 @@ export const en: Dictionary = {
     visit: 'View project',
     code: 'View code',
     private: 'Private repository',
+    listName: 'Projects by Emanuel Guzman',
+    cover: { total: 'Total', pay: 'Pay', balance: 'Balance', files: ['contract.pdf', 'photos-2026.zip', 'backup.db'] },
   },
   achievements: {
     title: [
