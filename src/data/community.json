@@ -46,7 +46,8 @@
       "hi": "Soroban, ट्रस्टलेस एस्क्रो और प्रोडक्ट माइंडसेट"
     },
     "org": "Trustless Work · BAF",
-    "mark": "TW"
+    "mark": "TW",
+    "url": "https://www.linkedin.com/feed/update/urn:li:activity:7426138325733859328/"
   },
   {
     "id": "blockchain-salta",
@@ -70,7 +71,8 @@
       "hi": "रेडियो और टीवी पर चर्चित कॉन्फ़्रेंस"
     },
     "org": "DESAFIA · SaltaDev",
-    "mark": "BS"
+    "mark": "BS",
+    "url": "https://luma.com/0nlhacs9"
   },
   {
     "id": "hackathon-milagro",
@@ -94,7 +96,8 @@
       "hi": "विजेता प्रोजेक्ट्स के लिए मुफ़्त होस्टिंग"
     },
     "org": "CloudyCoding · SaltaDev",
-    "mark": "CC"
+    "mark": "CC",
+    "url": "https://daffodil-bandicoot-bca.notion.site/mini-hackathon"
   },
   {
     "id": "eth-hackathons",
@@ -118,6 +121,7 @@
       "hi": "एक ग्लोबल Ethereum हैकाथॉन और ETH Argentina: 96 घंटे कोडिंग"
     },
     "org": "Ethereum",
-    "mark": "ETH"
+    "mark": "ETH",
+    "url": "https://www.linkedin.com/feed/update/urn:li:activity:7426138325733859328/"
   }
 ]

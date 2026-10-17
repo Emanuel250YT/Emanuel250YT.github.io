@@ -49,7 +49,8 @@ export interface Highlight extends HighlightEntry {
  * cover.
  * - src/assets/certifications/<id>.png|jpg: the issuer's badge (transparent PNG) or the
  *   certificate itself (JPG), from the credential page the card links to.
- * - src/assets/community/<id>.jpg: a photo of the event, from the owner's LinkedIn post.
+ * - src/assets/community/<id>.jpg: a photo of the event (his LinkedIn posts, the organisers'
+ *   pages) or, for a virtual one, its official flyer; 4:3.
  */
 const images: Partial<Record<HighlightKind, Record<string, ImageMetadata>>> = {
   certification: byFileName(

@@ -32,7 +32,7 @@ src/
   config/site.ts          identity, WhatsApp, contact form endpoint, GA4/GTM IDs, search-engine verification
   i18n/                   locales.ts (languages, URLs, flags), types.ts (Dictionary), one file per locale
   assets/certifications/  official badge or certificate image per certification (<id>.png|jpg)
-  assets/community/       event photo per community card, from the owner's LinkedIn posts (<id>.jpg)
+  assets/community/       event photo or official flyer per community card (<id>.jpg, 4:3)
   assets/projects/        screenshot of each project's live site (<id>.jpg, 4:3)
   data/                   services.ts, projects.ts, resume.ts, contact.ts (form values),
                           achievements.json, certifications.json, community.json (typed by highlights.ts),
@@ -115,9 +115,11 @@ honoured by Astro/Vite). Type imports too: `import type { Locale } from '@/i18n/
   the owner sent, rendered). **Never publish a document with the DNI or any other ID
   number**: remove that line from the PDF (true redaction, not a box over the image) before
   rendering it. A certificate without an image keeps its drawn cover. **Community cards
-  show a photo of the event** from the owner's own LinkedIn post (`src/assets/community/
-  <id>.jpg`, filling the cover), linked from the card (`url`); an event he did not post
-  about keeps its drawn pass until the owner sends a photo or a link.
+  show a real image of the event** (`src/assets/community/<id>.jpg`, 4:3, filling the
+  cover): his own LinkedIn posts first, then the organisers' pages (the SaltaDev event
+  page for Blockchain Salta); a virtual event shows its official flyer (Hackathon del
+  Milagro). The card links (`url`) to the page that proves his part: his post, the Luma
+  agenda that lists his talk, the official rules page. Never a generated image.
   The strip has no visible label (owner's decision: it blurred the message); its name is
   visually hidden for screen readers. Never mix the kinds in one file.
 - **Identity and integrations** (name, email, WhatsApp, socials, domain, form endpoint,

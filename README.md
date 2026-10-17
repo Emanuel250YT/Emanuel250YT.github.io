@@ -49,7 +49,7 @@ Footer. Every page has floating WhatsApp and back-to-top buttons at the bottom r
 | Rotating roles in the hero | `hero.roles` in each dictionary |
 | Services | `src/data/services.ts` |
 | Projects (the section hides itself if the list is empty) | `src/data/projects.ts`; screenshot of its site: `src/assets/projects/<id>.jpg` (4:3) |
-| Photo of a community card (from its LinkedIn post) | `src/assets/community/<id>.jpg` |
+| Photo of a community card (his LinkedIn post or the organiser's page, 4:3) | `src/assets/community/<id>.jpg` |
 | Achievements, certifications, community (talks, hackathons) | `src/data/achievements.json`, `certifications.json`, `community.json` |
 | Image of a certificate (PNG: official badge; JPG: the certificate itself, without ID numbers) | `src/assets/certifications/<id>.png` or `.jpg`; a certificate without a public page: also `public/certifications/<id>.jpg`, linked from its `url` |
 | Work experience (About section + JSON-LD) | `src/data/experience.json` |
