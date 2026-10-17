@@ -116,6 +116,3 @@ export const skillGroups: SkillGroup[] = [
     items: ['Docker', 'Cloudflare', 'APISIX', 'GitHub Actions', 'Git'],
   },
 ];
-
-/** Underlined labels at the bottom of the dark section, as in the design. */
-export const coreStack = ['TypeScript', 'Node.js', 'Stellar · Soroban', 'Solidity', 'Rust', 'Go'];

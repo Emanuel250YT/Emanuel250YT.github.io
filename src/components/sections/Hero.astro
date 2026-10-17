@@ -31,7 +31,7 @@ const formatCount = new Intl.NumberFormat(localeMeta[locale].htmlLang);
       <p class="badge enter" style="--enter-index: 0">
         <span class="badge-pill">
           <strong>{site.name}</strong>
-          <span class="badge-sep" aria-hidden="true">/</span>
+          <span class="badge-sep" aria-hidden="true"></span>
           <span class="visually-hidden">{t.a11y.rolesLabel}: {t.hero.roles.join(', ')}</span>
           <!-- Rotating role, typed and erased by the script below. Every role also sits invisible
                in the same grid cell, so the pill keeps the width of the longest one. -->
@@ -299,6 +299,15 @@ const formatCount = new Intl.NumberFormat(localeMeta[locale].htmlLang);
   .badge-sep,
   .roles {
     color: var(--ink-soft);
+  }
+
+  /* Small square between the name and the role (square design, no slash). */
+  .badge-sep {
+    flex: none;
+    width: 5px;
+    height: 5px;
+    margin-inline: 3px;
+    background: currentColor;
   }
 
   .roles {

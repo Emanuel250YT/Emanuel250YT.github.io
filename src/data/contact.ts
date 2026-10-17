@@ -13,16 +13,3 @@ export const BUDGET_VALUES = [
   'Not sure yet',
 ] as const;
 
-/** Ecosystems and communities shown in the scroll-linked strip of the achievements section. */
-export const ecosystems = [
-  'Stellar',
-  'Solana',
-  'Monad',
-  'Ethereum',
-  'Arkiv',
-  'Stellar Development Foundation',
-  'Blockchain Acceleration Foundation',
-  'Trustless Work',
-  'SaltaDev',
-  'DESAFIA',
-];

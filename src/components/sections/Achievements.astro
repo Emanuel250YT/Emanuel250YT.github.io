@@ -1,8 +1,10 @@
 ---
+import BrandLogo from '@/components/ui/BrandLogo.astro';
 import Icon from '@/components/ui/Icon.astro';
+import Marquee from '@/components/ui/Marquee.astro';
 import SectionHeader from '@/components/ui/SectionHeader.astro';
 import { sortedAchievements } from '@/data/achievements';
-import { ecosystems } from '@/data/contact';
+import { ecosystems } from '@/data/ecosystems';
 import { useTranslations } from '@/i18n';
 import type { Locale } from '@/i18n/locales';
 import { formatMonth } from '@/lib/format';
@@ -60,17 +62,23 @@ const t = useTranslations(locale);
     </ol>
   </div>
 
-  <!-- Ecosystems strip: it moves with the page scroll (no autoplay), where scroll-driven animations exist. -->
+  <!-- Ecosystems strip: infinite carousel, paused while a name is pointed at. -->
   <div class="ecosystems">
-    <p class="container ecosystems-label">{t.achievements.ecosystemsLabel}</p>
-    <div class="marquee">
-      <ul class="marquee-track" role="list">
-        {ecosystems.map((name) => <li>{name}</li>)}
-      </ul>
-      <ul class="marquee-track" role="list" aria-hidden="true">
-        {ecosystems.map((name) => <li>{name}</li>)}
-      </ul>
-    </div>
+    <p class="container ecosystems-label" id="ecosystems-label">{t.achievements.ecosystemsLabel}</p>
+    <Marquee labelledby="ecosystems-label" duration="32s" class="ecosystems-strip">
+      {
+        ecosystems.map((ecosystem) => (
+          <li class="ecosystem">
+            {'mask' in ecosystem ? (
+              <BrandLogo mask={ecosystem.mask} />
+            ) : (
+              <BrandLogo icon={ecosystem.icon} ratio={ecosystem.ratio} />
+            )}
+            {ecosystem.name}
+          </li>
+        ))
+      }
+    </Marquee>
   </div>
 </section>
 
@@ -129,57 +137,23 @@ const t = useTranslations(locale);
     text-align: center;
   }
 
-  .marquee {
-    display: flex;
-    overflow: hidden;
+  /* Logos and names rest at 0.7 on the light background (5:1 contrast for ink-2 on --bg). */
+  .ecosystems :global(.ecosystems-strip) {
+    --marquee-gap: clamp(40px, 5vw, 72px);
+    --marquee-rest: 0.7;
     border-block: 1px solid var(--line);
-    mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
-    -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+    color: var(--ink);
   }
 
-  .marquee-track {
+  .ecosystem {
     display: flex;
-    flex: none;
-    gap: clamp(32px, 5vw, 64px);
-    margin: 0;
-    padding: 22px clamp(16px, 2.5vw, 32px);
+    align-items: center;
+    gap: 12px;
+    padding-block: 14px;
     font-size: clamp(1.1rem, 2vw, 1.5rem);
     font-weight: 500;
     letter-spacing: var(--tracking-display);
-    white-space: nowrap;
     color: var(--ink-2);
-  }
-
-  .marquee-track li {
-    display: flex;
-    align-items: center;
-    gap: clamp(32px, 5vw, 64px);
-  }
-
-  .marquee-track li::after {
-    content: '✦';
-    font-size: 0.7em;
-    color: var(--muted);
-  }
-
-  /* Scroll-linked: the strip slides while the section crosses the viewport. */
-  @media (prefers-reduced-motion: no-preference) {
-    @supports (animation-timeline: view()) {
-      .marquee-track {
-        animation: marquee linear both;
-        animation-timeline: view();
-        animation-range: entry 0% exit 100%;
-      }
-    }
-  }
-
-  @keyframes marquee {
-    from {
-      transform: translateX(0);
-    }
-    to {
-      transform: translateX(-60%);
-    }
   }
 
   .rail {

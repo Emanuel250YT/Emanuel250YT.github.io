@@ -52,8 +52,10 @@ Footer. Every page has floating WhatsApp and back-to-top buttons at the bottom r
 | Work experience (About section + JSON-LD) | `src/data/experience.json` |
 | Education, certifications, skills (JSON-LD) | `src/data/resume.ts` |
 | npm packages and organisations counted in the downloads stat | `src/data/npm.ts` |
+| Technologies carousel (About) | `src/data/technologies.ts` (name + logo path from Simple Icons, or Devicon for Java) |
 | CV PDF | upload `public/cv/emanuel-guzman-cv.pdf` (required) and, optionally, `public/<locale>/cv/emanuel-guzman-cv.pdf` |
-| Form options (budget ranges, extra services), ecosystems strip | `src/data/contact.ts` |
+| Form options (budget ranges, extra services) | `src/data/contact.ts` |
+| Ecosystems strip (Achievements), with logos | `src/data/ecosystems.ts` (PNG-only logos: `assets-src/logos/` + `npm run assets`) |
 | Name, email, WhatsApp, socials, domain, form endpoint, GA4, search-console tokens | `src/config/site.ts` |
 | Portrait | `assets-src/portrait.png` (colour cut-out, transparent background) |
 

@@ -28,9 +28,10 @@ const t = useTranslations(locale);
       {
         t.process.steps.map((step, position) => (
           <li class="step" data-reveal>
-            <span class="marker" aria-hidden="true">
-              {String(position + 1).padStart(2, '0')}
-            </span>
+            <div class="step-top" aria-hidden="true">
+              <span class="marker">{String(position + 1).padStart(2, '0')}</span>
+              {position < t.process.steps.length - 1 && <Icon name="arrow-right" size={22} class="next" />}
+            </div>
             <h3>{step.title}</h3>
             <p>{step.body}</p>
           </li>
@@ -57,34 +58,10 @@ const t = useTranslations(locale);
   }
 
   .steps {
-    position: relative;
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: clamp(24px, 3vw, 40px);
     margin: 0;
-  }
-
-  /* Line joining the numbered squares; it draws itself when the list is revealed. */
-  .steps::before {
-    content: '';
-    position: absolute;
-    top: 22px;
-    left: 22px;
-    right: 22px;
-    height: 1px;
-    background: var(--line-strong);
-    transform-origin: left;
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    :global(.js) .steps::before {
-      transform: scaleX(0);
-      transition: transform 1.6s var(--ease) 0.2s;
-    }
-
-    :global(.js) .steps.is-revealed::before {
-      transform: scaleX(1);
-    }
   }
 
   .step {
@@ -94,12 +71,56 @@ const t = useTranslations(locale);
     gap: 10px;
   }
 
+  /* Numbered square and, at the far end of the column, an arrow towards the next step. */
+  .step-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .step-top :global(.next) {
+    flex: none;
+    color: var(--ink-soft);
+  }
+
+  /* The arrow fades in after its step; with motion allowed it also slides in, and it nudges on hover. */
+  :global(.js) .step.is-revealed :global(.next) {
+    animation: next-in 0.6s var(--ease) 0.45s backwards;
+  }
+
+  @keyframes next-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    :global(.js) .step.is-revealed :global(.next) {
+      animation-name: next-slide;
+    }
+
+    .step-top :global(.next) {
+      transition: translate 0.3s var(--ease);
+    }
+
+    .step:hover .step-top :global(.next) {
+      translate: 4px 0;
+    }
+  }
+
+  @keyframes next-slide {
+    from {
+      opacity: 0;
+      translate: -12px 0;
+    }
+  }
+
   .marker {
     display: grid;
     place-items: center;
     width: 44px;
     height: 44px;
-    margin-bottom: 10px;
     border: 1.5px solid var(--ink);
     background: var(--bg);
     font-family: var(--font-mono);
@@ -134,7 +155,8 @@ const t = useTranslations(locale);
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .steps::before {
+    /* Two or one columns: the next step is no longer to the right. */
+    .step-top :global(.next) {
       display: none;
     }
   }

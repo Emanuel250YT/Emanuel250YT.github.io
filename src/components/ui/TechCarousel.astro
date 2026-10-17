@@ -1,0 +1,60 @@
+---
+import BrandLogo from '@/components/ui/BrandLogo.astro';
+import Marquee from '@/components/ui/Marquee.astro';
+import { technologies } from '@/data/technologies';
+import { useTranslations } from '@/i18n';
+import type { Locale } from '@/i18n/locales';
+
+/**
+ * Technologies carousel on the dark band of the About section: monochrome logos from
+ * the /logos.svg sprite plus their names, in an infinite Marquee.
+ */
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+---
+
+<div class="tech">
+  <h3 class="container tech-label" id="tech-label">{t.about.skillsLabel}</h3>
+
+  <Marquee labelledby="tech-label">
+    {
+      technologies.map((tech) => (
+        <li class="tech-item">
+          <BrandLogo icon={tech.icon} />
+          {tech.name}
+        </li>
+      ))
+    }
+  </Marquee>
+</div>
+
+<style>
+  .tech {
+    margin-top: clamp(48px, 7vw, 80px);
+    color: var(--on-dark);
+  }
+
+  .tech-label {
+    margin-bottom: 22px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--on-dark-soft);
+  }
+
+  /* Resting at 0.5 keeps 5:1 contrast on the dark band. */
+  .tech-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: clamp(1.05rem, 1.7vw, 1.35rem);
+    font-weight: 500;
+    letter-spacing: var(--tracking-display);
+  }
+</style>

@@ -1,0 +1,52 @@
+---
+/**
+ * A third-party logo drawn in the current text colour: a symbol of the /logos.svg
+ * sprite (`icon`) or a monochrome PNG mask (`mask`, see scripts/generate-assets.mjs).
+ * Marks sit in a square box of 1.35em; a wordmark (`ratio` = width / height, e.g. BAF)
+ * keeps its proportions at about the height of the text. Always decorative: the name
+ * sits next to it.
+ */
+type Props = { class?: string } & ({ icon: string; ratio?: number; mask?: never } | { mask: string; icon?: never; ratio?: never });
+
+const { icon, mask, ratio = 1, class: className } = Astro.props;
+const wide = ratio !== 1;
+---
+
+{
+  icon ? (
+    <svg
+      class:list={['brand-logo', { 'brand-logo--wide': wide }, className]}
+      viewBox={`0 0 ${24 * ratio} 24`}
+      width={Math.round(28 * ratio)}
+      height="28"
+      fill="currentColor"
+      aria-hidden="true"
+      focusable="false"
+      style={wide ? `aspect-ratio: ${ratio}` : undefined}
+    >
+      <use href={`/logos.svg#${icon}`} />
+    </svg>
+  ) : (
+    <span class:list={['brand-logo', 'brand-logo--mask', className]} style={`--logo: url(${mask})`} aria-hidden="true" />
+  )
+}
+
+<style>
+  .brand-logo {
+    flex: none;
+    width: 1.35em;
+    height: 1.35em;
+  }
+
+  .brand-logo--wide {
+    width: auto;
+    height: 1.05em;
+  }
+
+  .brand-logo--mask {
+    display: inline-block;
+    background: currentColor;
+    mask: var(--logo) center / contain no-repeat;
+    -webkit-mask: var(--logo) center / contain no-repeat;
+  }
+</style>

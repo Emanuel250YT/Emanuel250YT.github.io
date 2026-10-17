@@ -1,7 +1,8 @@
 ---
-import { coreStack, roles } from '@/data/resume';
+import { roles } from '@/data/resume';
 import Icon from '@/components/ui/Icon.astro';
 import RichHeading from '@/components/ui/RichHeading.astro';
+import TechCarousel from '@/components/ui/TechCarousel.astro';
 import { useTranslations } from '@/i18n';
 import type { Locale } from '@/i18n/locales';
 import { cvPdfPath } from '@/lib/cv';
@@ -90,14 +91,9 @@ pay.uri; <span class="tk-c">{t.about.editorResult}</span></code></pre>
         <figcaption class="visually-hidden">{t.about.editorCaption}</figcaption>
       </figure>
     </div>
-
-    <div class="stack">
-      <h3 class="visually-hidden">{t.about.skillsLabel}</h3>
-      <ul role="list" data-reveal-stagger>
-        {coreStack.map((skill) => <li data-reveal>{skill}</li>)}
-      </ul>
-    </div>
   </div>
+
+  <TechCarousel locale={locale} />
 </section>
 
 <style>
@@ -260,32 +256,9 @@ pay.uri; <span class="tk-c">{t.about.editorResult}</span></code></pre>
     color: #fcd34d;
   }
 
-  .stack {
-    margin-top: clamp(48px, 7vw, 80px);
-  }
-
-  .stack ul {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 16px 32px;
-    margin: 0;
-  }
-
-  .stack li {
-    padding-bottom: 6px;
-    border-bottom: 1.5px solid currentColor;
-    font-size: 0.9rem;
-    font-weight: 500;
-  }
-
   @media (max-width: 900px) {
     .about-grid {
       grid-template-columns: 1fr;
-    }
-
-    .stack ul {
-      justify-content: flex-start;
     }
   }
 </style>

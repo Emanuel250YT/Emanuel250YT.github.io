@@ -14,7 +14,7 @@ export const site = {
   fullName: 'Emanuel Eduardo Guzman',
   givenName: 'Emanuel',
   familyName: 'Guzman',
-  logo: 'emanuel.',
+  logo: 'Emanuel.',
   email: 'emanuel@cloudycoding.com',
 
   /**

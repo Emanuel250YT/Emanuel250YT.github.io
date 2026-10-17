@@ -1,0 +1,108 @@
+---
+/**
+ * Infinite, continuous carousel (technologies, ecosystems). The slotted <li> items are
+ * rendered twice (the copy is aria-hidden) and the track slides by one copy, so the
+ * loop is seamless. Items rest dimmed (`--marquee-rest`); pointing at one pauses the
+ * strip and lights it up, a tap does the same on touch screens, and keyboard users
+ * pause it by focusing the strip (WCAG 2.2.2). It moves with reduced motion too, by
+ * the owner's decision. CSS only.
+ *
+ * The parent styles its own items (they keep the parent's scope) and may set
+ * `--marquee-gap` and `--marquee-rest` (keep the resting text at 4.5:1 contrast).
+ */
+interface Props {
+  /** Id of the visible label that names the strip. */
+  labelledby: string;
+  /** One full loop. */
+  duration?: string;
+  class?: string;
+}
+
+const { labelledby, duration = '70s', class: className } = Astro.props;
+const items = await Astro.slots.render('default');
+---
+
+<div
+  class:list={['marquee', className]}
+  role="region"
+  aria-labelledby={labelledby}
+  tabindex="0"
+  style={`--marquee-duration: ${duration}`}
+>
+  <div class="marquee-track">
+    <ul class="marquee-list" role="list" set:html={items} />
+    <ul class="marquee-list" role="list" aria-hidden="true" set:html={items} />
+  </div>
+</div>
+
+<style>
+  .marquee {
+    --marquee-gap: clamp(40px, 5vw, 72px);
+    --marquee-rest: 0.5;
+    overflow: hidden;
+    mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  }
+
+  .marquee:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: -2px;
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
+
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    animation: marquee-slide var(--marquee-duration) linear infinite;
+  }
+
+  @keyframes marquee-slide {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  /* Pauses only while an item is pointed at (or the strip has keyboard focus). */
+  .marquee-track:has(li:hover),
+  .marquee:focus-visible .marquee-track {
+    animation-play-state: paused;
+  }
+
+  /* Each list ends with one gap, so sliding by -50% lands exactly on the start of the copy. */
+  .marquee-list {
+    display: flex;
+    align-items: center;
+    gap: var(--marquee-gap);
+    margin: 0;
+    padding: 8px var(--marquee-gap) 8px 0;
+  }
+
+  .marquee-list > :global(li) {
+    flex: none;
+    white-space: nowrap;
+    opacity: var(--marquee-rest);
+    transition: opacity 0.25s var(--ease);
+  }
+
+  .marquee-list > :global(li:hover) {
+    opacity: 1;
+  }
+
+  @media print {
+    .marquee-track {
+      width: auto;
+      animation: none;
+    }
+
+    .marquee-list {
+      flex-wrap: wrap;
+      gap: 16px 32px;
+      padding-inline: var(--gutter);
+    }
+
+    .marquee-list[aria-hidden] {
+      display: none;
+    }
+  }
+</style>

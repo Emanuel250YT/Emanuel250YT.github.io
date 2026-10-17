@@ -4,6 +4,7 @@
  *   - src/assets/portrait.png, src/assets/avatar.png  (black & white, from assets-src/portrait.png)
  *   - public/favicon.ico, apple-touch-icon.png, icon-192/512.png, icon-maskable-512.png
  *   - public/og/og-<locale>.png                        (1200x630, one per locale)
+ *   - public/logos/<name>.png                          (monochrome masks of the raster logos in assets-src/logos)
  *
  * The CV PDFs are not generated: the owner uploads them (see src/lib/cv.ts).
  *
@@ -25,11 +26,12 @@ const pub = path.join(root, 'public');
 const LOCALES = ['es', 'en', 'pt', 'fr', 'de', 'zh', 'hi'];
 
 const BRAND_BG = '#111111';
-// Square design: square tile, square stroke ends and a square dot (same drawing as public/favicon.svg).
+// Square design: square tile, a capital E built from straight strokes and a square dot
+// (same drawing as public/favicon.svg).
 const glyph = (scale = 1) => {
-  // The "e." of the logo, centred on a 64x64 canvas.
+  // The "E." of the logo, centred on a 64x64 canvas.
   const t = (64 - 64 * scale) / 2;
-  return `<g transform="translate(${t} ${t}) scale(${scale})"><path d="M17 33h23a11.5 11.5 0 1 0-3.4 8.2" fill="none" stroke="#fff" stroke-width="5.5" stroke-linecap="butt" stroke-linejoin="miter"/><rect x="44.2" y="39.7" width="7.6" height="7.6" fill="#fff"/></g>`;
+  return `<g transform="translate(${t} ${t}) scale(${scale})" fill="#fff"><path d="M14 16h24v6.5H20.5v6.25H35v6.5H20.5v6.25H38V48H14z"/><rect x="42" y="41" width="7" height="7"/></g>`;
 };
 const iconSvg = ({ scale = 1 } = {}) =>
   Buffer.from(
@@ -74,6 +76,37 @@ async function portraits() {
     .png({ compressionLevel: 9 })
     .toFile(path.join(root, 'src/assets/avatar.png'));
   console.log('✓ portraits');
+}
+
+/**
+ * Ecosystem logos that only exist as PNG become monochrome masks (black, the logo in the
+ * alpha channel) so the page paints them in its own colour, like the vector logos.
+ * `alpha` keeps the source silhouette (a one-colour logo); `luminance` also keeps its
+ * inner shapes: dark areas stay solid, light ones turn transparent.
+ */
+const LOGO_MASKS = [
+  { name: 'trustless-work', mode: 'alpha' },
+  { name: 'saltadev', mode: 'luminance' },
+];
+
+async function logoMasks() {
+  await mkdir(path.join(pub, 'logos'), { recursive: true });
+  for (const { name, mode } of LOGO_MASKS) {
+    const trimmed = await sharp(path.join(root, 'assets-src', 'logos', `${name}.png`)).trim({ threshold: 1 }).toBuffer();
+    const { data, info } = await sharp(trimmed)
+      .resize({ height: 96 })
+      .ensureAlpha()
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+    for (let i = 0; i < data.length; i += 4) {
+      const luminance = (0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2]) / 255;
+      const alpha = mode === 'luminance' ? data[i + 3] * (1 - luminance) : data[i + 3];
+      data[i] = data[i + 1] = data[i + 2] = 0;
+      data[i + 3] = Math.round(alpha);
+    }
+    await sharp(data, { raw: info }).png({ compressionLevel: 9 }).toFile(path.join(pub, 'logos', `${name}.png`));
+  }
+  console.log(`✓ logo masks (${LOGO_MASKS.length})`);
 }
 
 /** ICO with embedded PNGs (supported since Windows Vista and by every browser). */
@@ -231,4 +264,5 @@ async function ogImages(chrome) {
 const chrome = findChrome();
 await portraits();
 await icons();
+await logoMasks();
 await ogImages(chrome);

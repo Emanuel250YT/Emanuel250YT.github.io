@@ -26,10 +26,13 @@ npm run assets    # regenerates portraits, icons and OG images (needs Chrome)
 
 ```
 assets-src/portrait.png   colour cut-out photo (source of truth for every portrait)
+assets-src/logos/         official PNG logos without a vector version (Trustless Work, SaltaDev)
 src/
   config/site.ts          identity, WhatsApp, contact form endpoint, GA4/GTM IDs, search-engine verification
   i18n/                   locales.ts (languages, URLs, flags), types.ts (Dictionary), one file per locale
-  data/                   services.ts, projects.ts, achievements.ts, resume.ts, contact.ts (form values, ecosystems),
+  data/                   services.ts, projects.ts, achievements.ts, resume.ts, contact.ts (form values),
+                          technologies.ts (carousel: names + logo paths from Simple Icons / Devicon),
+                          ecosystems.ts (ecosystems strip: names + logos),
                           npm.ts (packages and npm orgs whose downloads are counted),
                           experience.json (work experience, read through resume.ts)
   lib/                    schema.ts (JSON-LD), portrait.ts (JSON-LD image), npm.ts (npm registry + downloads API), fonts.ts (@font-face), format.ts (dates),
@@ -42,10 +45,13 @@ src/
     analytics/ConsentBanner.astro GA4 consent banner (rendered only when an ID is set)
     projects/ProjectCover.astro  HTML/CSS illustrated covers (decorative)
     pages/                HomePage, PrivacyPage: real pages, parameterised by locale
-    ui/                   Icon, Flag, LanguageSwitcher, RichHeading, SectionHeader, FloatingActions
-  pages/                  index, privacy, 404 (default locale) and [lang]/{index,privacy}
+    ui/                   Icon, Flag, LanguageSwitcher, RichHeading, SectionHeader, FloatingActions,
+                          Marquee (infinite carousel), TechCarousel, BrandLogo (sprite symbol or PNG mask)
+  pages/                  index, privacy, 404 (default locale), [lang]/{index,privacy} and logos.svg.ts
+                          (logo sprite built from technologies.ts + ecosystems.ts)
   styles/global.css       tokens, reset, buttons, motion, cursor, per-script typography
-public/                   CNAME, robots.txt, llms.txt, humans.txt, manifest, icons, cursors/, og/, [locale/]cv/*.pdf (uploaded)
+public/                   CNAME, robots.txt, llms.txt, humans.txt, manifest, icons, cursors/, og/, logos/ (generated masks),
+                          [locale/]cv/*.pdf (uploaded)
 scripts/                  generate-assets.mjs, verify-seo.mjs
 .github/                  workflows/deploy.yml (build + verify + Pages), dependabot.yml
 ```
@@ -237,8 +243,15 @@ Every indexable page has, and `scripts/verify-seo.mjs` enforces:
 - Mobile menu: `aria-expanded`/`aria-controls`, Escape closes and returns focus.
 - **Auto-updating content (2.2.2)**: the rotating role pauses on hover, while off-screen
   and while the tab is hidden, and stops on the first role after three cycles; screen
-  readers get the whole list once (`.visually-hidden`), the typed copy is `aria-hidden`. Moving strips are
-  scroll-linked (never autoplay).
+  readers get the whole list once (`.visually-hidden`), the typed copy is `aria-hidden`.
+  The two autoplaying strips, technologies (About) and ecosystems and communities
+  (Achievements), share `ui/Marquee.astro`, by the owner's decision: infinite and
+  continuous, no visible play/pause button (he removed it). They pause while an item is
+  pointed at (`:has(li:hover)`, also a tap on touch screens) and while the strip has
+  keyboard focus (`tabindex="0"` region). Items rest dimmed (`--marquee-rest`: 0.5 on
+  `--dark`, 0.7 on `--bg`, both 5:1; do not go lower) and light up to 1 under the
+  pointer. The copy of the list is `aria-hidden`. Keep both at the same speed: tune
+  `duration` to the length of the list (about 76 px/s).
 
 ## 10 · Motion
 
@@ -258,8 +271,9 @@ Every indexable page has, and `scripts/verify-seo.mjs` enforces:
 - **Typing and count-ups change text in place and move nothing**, so they run with
   and without reduced motion (the owner's machine has it on and wants to see them).
 - **`prefers-reduced-motion: reduce` means fade, not frozen**: reveals and the hero
-  entrance cross-fade; slides, drifts, caret blinks and the scroll-linked strip are
-  disabled. Wrap any new movement in
+  entrance cross-fade; slides, drifts and caret blinks are disabled. Exception, the
+  owner's decision: both Marquee strips always slide continuously, reduced motion
+  included (he wants them to move, never step by step). Wrap any new movement in
   `@media (prefers-reduced-motion: no-preference)` and give it a fade fallback.
   (The owner's machine has reduced motion enabled: test both modes.)
 - Hero entrance animations start at `opacity: 0.01`, not 0, so LCP is not delayed.
@@ -276,8 +290,19 @@ Every indexable page has, and `scripts/verify-seo.mjs` enforces:
 
 - **Square design**: no `border-radius`, no circles, no radial "halo" shapes anywhere,
   covers and icons included (stroke icons use square caps and miter joins). Only flags,
-  letterforms and third-party logos (WhatsApp, GitHub…) keep their own curves. No
-  decorative glows or gradient bands either: the footer is plain black.
+  letterforms and third-party logos (WhatsApp, GitHub, the technology logos…) keep their
+  own curves. Technology and ecosystem logos are the official marks in one colour, in
+  the text colour (`ui/BrandLogo.astro`): vector paths in the /logos.svg sprite, taken
+  from Simple Icons, Devicon (Java is the cup, never the OpenJDK mark) or the
+  organisation's own site; logos that only exist as PNG go to `assets-src/logos/` and
+  `npm run assets` turns them into masks in `public/logos/`. Every ecosystem in the
+  strip has its logo. DESAFIA is not in the strip (owner's decision). No decorative glows or gradient bands either: the footer is plain black.
+- **No bars as separators**: no dashes, slashes or rules between items. Use a small
+  filled square (hero badge, between name and role), an arrow (process steps, one
+  pointing to the next on 4 columns) or plain spacing.
+- **Logo**: "Emanuel." with a capital E (it is his name), in `site.logo`; the favicon
+  and app icons draw a square "E." from straight strokes (`public/favicon.svg` and
+  `scripts/generate-assets.mjs`, same drawing; `npm run assets` after changing it).
 - Tokens in `:root` of `global.css`; components use tokens (loose colours only in
   `ProjectCover.astro` and the flags). Space Grotesk Variable (Latin subset preloaded);
   Chinese and Devanagari use platform fonts via `:lang()`, which also reset the display

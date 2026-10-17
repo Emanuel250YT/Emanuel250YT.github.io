@@ -82,6 +82,7 @@ export interface Dictionary {
     title: RichText;
     body: string[];
     rolesLabel: string;
+    /** Label of the technologies carousel. */
     skillsLabel: string;
     editorFile: string;
     editorComment: string;
