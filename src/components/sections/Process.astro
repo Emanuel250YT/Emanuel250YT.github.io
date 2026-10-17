@@ -27,21 +27,19 @@ const number = (position: number) => String(position + 1).padStart(2, '0');
 ---
 
 <section id="process" class="section process" aria-labelledby="process-title">
-  <div class="container">
-    <SectionHeader
-      index={index}
-      eyebrow={t.process.eyebrow}
-      title={t.process.title}
-      titleId="process-title"
-      intro={t.process.intro}
-      layout="split"
-    />
-  </div>
-
-  <!-- Four views. On wide, tall enough screens (with JS) the stage stays pinned while
-       the page scrolls through it and shows one view at a time; otherwise they stack. -->
+  <!-- Four views. On wide, tall enough screens (with JS) the stage, section title
+       included, stays pinned while the page scrolls through it and shows one view at a
+       time; otherwise they stack under the title. -->
   <div class="journey" data-journey style={`--views: ${t.process.steps.length}`}>
     <div class="container stage" data-journey-stage>
+      <SectionHeader
+        index={index}
+        eyebrow={t.process.eyebrow}
+        title={t.process.title}
+        titleId="process-title"
+        intro={t.process.intro}
+        layout="split"
+      />
       <ol class="progress" role="list" aria-hidden="true">
         {
           t.process.steps.map((step, position) => (
@@ -102,6 +100,8 @@ const number = (position: number) => String(position + 1).padStart(2, '0');
         }
       </ol>
     </div>
+    <!-- Pinned layout only: the scroll distance the stage stays pinned for. -->
+    <div class="runway" aria-hidden="true"></div>
   </div>
 </section>
 
@@ -116,7 +116,7 @@ const number = (position: number) => String(position + 1).padStart(2, '0');
   if (journey && stage) {
     const views = [...journey.querySelectorAll<HTMLElement>('[data-view]')];
     const dots = [...journey.querySelectorAll<HTMLElement>('[data-journey-dot]')];
-    const pinned = window.matchMedia('(min-width: 900px) and (min-height: 640px)');
+    const pinned = window.matchMedia('(min-width: 900px) and (min-height: 700px)');
     let active = -1;
     let frame = 0;
 
@@ -134,11 +134,29 @@ const number = (position: number) => String(position + 1).padStart(2, '0');
       });
     };
 
+    // The stage sticks at its CSS `top`; the runway below it is the distance it stays pinned.
+    const pinnedAt = () => parseFloat(getComputedStyle(stage).top) || 0;
+    const runway = () => journey.offsetHeight - stage.offsetHeight;
+
+    // While pinned, the stage sits centred in the space under the header (`--pin-top`).
+    // It keeps its own height, so on the way in it still follows the section title closely.
+    const header = document.querySelector<HTMLElement>('[data-header]');
+    const centre = () => {
+      if (!pinned.matches) return;
+      const headerHeight = header?.offsetHeight ?? 64;
+      const free = window.innerHeight - headerHeight - stage.offsetHeight;
+      stage.style.setProperty('--pin-top', `${Math.round(headerHeight + Math.max(12, free / 2))}px`);
+    };
+    new ResizeObserver(() => {
+      centre();
+      schedule();
+    }).observe(stage);
+
     const update = () => {
       frame = 0;
       if (!pinned.matches) return;
-      const distance = journey.offsetHeight - stage.offsetHeight;
-      const progress = distance > 0 ? -journey.getBoundingClientRect().top / distance : 0;
+      const distance = runway();
+      const progress = distance > 0 ? (pinnedAt() - journey.getBoundingClientRect().top) / distance : 0;
       show(Math.min(views.length - 1, Math.max(0, Math.floor(progress * views.length))));
     };
     const schedule = () => {
@@ -150,9 +168,8 @@ const number = (position: number) => String(position + 1).padStart(2, '0');
     views.forEach((view, position) => {
       view.addEventListener('focusin', () => {
         if (!pinned.matches || position === active) return;
-        const distance = journey.offsetHeight - stage.offsetHeight;
-        const top = journey.getBoundingClientRect().top + window.scrollY;
-        window.scrollTo({ top: top + (distance * (position + 0.5)) / views.length, behavior: 'instant' });
+        const top = journey.getBoundingClientRect().top + window.scrollY - pinnedAt();
+        window.scrollTo({ top: top + (runway() * (position + 0.5)) / views.length, behavior: 'instant' });
         show(position);
       });
     });
@@ -168,11 +185,17 @@ const number = (position: number) => String(position + 1).padStart(2, '0');
 
     pinned.addEventListener('change', () => {
       active = -1;
-      if (pinned.matches) update();
-      else views.forEach((view) => (view.removeAttribute('aria-current'), view.classList.add('is-active')));
+      if (pinned.matches) {
+        centre();
+        update();
+      } else views.forEach((view) => (view.removeAttribute('aria-current'), view.classList.add('is-active')));
     });
     window.addEventListener('scroll', schedule, { passive: true });
-    window.addEventListener('resize', schedule);
+    window.addEventListener('resize', () => {
+      centre();
+      schedule();
+    });
+    centre();
     update();
   }
 </script>
@@ -192,7 +215,7 @@ const number = (position: number) => String(position + 1).padStart(2, '0');
 
   .views {
     display: grid;
-    gap: clamp(56px, 8vw, 96px);
+    gap: clamp(40px, 6vw, 64px);
     margin: 0;
   }
 
@@ -223,7 +246,7 @@ const number = (position: number) => String(position + 1).padStart(2, '0');
   }
 
   .cta {
-    margin-top: 32px;
+    margin-top: 24px;
   }
 
   .marker {
@@ -231,7 +254,7 @@ const number = (position: number) => String(position + 1).padStart(2, '0');
     place-items: center;
     width: 44px;
     height: 44px;
-    margin-bottom: 20px;
+    margin-bottom: 14px;
     border: 1.5px solid var(--ink);
     font-family: var(--font-mono);
     font-size: 0.8rem;
@@ -247,14 +270,14 @@ const number = (position: number) => String(position + 1).padStart(2, '0');
 
   .body {
     max-width: 30rem;
-    margin-top: 12px;
+    margin-top: 8px;
     font-size: 1rem;
     color: var(--ink-soft);
   }
 
   .label {
-    margin-top: 28px;
-    margin-bottom: 14px;
+    margin-top: 20px;
+    margin-bottom: 10px;
     font-family: var(--font-mono);
     font-size: 0.75rem;
     letter-spacing: var(--tracking-label);
@@ -264,7 +287,7 @@ const number = (position: number) => String(position + 1).padStart(2, '0');
 
   .actions {
     display: grid;
-    gap: 12px;
+    gap: 10px;
     margin: 0;
   }
 
@@ -334,22 +357,34 @@ const number = (position: number) => String(position + 1).padStart(2, '0');
     }
   }
 
-  /* Pinned layout: the journey is as tall as the stage plus one share of scroll per
-     extra view; the stage sticks under the header and the views share one cell. */
-  @media (min-width: 900px) and (min-height: 640px) {
+  .runway {
+    display: none;
+  }
+
+  /* Pinned layout: the stage (section title, progress and views) keeps its own height
+     and, once pinned, sits centred under the header: the script sets `--pin-top` from
+     its height. The title stays on screen through the four views. The runway after it
+     adds one share of scroll per extra view. The views share one cell. */
+  @media (min-width: 900px) and (min-height: 700px) {
     :global(.js) .journey {
       --stage-h: calc(100svh - var(--header-h));
-      height: calc(var(--stage-h) + (var(--views) - 1) * 70svh);
     }
 
     :global(.js) .stage {
       position: sticky;
-      top: var(--header-h);
+      top: var(--pin-top, calc(var(--header-h) + clamp(12px, 3vh, 28px)));
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      gap: clamp(24px, 4vh, 48px);
-      height: var(--stage-h);
+      gap: 20px;
+    }
+
+    :global(.js) .stage :global(.section-header) {
+      margin-bottom: 4px;
+    }
+
+    :global(.js) .runway {
+      display: block;
+      height: calc((var(--views) - 1) * 60svh);
     }
 
     :global(.js) .progress {
@@ -408,9 +443,10 @@ const number = (position: number) => String(position + 1).padStart(2, '0');
       pointer-events: auto;
     }
 
-    /* Keep the photo (4:3) inside the stage on shorter screens. */
-    :global(.js) .visual {
-      width: min(100%, (var(--stage-h) - 200px) * 4 / 3);
+    /* Keep the whole stage (title, progress and a 4:3 photo) inside the viewport on
+       shorter screens: the photo column shrinks with the height, the copy takes the rest. */
+    :global(.js) .view {
+      grid-template-columns: min(55%, (var(--stage-h) - 300px) * 4 / 3) minmax(0, 1fr);
     }
   }
 
@@ -422,13 +458,12 @@ const number = (position: number) => String(position + 1).padStart(2, '0');
 
   /* Printed: the four views one after another, fully drawn. */
   @media print {
-    :global(.js) .journey {
-      height: auto;
+    :global(.js) .runway {
+      display: none;
     }
 
     :global(.js) .stage {
       position: static;
-      height: auto;
     }
 
     :global(.js) .progress {

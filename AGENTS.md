@@ -130,9 +130,11 @@ About stays right after the hero because the cut-out portrait "stands" on its da
   `process.actionsLabel`) and its own "book the diagnosis" button (`cta_click`, location
   `process_<step>`). The photos are generated with Higgsfield (GPT Image 2.5) in one
   black & white series: sources and prompts in `assets-src/process/`, `npm run assets`
-  derives `src/assets/process/`; regenerate with the same style, never mix in other looks. On screens ≥ 900 px wide and ≥ 640 px tall, with JS,
-  the stage is `position: sticky` under the header and the page scrolls through it: the
-  active view follows the scroll (equal share each, `70svh`), a 4-step indicator on top
+  derives `src/assets/process/`; regenerate with the same style, never mix in other looks. On screens ≥ 900 px wide and ≥ 700 px tall, with JS,
+  the stage (section title and intro included, so they stay on screen through the four
+  views) is `position: sticky`, centred under the header while pinned (the script sets
+  `--pin-top` from its height; on the way in it follows the title), and the page scrolls through it: the
+  active view follows the scroll (equal share each, `60svh` of runway), a 4-step indicator on top
   shows where you are and the active view has `aria-current="step"`; tabbing to the
   button of a hidden view scrolls to that view. Otherwise (no JS,
   narrow or short screens, print) the views stack. Never hijack the scroll. The actions
@@ -343,7 +345,7 @@ Every indexable page has, and `scripts/verify-seo.mjs` enforces:
   hero it stands on a square `--backdrop` block (the head rises above it) with a short
   drop shadow, for contrast against the light grid.
 - Responsive: 1200 px container; hamburger menu < 1024 px; services 2 → 1 columns
-  (≤ 760); process pinned views → stacked (< 900 px wide or < 640 px tall); projects
+  (≤ 760); process pinned views → stacked (< 900 px wide or < 700 px tall); projects
   3 → 2 → 1; contact 2 → 1 (≤ 960).
   Test 1440, 390 and 320 px.
 

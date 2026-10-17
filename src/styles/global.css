@@ -190,7 +190,7 @@ button {
 }
 
 .section {
-  padding-block: clamp(72px, 10vw, 128px);
+  padding-block: clamp(52px, 7vw, 88px);
 }
 
 /* Buttons from the design: corner-framed outline and solid black */
@@ -353,7 +353,7 @@ button {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 18px;
+  margin-bottom: 12px;
   font-family: var(--font-mono);
   font-size: 0.75rem;
   letter-spacing: var(--tracking-label);
