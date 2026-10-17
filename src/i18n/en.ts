@@ -75,11 +75,41 @@ export const en: Dictionary = {
       {
         title: 'Diagnosis',
         body: 'A 30-minute call to understand the problem, your users and what has to happen for the project to work.',
+        actions: [
+          'Understand the problem and your users',
+          'Review what you already have: systems, integrations and data',
+          'Define what has to happen for the project to work',
+        ],
       },
-      { title: 'Proposal', body: 'Scope, timeline and budget in writing before a single line of code is written.' },
-      { title: 'Build', body: 'Weekly deliveries with real progress you can try and comment on.' },
-      { title: 'Launch', body: 'Production deploy, documentation and support after launch.' },
+      {
+        title: 'Proposal',
+        body: 'Scope, timeline and budget in writing before a single line of code is written.',
+        actions: [
+          'Clear scope: what is in and what is not',
+          'A timeline with planned weekly deliveries',
+          'Budget in writing before any code',
+        ],
+      },
+      {
+        title: 'Build',
+        body: 'Weekly deliveries with real progress you can try and comment on.',
+        actions: [
+          'Weekly deliveries with real progress',
+          'You try and comment on every delivery',
+          'We adjust course with your feedback',
+        ],
+      },
+      {
+        title: 'Launch',
+        body: 'Production deploy, documentation and support after launch.',
+        actions: [
+          'Deploy to production',
+          'Documentation for your team',
+          'Support after launch',
+        ],
+      },
     ],
+    actionsLabel: "What we'll do",
     cta: 'Book the diagnosis call',
   },
   about: {

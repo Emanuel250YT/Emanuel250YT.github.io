@@ -18,6 +18,11 @@ export interface Step {
   body: string;
 }
 
+/** A view of the process section: what happens and the actions taken in it. */
+export interface ProcessStep extends Step {
+  actions: [string, string, string];
+}
+
 export interface Dictionary {
   meta: {
     title: string;
@@ -74,7 +79,10 @@ export interface Dictionary {
     eyebrow: string;
     title: RichText;
     intro: string;
-    steps: Step[];
+    /** Four views (diagnosis, proposal, build, launch), in this order: each has its own illustration. */
+    steps: [ProcessStep, ProcessStep, ProcessStep, ProcessStep];
+    /** Heading of the list of actions inside every view. */
+    actionsLabel: string;
     cta: string;
   };
   about: {

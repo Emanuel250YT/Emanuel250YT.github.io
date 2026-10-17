@@ -27,6 +27,7 @@ npm run assets    # regenerates portraits, icons and OG images (needs Chrome)
 ```
 assets-src/portrait.png   colour cut-out photo (source of truth for every portrait)
 assets-src/logos/         official PNG logos without a vector version (Trustless Work, SaltaDev)
+assets-src/process/       the four process photos (generated with Higgsfield; prompts in its README.md)
 src/
   config/site.ts          identity, WhatsApp, contact form endpoint, GA4/GTM IDs, search-engine verification
   i18n/                   locales.ts (languages, URLs, flags), types.ts (Dictionary), one file per locale
@@ -117,13 +118,26 @@ honoured by Astro/Vite). Type imports too: `import type { Locale } from '@/i18n/
 
 ## 4 · Page structure and conversion
 
-Home sections, in this order (the number feeds the `01 —` eyebrow):
+Home sections, in this order (the number feeds the `01` eyebrow):
 **Hero → 01 About → 02 Services → 03 Process → 04 Projects → 05 Achievements → 06 Contact**.
 About stays right after the hero because the cut-out portrait "stands" on its dark band.
 
 - Every section ends with (or contains) a call to action to `#contact`; the header
   always shows the "Let's talk" button (below 1024 px it sits in the bar, next to the
   burger; the copy inside the menu is hidden).
+- **Process = four views** (diagnosis, proposal, build, launch), each with a photo, its
+  number, title, description, three actions (`process.steps[].actions`, under
+  `process.actionsLabel`) and its own "book the diagnosis" button (`cta_click`, location
+  `process_<step>`). The photos are generated with Higgsfield (GPT Image 2.5) in one
+  black & white series: sources and prompts in `assets-src/process/`, `npm run assets`
+  derives `src/assets/process/`; regenerate with the same style, never mix in other looks. On screens ≥ 900 px wide and ≥ 640 px tall, with JS,
+  the stage is `position: sticky` under the header and the page scrolls through it: the
+  active view follows the scroll (equal share each, `70svh`), a 4-step indicator on top
+  shows where you are and the active view has `aria-current="step"`; tabbing to the
+  button of a hidden view scrolls to that view. Otherwise (no JS,
+  narrow or short screens, print) the views stack. Never hijack the scroll. The actions
+  only restate commitments the site already makes (30-minute call, written proposal,
+  weekly deliveries, deploy, docs, support).
 - Service cards link to `#contact` with `data-service="<id>"`: the form preselects that
   service. Keep `ServiceId` and the form's `data-service-id` in sync.
 - The contact section pairs the form with "what happens next" (3 steps) and direct
@@ -298,8 +312,8 @@ Every indexable page has, and `scripts/verify-seo.mjs` enforces:
   `npm run assets` turns them into masks in `public/logos/`. Every ecosystem in the
   strip has its logo. DESAFIA is not in the strip (owner's decision). No decorative glows or gradient bands either: the footer is plain black.
 - **No bars as separators**: no dashes, slashes or rules between items. Use a small
-  filled square (hero badge, between name and role), an arrow (process steps, one
-  pointing to the next on 4 columns) or plain spacing.
+  filled square (hero badge, between name and role, the process indicator) or plain
+  spacing.
 - **Logo**: "Emanuel." with a capital E (it is his name), in `site.logo`; the favicon
   and app icons draw a square "E." from straight strokes (`public/favicon.svg` and
   `scripts/generate-assets.mjs`, same drawing; `npm run assets` after changing it).
@@ -329,7 +343,8 @@ Every indexable page has, and `scripts/verify-seo.mjs` enforces:
   hero it stands on a square `--backdrop` block (the head rises above it) with a short
   drop shadow, for contrast against the light grid.
 - Responsive: 1200 px container; hamburger menu < 1024 px; services 2 → 1 columns
-  (≤ 760); process 4 → 2 → 1; projects 3 → 2 → 1; contact 2 → 1 (≤ 960).
+  (≤ 760); process pinned views → stacked (< 900 px wide or < 640 px tall); projects
+  3 → 2 → 1; contact 2 → 1 (≤ 960).
   Test 1440, 390 and 320 px.
 
 ## 12 · Performance

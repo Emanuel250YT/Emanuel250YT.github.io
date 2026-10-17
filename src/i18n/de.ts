@@ -75,11 +75,41 @@ export const de: Dictionary = {
       {
         title: 'Analyse',
         body: 'Ein 30-minütiger Call, um das Problem, deine Nutzer und die Erfolgskriterien des Projekts zu verstehen.',
+        actions: [
+          'Das Problem und deine Nutzer verstehen',
+          'Prüfen, was es schon gibt: Systeme, Integrationen und Daten',
+          'Festlegen, was passieren muss, damit das Projekt funktioniert',
+        ],
       },
-      { title: 'Angebot', body: 'Umfang, Zeitplan und Budget schriftlich, bevor die erste Zeile Code entsteht.' },
-      { title: 'Umsetzung', body: 'Wöchentliche Lieferungen mit echten Fortschritten, die du testen und kommentieren kannst.' },
-      { title: 'Launch', body: 'Deployment in Produktion, Dokumentation und Begleitung nach dem Launch.' },
+      {
+        title: 'Angebot',
+        body: 'Umfang, Zeitplan und Budget schriftlich, bevor die erste Zeile Code entsteht.',
+        actions: [
+          'Klarer Umfang: was dazugehört und was nicht',
+          'Zeitplan mit geplanten wöchentlichen Lieferungen',
+          'Budget schriftlich, bevor Code entsteht',
+        ],
+      },
+      {
+        title: 'Umsetzung',
+        body: 'Wöchentliche Lieferungen mit echten Fortschritten, die du testen und kommentieren kannst.',
+        actions: [
+          'Wöchentliche Lieferungen mit echtem Fortschritt',
+          'Du testest und kommentierst jede Lieferung',
+          'Wir passen den Kurs an dein Feedback an',
+        ],
+      },
+      {
+        title: 'Launch',
+        body: 'Deployment in Produktion, Dokumentation und Begleitung nach dem Launch.',
+        actions: [
+          'Deployment in Produktion',
+          'Dokumentation für dein Team',
+          'Begleitung nach dem Launch',
+        ],
+      },
     ],
+    actionsLabel: 'Was wir tun',
     cta: 'Analyse-Call vereinbaren',
   },
   about: {

@@ -75,11 +75,41 @@ export const fr: Dictionary = {
       {
         title: 'Diagnostic',
         body: 'Un appel de 30 minutes pour comprendre le problème, vos utilisateurs et ce qui doit se passer pour que le projet fonctionne.',
+        actions: [
+          'Comprendre le problème et vos utilisateurs',
+          'Passer en revue l’existant : systèmes, intégrations et données',
+          'Définir ce qui doit se passer pour que le projet fonctionne',
+        ],
       },
-      { title: 'Proposition', body: 'Périmètre, délais et budget par écrit avant d’écrire la moindre ligne de code.' },
-      { title: 'Développement', body: 'Des livraisons hebdomadaires avec de vraies avancées à tester et commenter.' },
-      { title: 'Lancement', body: 'Mise en production, documentation et accompagnement après le lancement.' },
+      {
+        title: 'Proposition',
+        body: 'Périmètre, délais et budget par écrit avant d’écrire la moindre ligne de code.',
+        actions: [
+          'Un périmètre clair : ce qui est inclus et ce qui ne l’est pas',
+          'Un calendrier avec des livraisons hebdomadaires',
+          'Un budget écrit avant la première ligne de code',
+        ],
+      },
+      {
+        title: 'Développement',
+        body: 'Des livraisons hebdomadaires avec de vraies avancées à tester et commenter.',
+        actions: [
+          'Des livraisons hebdomadaires avec de vraies avancées',
+          'Vous testez et commentez chaque livraison',
+          'Nous ajustons le cap selon vos retours',
+        ],
+      },
+      {
+        title: 'Lancement',
+        body: 'Mise en production, documentation et accompagnement après le lancement.',
+        actions: [
+          'Mise en production',
+          'Documentation pour votre équipe',
+          'Accompagnement après le lancement',
+        ],
+      },
     ],
+    actionsLabel: 'Ce que nous allons faire',
     cta: 'Planifions le diagnostic',
   },
   about: {

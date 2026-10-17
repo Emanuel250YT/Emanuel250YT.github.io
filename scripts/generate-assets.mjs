@@ -2,6 +2,7 @@
 /**
  * Generates the binary assets that are committed to the repository:
  *   - src/assets/portrait.png, src/assets/avatar.png  (black & white, from assets-src/portrait.png)
+ *   - src/assets/process/<step>.jpg                    (black & white, from assets-src/process)
  *   - public/favicon.ico, apple-touch-icon.png, icon-192/512.png, icon-maskable-512.png
  *   - public/og/og-<locale>.png                        (1200x630, one per locale)
  *   - public/logos/<name>.png                          (monochrome masks of the raster logos in assets-src/logos)
@@ -76,6 +77,25 @@ async function portraits() {
     .png({ compressionLevel: 9 })
     .toFile(path.join(root, 'src/assets/avatar.png'));
   console.log('✓ portraits');
+}
+
+/**
+ * Images of the four process views (generated with Higgsfield, see
+ * assets-src/process/README.md): pure grayscale like the portraits, 1600 px wide;
+ * Astro serves them as responsive WebP.
+ */
+const PROCESS_IMAGES = ['diagnosis', 'proposal', 'build', 'launch'];
+
+async function processImages() {
+  await mkdir(path.join(root, 'src/assets/process'), { recursive: true });
+  for (const name of PROCESS_IMAGES) {
+    await sharp(path.join(root, 'assets-src', 'process', `${name}.jpg`))
+      .resize({ width: 1600 })
+      .grayscale()
+      .jpeg({ quality: 86, mozjpeg: true })
+      .toFile(path.join(root, 'src/assets/process', `${name}.jpg`));
+  }
+  console.log(`✓ process images (${PROCESS_IMAGES.length})`);
 }
 
 /**
@@ -263,6 +283,7 @@ async function ogImages(chrome) {
 
 const chrome = findChrome();
 await portraits();
+await processImages();
 await icons();
 await logoMasks();
 await ogImages(chrome);

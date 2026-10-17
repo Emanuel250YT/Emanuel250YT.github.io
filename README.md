@@ -37,7 +37,7 @@ npm run assets    # regenerates portraits, icons and Open Graph images (needs Ch
 ## Page structure
 
 Hero (typed rotating roles, primary CTA) → About → Services (4, each with its own CTA that
-preselects the service in the form) → Process (4 steps) → Projects → Achievements and
+preselects the service in the form) → Process (4 views pinned while you scroll: illustration, description and actions) → Projects → Achievements and
 ecosystems → Contact (form by email or WhatsApp + what happens next + direct channels) →
 Footer. Every page has floating WhatsApp and back-to-top buttons at the bottom right.
 
@@ -58,6 +58,7 @@ Footer. Every page has floating WhatsApp and back-to-top buttons at the bottom r
 | Ecosystems strip (Achievements), with logos | `src/data/ecosystems.ts` (PNG-only logos: `assets-src/logos/` + `npm run assets`) |
 | Name, email, WhatsApp, socials, domain, form endpoint, GA4, search-console tokens | `src/config/site.ts` |
 | Portrait | `assets-src/portrait.png` (colour cut-out, transparent background) |
+| Process photos | `assets-src/process/*.jpg` (Higgsfield prompts in its `README.md`), then `npm run assets` |
 
 Every translatable field is typed as `Record<Locale, …>`, so `npm run check` fails if a
 language is missing. After changing the portrait or the identity, run
