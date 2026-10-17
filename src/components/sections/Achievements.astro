@@ -1,13 +1,12 @@
 ---
+import HighlightGrid from '@/components/achievements/HighlightGrid.astro';
 import BrandLogo from '@/components/ui/BrandLogo.astro';
-import Icon from '@/components/ui/Icon.astro';
 import Marquee from '@/components/ui/Marquee.astro';
 import SectionHeader from '@/components/ui/SectionHeader.astro';
-import { sortedAchievements } from '@/data/achievements';
 import { ecosystems } from '@/data/ecosystems';
+import { achievements, achievementsAndCertifications, community } from '@/data/highlights';
 import { useTranslations } from '@/i18n';
 import type { Locale } from '@/i18n/locales';
-import { formatMonth } from '@/lib/format';
 
 interface Props {
   locale: Locale;
@@ -26,45 +25,19 @@ const t = useTranslations(locale);
       eyebrow={t.achievements.eyebrow}
       title={t.achievements.title}
       titleId="achievements-title"
-      layout="center"
+    />
+    <HighlightGrid
+      locale={locale}
+      label={achievements.length > 0 ? t.achievements.highlightsLabel : t.achievements.certificationsLabel}
+      labelId="highlights-label"
+      items={achievementsAndCertifications}
     />
   </div>
 
-  <!-- Scrollable region reachable by keyboard (WCAG 2.1.1) -->
-  <div class="rail" role="region" aria-label={t.a11y.scrollHint} tabindex="0">
-    <ol class="track" role="list" data-reveal-stagger>
-      {
-        sortedAchievements.map((item) => (
-          <li class="card" data-reveal>
-            <div class="top">
-              <span class="mark" aria-hidden="true">
-                {item.mark}
-              </span>
-              <time datetime={item.date}>{formatMonth(item.date, locale)}</time>
-            </div>
-            <h3 class="title">{item.title[locale]}</h3>
-            <p class="detail">{item.detail[locale]}</p>
-            <div class="foot">
-              <p class="org">{item.org}</p>
-              {item.url && (
-                <a class="source link-arrow" href={item.url} target="_blank" rel="noopener">
-                  {t.achievements.source}
-                  <span class="visually-hidden">
-                    : {item.title[locale]} {t.a11y.newTab}
-                  </span>
-                  <Icon name="arrow-up-right" size={14} />
-                </a>
-              )}
-            </div>
-          </li>
-        ))
-      }
-    </ol>
-  </div>
-
-  <!-- Ecosystems strip: infinite carousel, paused while a name is pointed at. -->
+  <!-- Ecosystems strip: infinite carousel, paused while a name is pointed at. Its label
+       is for screen readers only: the owner removed the visible one (it blurred the message). -->
   <div class="ecosystems">
-    <p class="container ecosystems-label" id="ecosystems-label">{t.achievements.ecosystemsLabel}</p>
+    <p class="visually-hidden" id="ecosystems-label">{t.achievements.ecosystemsLabel}</p>
     <Marquee labelledby="ecosystems-label" duration="32s" class="ecosystems-strip">
       {
         ecosystems.map((ecosystem) => (
@@ -79,6 +52,11 @@ const t = useTranslations(locale);
         ))
       }
     </Marquee>
+  </div>
+
+  <!-- Talks, hackathons and events, under the strip of the communities behind them. -->
+  <div class="container community">
+    <HighlightGrid locale={locale} label={t.achievements.communityLabel} labelId="community-label" items={community} />
   </div>
 </section>
 
@@ -100,7 +78,7 @@ const t = useTranslations(locale);
   .frames i {
     position: absolute;
     aspect-ratio: 1;
-    border: 1px solid rgb(17 17 17 / 0.05);
+    border: 1px solid color-mix(in srgb, var(--ink) 5%, transparent);
     translate: -50% -50%;
   }
 
@@ -120,21 +98,12 @@ const t = useTranslations(locale);
     top: 120%;
     left: 50%;
     width: 640px;
-    border-color: rgb(17 17 17 / 0.04);
+    border-color: color-mix(in srgb, var(--ink) 4%, transparent);
   }
 
-  .ecosystems {
-    margin-top: clamp(28px, 4vw, 44px);
-  }
-
-  .ecosystems-label {
-    margin-bottom: 12px;
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    letter-spacing: var(--tracking-label);
-    text-transform: uppercase;
-    color: var(--ink-soft);
-    text-align: center;
+  .ecosystems,
+  .community {
+    margin-top: clamp(48px, 6vw, 80px);
   }
 
   /* Logos and names rest at 0.7 on the light background (5:1 contrast for ink-2 on --bg). */
@@ -154,110 +123,5 @@ const t = useTranslations(locale);
     font-weight: 500;
     letter-spacing: var(--tracking-display);
     color: var(--ink-2);
-  }
-
-  .rail {
-    --edge: max(var(--gutter), calc((100vw - var(--container)) / 2));
-    position: relative;
-    overflow-x: auto;
-    overscroll-behavior-x: contain;
-    scroll-snap-type: x mandatory;
-    scroll-padding-inline: var(--edge);
-    scrollbar-width: thin;
-    scrollbar-color: rgb(17 17 17 / 0.25) transparent;
-    mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
-    -webkit-mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
-  }
-
-  .rail:focus-visible {
-    outline: 2px solid var(--ink);
-    outline-offset: -2px;
-  }
-
-  .track {
-    display: flex;
-    gap: 20px;
-    width: max-content;
-    margin: 0;
-    padding: 4px var(--edge) 20px;
-  }
-
-  .card {
-    display: flex;
-    flex-direction: column;
-    width: clamp(240px, 24vw, 280px);
-    min-height: 236px;
-    padding: 22px;
-    background: var(--surface);
-    box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
-    scroll-snap-align: start;
-    transition:
-      translate 0.3s var(--ease),
-      box-shadow 0.3s var(--ease);
-  }
-
-  .card:hover {
-    translate: 0 -4px;
-    box-shadow: var(--shadow-card);
-  }
-
-  .top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 20px;
-  }
-
-  .mark {
-    display: grid;
-    place-items: center;
-    min-width: 34px;
-    height: 34px;
-    padding-inline: 6px;
-    border: 1.5px solid var(--ink);
-    font-size: 0.62rem;
-    font-weight: 700;
-    letter-spacing: 0.02em;
-  }
-
-  time {
-    font-size: 0.8rem;
-    font-weight: 500;
-  }
-
-  .title {
-    font-size: 1.05rem;
-    font-weight: 500;
-    line-height: 1.3;
-    letter-spacing: -0.01em;
-  }
-
-  .detail {
-    margin-top: 8px;
-    font-size: 0.8rem;
-    line-height: 1.45;
-    color: var(--ink-soft);
-  }
-
-  .foot {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 4px 12px;
-    margin-top: auto;
-    padding-top: 22px;
-  }
-
-  .org {
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: var(--ink-2);
-  }
-
-  /* Target size >= 24 px (WCAG 2.5.8): .link-arrow already sets min-height. */
-  .source {
-    gap: 4px;
-    font-size: 0.75rem;
   }
 </style>

@@ -42,11 +42,12 @@ export interface Dictionary {
     /** Label of the language switcher ("Language"). */
     language: string;
     newTab: string;
-    scrollHint: string;
     /** Prefix read before the list of rotating roles ("Roles"). */
     rolesLabel: string;
     /** Floating button that scrolls back to the top. */
     backToTop: string;
+    /** Name of the header toggle that switches the dark theme on and off. */
+    darkMode: string;
   };
   nav: {
     services: string;
@@ -119,6 +120,15 @@ export interface Dictionary {
   achievements: {
     eyebrow: string;
     title: RichText;
+    /** Label of the rail of achievements and certifications. */
+    highlightsLabel: string;
+    /** The same label while there are certifications only (src/data/achievements.json empty). */
+    certificationsLabel: string;
+    /** Label of the rail of talks, hackathons and events. */
+    communityLabel: string;
+    /** Detail line of a certificate card without its own description. */
+    certification: string;
+    /** Name of the ecosystems strip, read by screen readers only. */
     ecosystemsLabel: string;
     /** Link to the public source that proves an achievement. */
     source: string;

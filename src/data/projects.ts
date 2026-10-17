@@ -1,6 +1,7 @@
 import type { Localized } from '@/i18n/locales';
+import { byFileName } from '@/lib/images';
 
-/** Every cover is drawn in HTML/CSS (no images): see ProjectCover.astro. */
+/** Drawn cover (HTML/CSS, see ProjectCover.astro) of a project without a screenshot. */
 export type CoverKind = 'checkout' | 'wallet' | 'code' | 'storage' | 'social' | 'terminal';
 
 export interface Project {
@@ -15,9 +16,55 @@ export interface Project {
   year: string;
   tech: string[];
   cover: CoverKind;
+  /** Screenshot of the live site, from src/assets/projects/ (see below). */
+  image?: ImageMetadata | undefined;
 }
 
-export const projects: Project[] = [
+/**
+ * Screenshots of the live sites, picked up by id: src/assets/projects/<id>.jpg (4:3, taken
+ * from the page the card links to). A project without one keeps its drawn cover. While
+ * the list is empty the Projects section, its menu link and its JSON-LD list stay out of
+ * the home page and the next sections renumber.
+ */
+const screenshots = byFileName(import.meta.glob<ImageMetadata>('/src/assets/projects/*.jpg', { eager: true, import: 'default' }));
+
+const entries: Project[] = [
+  {
+    id: 'stellar-snap',
+    name: 'Stellar Snap',
+    tagline: {
+      es: 'Stellar y Soroban dentro de MetaMask',
+      en: 'Stellar and Soroban inside MetaMask',
+      pt: 'Stellar e Soroban dentro do MetaMask',
+      fr: 'Stellar et Soroban dans MetaMask',
+      de: 'Stellar und Soroban in MetaMask',
+      zh: '在 MetaMask 中使用 Stellar 与 Soroban',
+      hi: 'MetaMask के अंदर Stellar और Soroban',
+    },
+    description: {
+      es: 'MetaMask Snap open source que suma cuentas de Stellar y Soroban a MetaMask: enviar, recibir, hacer swaps y firmar sin instalar otra wallet, con una API estándar SEP-43 para dApps.',
+      en: 'An open source MetaMask Snap that adds Stellar and Soroban accounts to MetaMask: send, receive, swap and sign without installing another wallet, with a standard SEP-43 API for dApps.',
+      pt: 'Um MetaMask Snap open source que adiciona contas Stellar e Soroban ao MetaMask: enviar, receber, fazer swaps e assinar sem instalar outra wallet, com uma API padrão SEP-43 para dApps.',
+      fr: 'Un MetaMask Snap open source qui ajoute des comptes Stellar et Soroban à MetaMask : envoyer, recevoir, échanger et signer sans installer d’autre wallet, avec une API standard SEP-43 pour les dApps.',
+      de: 'Ein Open-Source-MetaMask-Snap, der MetaMask Stellar- und Soroban-Konten hinzufügt: senden, empfangen, tauschen und signieren ohne weitere Wallet, mit einer Standard-API nach SEP-43 für dApps.',
+      zh: '开源 MetaMask Snap，为 MetaMask 添加 Stellar 与 Soroban 账户：无需安装其他钱包即可转账、收款、兑换和签名，并为 dApp 提供标准 SEP-43 API。',
+      hi: 'एक ओपन सोर्स MetaMask Snap जो MetaMask में Stellar और Soroban अकाउंट जोड़ता है: दूसरा वॉलेट इंस्टॉल किए बिना भेजें, पाएं, स्वैप करें और साइन करें, dApps के लिए मानक SEP-43 API के साथ।',
+    },
+    tags: {
+      es: ['MetaMask Snap', 'Open source', 'SEP-43'],
+      en: ['MetaMask Snap', 'Open source', 'SEP-43'],
+      pt: ['MetaMask Snap', 'Open source', 'SEP-43'],
+      fr: ['MetaMask Snap', 'Open source', 'SEP-43'],
+      de: ['MetaMask Snap', 'Open Source', 'SEP-43'],
+      zh: ['MetaMask Snap', '开源', 'SEP-43'],
+      hi: ['MetaMask Snap', 'ओपन सोर्स', 'SEP-43'],
+    },
+    url: 'https://snap.cosmospay.lat/',
+    repo: 'https://github.com/CosmosPay/Stellar-Snap',
+    year: '2026',
+    tech: ['TypeScript', 'MetaMask Snaps', 'Stellar', 'Soroban'],
+    cover: 'wallet',
+  },
   {
     id: 'cosmos-pay',
     name: 'Cosmos Pay',
@@ -84,152 +131,13 @@ export const projects: Project[] = [
       zh: ['浏览器扩展', 'Android', '桌面端'],
       hi: ['एक्सटेंशन', 'Android', 'डेस्कटॉप'],
     },
-    url: 'https://github.com/CosmosPay/CosmosPay-Wallet',
+    url: 'https://cosmospay.lat/wallet/',
     repo: 'https://github.com/CosmosPay/CosmosPay-Wallet',
     year: '2026',
     tech: ['TypeScript', 'Astro', 'Rust', 'Kotlin', 'Stellar'],
     cover: 'wallet',
   },
-  {
-    id: 'bancasdk',
-    name: 'BancaSDK',
-    tagline: {
-      es: 'SDK multi-banco en TypeScript',
-      en: 'Multi-bank TypeScript SDK',
-      pt: 'SDK multibanco em TypeScript',
-      fr: 'SDK multibanque en TypeScript',
-      de: 'Multibank-SDK in TypeScript',
-      zh: 'TypeScript 多银行 SDK',
-      hi: 'TypeScript में मल्टी-बैंक SDK',
-    },
-    description: {
-      es: 'Evolución de MacroClickJS, la librería para integrar la pasarela de Banco Macro que sumó 2.586 descargas en su primera semana. Un cliente unificado para integraciones bancarias.',
-      en: 'The evolution of MacroClickJS, the library for Banco Macro’s payment gateway that reached 2,586 downloads in its first week. One client for banking integrations.',
-      pt: 'Evolução do MacroClickJS, a biblioteca para integrar o gateway do Banco Macro que somou 2.586 downloads na primeira semana. Um cliente unificado para integrações bancárias.',
-      fr: 'L’évolution de MacroClickJS, la bibliothèque d’intégration de la passerelle de Banco Macro qui a atteint 2 586 téléchargements dès sa première semaine. Un client unique pour les intégrations bancaires.',
-      de: 'Die Weiterentwicklung von MacroClickJS, der Bibliothek für das Gateway der Banco Macro, die in der ersten Woche 2.586 Downloads erreichte. Ein Client für Bankintegrationen.',
-      zh: 'MacroClickJS 的演进版本：这个用于对接 Banco Macro 支付网关的库首周下载量达到 2,586 次。一个统一的银行集成客户端。',
-      hi: 'MacroClickJS का अगला रूप: Banco Macro के पेमेंट गेटवे से जुड़ने वाली लाइब्रेरी, जिसके पहले हफ़्ते में 2,586 डाउनलोड हुए। बैंकिंग इंटीग्रेशन के लिए एक यूनिफ़ाइड क्लाइंट।',
-    },
-    tags: {
-      es: ['Open source', 'npm', 'TypeScript'],
-      en: ['Open source', 'npm', 'TypeScript'],
-      pt: ['Open source', 'npm', 'TypeScript'],
-      fr: ['Open source', 'npm', 'TypeScript'],
-      de: ['Open Source', 'npm', 'TypeScript'],
-      zh: ['开源', 'npm', 'TypeScript'],
-      hi: ['ओपन सोर्स', 'npm', 'TypeScript'],
-    },
-    year: '2026',
-    tech: ['TypeScript', 'Zod', 'Vitest'],
-    cover: 'code',
-  },
-  {
-    id: 'soladb-monadb',
-    name: 'SolaDB & MonaDB',
-    tagline: {
-      es: 'Storage privado y replicado on-chain',
-      en: 'Private, replicated on-chain storage',
-      pt: 'Storage privado e replicado on-chain',
-      fr: 'Stockage privé et répliqué on-chain',
-      de: 'Privater, replizierter On-Chain-Speicher',
-      zh: '私密、多副本的链上存储',
-      hi: 'प्राइवेट, रेप्लिकेटेड ऑन-चेन स्टोरेज',
-    },
-    description: {
-      es: 'Archivos cifrados en el navegador, fragmentados con Reed-Solomon y guardados por nodos que cobran por cada copia, verificada con pruebas de almacenamiento on-chain.',
-      en: 'Files encrypted in the browser, sharded with Reed-Solomon and kept by nodes paid for every copy, checked with on-chain storage proofs.',
-      pt: 'Arquivos criptografados no navegador, fragmentados com Reed-Solomon e guardados por nós que recebem por cada cópia, verificada com provas de armazenamento on-chain.',
-      fr: 'Des fichiers chiffrés dans le navigateur, fragmentés avec Reed-Solomon et conservés par des nœuds rémunérés pour chaque copie, vérifiée par des preuves de stockage on-chain.',
-      de: 'Dateien werden im Browser verschlüsselt, mit Reed-Solomon fragmentiert und von Nodes gespeichert, die für jede Kopie bezahlt werden, geprüft mit On-Chain-Speichernachweisen.',
-      zh: '文件在浏览器中加密，经 Reed-Solomon 分片后由节点保存；每份副本都通过链上存储证明验证，节点按副本获得报酬。',
-      hi: 'फ़ाइलें ब्राउज़र में एन्क्रिप्ट होती हैं, Reed-Solomon से टुकड़ों में बँटती हैं और ऐसे नोड्स पर रखी जाती हैं जिन्हें हर कॉपी का भुगतान मिलता है, ऑन-चेन स्टोरेज प्रूफ़ से सत्यापित।',
-    },
-    tags: {
-      es: ['Protocolo', 'Solana', 'Monad'],
-      en: ['Protocol', 'Solana', 'Monad'],
-      pt: ['Protocolo', 'Solana', 'Monad'],
-      fr: ['Protocole', 'Solana', 'Monad'],
-      de: ['Protokoll', 'Solana', 'Monad'],
-      zh: ['协议', 'Solana', 'Monad'],
-      hi: ['प्रोटोकॉल', 'Solana', 'Monad'],
-    },
-    url: 'https://github.com/Emanuel250YT/SolaDB',
-    repo: 'https://github.com/Emanuel250YT/SolaDB',
-    year: '2026',
-    tech: ['Rust', 'Solidity', 'TypeScript'],
-    cover: 'storage',
-  },
-  {
-    id: 'aside-arkacdn',
-    name: 'ASide & ArkaCDN',
-    tagline: {
-      es: 'SDKs para construir sobre Arkiv',
-      en: 'SDKs to build on Arkiv',
-      pt: 'SDKs para construir sobre a Arkiv',
-      fr: 'Des SDK pour construire sur Arkiv',
-      de: 'SDKs zum Bauen auf Arkiv',
-      zh: '基于 Arkiv 构建的 SDK',
-      hi: 'Arkiv पर बनाने के लिए SDK',
-    },
-    description: {
-      es: 'ArkaCDN convierte a Arkiv en una capa de distribución de contenido; ASide suma perfiles, grafo social, feed, eventos y más de 70 features. 912 descargas en sus primeros 3 días.',
-      en: 'ArkaCDN turns Arkiv into a content distribution layer; ASide adds profiles, a social graph, feeds, events and 70+ features. 912 downloads in their first 3 days.',
-      pt: 'O ArkaCDN transforma a Arkiv em uma camada de distribuição de conteúdo; o ASide adiciona perfis, grafo social, feed, eventos e mais de 70 recursos. 912 downloads nos primeiros 3 dias.',
-      fr: 'ArkaCDN fait d’Arkiv une couche de distribution de contenu ; ASide ajoute profils, graphe social, fil d’actualité, événements et plus de 70 fonctionnalités. 912 téléchargements en 3 jours.',
-      de: 'ArkaCDN macht Arkiv zur Content-Distributionsschicht; ASide ergänzt Profile, Social Graph, Feed, Events und über 70 Features. 912 Downloads in den ersten 3 Tagen.',
-      zh: 'ArkaCDN 把 Arkiv 变成内容分发层；ASide 在此之上提供个人资料、社交关系、动态流、活动等 70 多项功能。前 3 天下载 912 次。',
-      hi: 'ArkaCDN, Arkiv को कंटेंट डिस्ट्रीब्यूशन लेयर बनाता है; ASide उसमें प्रोफ़ाइल, सोशल ग्राफ़, फ़ीड, इवेंट्स और 70 से ज़्यादा फ़ीचर्स जोड़ता है। पहले 3 दिनों में 912 डाउनलोड।',
-    },
-    tags: {
-      es: ['Open source', 'npm', 'Arkiv'],
-      en: ['Open source', 'npm', 'Arkiv'],
-      pt: ['Open source', 'npm', 'Arkiv'],
-      fr: ['Open source', 'npm', 'Arkiv'],
-      de: ['Open Source', 'npm', 'Arkiv'],
-      zh: ['开源', 'npm', 'Arkiv'],
-      hi: ['ओपन सोर्स', 'npm', 'Arkiv'],
-    },
-    url: 'https://aside.cloudycoding.com',
-    repo: 'https://github.com/Emanuel250YT/ASide',
-    year: '2026',
-    tech: ['TypeScript', 'WebCrypto', 'Arkiv'],
-    cover: 'social',
-  },
-  {
-    id: 'stellar-orchestra',
-    name: 'StellarOrchestra',
-    tagline: {
-      es: 'Agentes de IA que cobran con x402',
-      en: 'AI agents that get paid via x402',
-      pt: 'Agentes de IA que cobram com x402',
-      fr: 'Des agents IA payés via x402',
-      de: 'KI-Agenten, die per x402 bezahlt werden',
-      zh: '通过 x402 收费的 AI 智能体',
-      hi: 'x402 से भुगतान पाने वाले AI एजेंट',
-    },
-    description: {
-      es: 'Orquestador self-hosted de agentes de IA: registrás tus agentes, compartís API keys y cobrás por tarea con pagos x402 sobre Stellar.',
-      en: 'A self-hosted AI agent orchestrator: register your agents, share API keys and charge per task with x402 payments on Stellar.',
-      pt: 'Orquestrador self-hosted de agentes de IA: você registra seus agentes, compartilha API keys e cobra por tarefa com pagamentos x402 na Stellar.',
-      fr: 'Un orchestrateur d’agents IA auto-hébergé : enregistrez vos agents, partagez des clés d’API et facturez chaque tâche avec des paiements x402 sur Stellar.',
-      de: 'Ein selbst gehosteter Orchestrator für KI-Agenten: Agenten registrieren, API-Keys teilen und pro Aufgabe mit x402-Zahlungen auf Stellar abrechnen.',
-      zh: '可自托管的 AI 智能体编排器：注册你的智能体、分享 API 密钥，并通过 Stellar 上的 x402 支付按任务收费。',
-      hi: 'सेल्फ़-होस्टेड AI एजेंट ऑर्केस्ट्रेटर: अपने एजेंट रजिस्टर करें, API कीज़ साझा करें और Stellar पर x402 पेमेंट्स से हर टास्क का शुल्क लें।',
-    },
-    tags: {
-      es: ['IA', 'Stellar', 'x402'],
-      en: ['AI', 'Stellar', 'x402'],
-      pt: ['IA', 'Stellar', 'x402'],
-      fr: ['IA', 'Stellar', 'x402'],
-      de: ['KI', 'Stellar', 'x402'],
-      zh: ['AI', 'Stellar', 'x402'],
-      hi: ['AI', 'Stellar', 'x402'],
-    },
-    url: 'https://github.com/Emanuel250YT/StellarOrchestra',
-    repo: 'https://github.com/Emanuel250YT/StellarOrchestra',
-    year: '2026',
-    tech: ['TypeScript', 'Node.js', 'Stellar', 'Cloudflare Tunnel'],
-    cover: 'terminal',
-  },
+
 ];
+
+export const projects: Project[] = entries.map((project) => ({ ...project, image: screenshots[project.id] }));

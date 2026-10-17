@@ -1,6 +1,4 @@
 ---
-import { Image } from 'astro:assets';
-import avatar from '@/assets/avatar.png';
 import { site } from '@/config/site';
 import Icon, { type IconName } from '@/components/ui/Icon.astro';
 import { useTranslations } from '@/i18n';
@@ -52,7 +50,7 @@ const socials: { label: string; href: string; icon: IconName }[] = [
       </a>
       <div class="channels">
         <a class="channel" href={`mailto:${site.email}`} data-track="contact_click" data-track-method="email_footer">
-          <Image src={avatar} alt="" width={30} height={30} densities={[1, 2]} class="channel-avatar" />
+          <span class="channel-icon"><Icon name="mail" size={16} /></span>
           {site.email}
         </a>
         <a
@@ -215,12 +213,10 @@ const socials: { label: string; href: string; icon: IconName }[] = [
     translate: 0 -2px;
   }
 
-  .channel :global(.channel-avatar),
   .channel-icon {
     flex: none;
     width: 30px;
     height: 30px;
-    object-fit: cover;
   }
 
   .channel-icon {

@@ -6,6 +6,7 @@ import Hero from '@/components/sections/Hero.astro';
 import Process from '@/components/sections/Process.astro';
 import Projects from '@/components/sections/Projects.astro';
 import Services from '@/components/sections/Services.astro';
+import { projects } from '@/data/projects';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { useTranslations } from '@/i18n';
 import type { Locale } from '@/i18n/locales';
@@ -28,6 +29,9 @@ const { locale } = Astro.props;
 const t = useTranslations(locale);
 
 const portrait = await portraitRef();
+// Projects stays out while src/data/projects.ts is empty; the sections after it renumber.
+const hasProjects = projects.length > 0;
+const after = hasProjects ? 5 : 4;
 
 const jsonLd = graph([
   personNode(locale, portrait, { offers: true }),
@@ -41,7 +45,7 @@ const jsonLd = graph([
     type: 'ProfilePage',
     image: portrait,
   }),
-  projectListNode(locale),
+  ...(hasProjects ? [projectListNode(locale)] : []),
   serviceCatalogNode(locale),
 ]);
 ---
@@ -52,7 +56,7 @@ const jsonLd = graph([
   <About locale={locale} index={1} />
   <Services locale={locale} index={2} />
   <Process locale={locale} index={3} />
-  <Projects locale={locale} index={4} />
-  <Achievements locale={locale} index={5} />
-  <Contact locale={locale} index={6} />
+  {hasProjects && <Projects locale={locale} index={4} />}
+  <Achievements locale={locale} index={after} />
+  <Contact locale={locale} index={after + 1} />
 </BaseLayout>

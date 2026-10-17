@@ -224,8 +224,13 @@ for (const { prefix } of Object.values(LOCALES)) {
   const file = path.join(dist, prefix, 'index.html');
   if (!existsSync(file)) continue;
   const html = await readFile(file, 'utf8');
-  for (const id of ['services', 'process', 'about', 'projects', 'achievements', 'contact']) {
+  for (const id of ['services', 'process', 'about', 'achievements', 'contact']) {
     if (!html.includes(`id="${id}"`)) fail(`/${prefix}`, `missing section #${id}`);
+  }
+  // Projects is left out while src/data/projects.ts is empty; every same-page link must
+  // resolve (#top needs no target: browsers scroll it to the top of the page).
+  for (const [, id] of html.matchAll(/href="#([\w-]+)"/g)) {
+    if (id !== 'top' && !html.includes(`id="${id}"`)) fail(`/${prefix}`, `link to #${id} without a target`);
   }
   if (!/<form[^>]*data-contact-form/.test(html)) fail(`/${prefix}`, 'missing contact form');
   // The npm stat is fetched at build time: a page without the number means the API failed.

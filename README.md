@@ -37,8 +37,8 @@ npm run assets    # regenerates portraits, icons and Open Graph images (needs Ch
 ## Page structure
 
 Hero (typed rotating roles, primary CTA) → About → Services (4, each with its own CTA that
-preselects the service in the form) → Process (4 views pinned while you scroll: illustration, description and actions) → Projects → Achievements and
-ecosystems → Contact (form by email or WhatsApp + what happens next + direct channels) →
+preselects the service in the form) → Process (4 views pinned while you scroll: illustration, description and actions) → Projects → Achievements
+(cards like the projects: achievements and certifications, the ecosystems strip, then community) → Contact (form by email or WhatsApp + what happens next + direct channels) →
 Footer. Every page has floating WhatsApp and back-to-top buttons at the bottom right.
 
 ## Editing content
@@ -48,7 +48,10 @@ Footer. Every page has floating WhatsApp and back-to-top buttons at the bottom r
 | Interface copy (per language) | `src/i18n/<locale>.ts` (`es`, `en`, `pt`, `fr`, `de`, `zh`, `hi`) |
 | Rotating roles in the hero | `hero.roles` in each dictionary |
 | Services | `src/data/services.ts` |
-| Projects / achievements | `src/data/projects.ts`, `src/data/achievements.ts` |
+| Projects (the section hides itself if the list is empty) | `src/data/projects.ts`; screenshot of its site: `src/assets/projects/<id>.jpg` (4:3) |
+| Photo of a community card (from its LinkedIn post) | `src/assets/community/<id>.jpg` |
+| Achievements, certifications, community (talks, hackathons) | `src/data/achievements.json`, `certifications.json`, `community.json` |
+| Image of a certificate (PNG: official badge; JPG: the certificate itself, without ID numbers) | `src/assets/certifications/<id>.png` or `.jpg`; a certificate without a public page: also `public/certifications/<id>.jpg`, linked from its `url` |
 | Work experience (About section + JSON-LD) | `src/data/experience.json` |
 | Education, certifications, skills (JSON-LD) | `src/data/resume.ts` |
 | npm packages and organisations counted in the downloads stat | `src/data/npm.ts` |

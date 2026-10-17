@@ -2,6 +2,8 @@
 import { site } from '@/config/site';
 import Icon from '@/components/ui/Icon.astro';
 import LanguageSwitcher from '@/components/ui/LanguageSwitcher.astro';
+import ThemeToggle from '@/components/ui/ThemeToggle.astro';
+import { projects } from '@/data/projects';
 import { useTranslations } from '@/i18n';
 import { localePath, type Locale } from '@/i18n/locales';
 
@@ -20,7 +22,8 @@ const links = [
   { id: 'about', label: t.nav.about },
   { id: 'services', label: t.nav.services },
   { id: 'process', label: t.nav.process },
-  { id: 'projects', label: t.nav.projects },
+  // The Projects section is left out of the home page while there are none.
+  ...(projects.length > 0 ? [{ id: 'projects', label: t.nav.projects }] : []),
   { id: 'achievements', label: t.nav.achievements },
 ];
 ---
@@ -70,6 +73,7 @@ const links = [
           <Icon name="arrow-right" size={16} class="btn-arrow" />
         </a>
         <LanguageSwitcher locale={locale} path={path} />
+        <ThemeToggle locale={locale} />
       </div>
     </nav>
   </div>
@@ -147,7 +151,7 @@ const links = [
     position: sticky;
     top: 0;
     z-index: 50;
-    background: rgb(243 243 243 / 0.92);
+    background: color-mix(in srgb, var(--bg) 92%, transparent);
     backdrop-filter: saturate(1.4) blur(14px);
     -webkit-backdrop-filter: saturate(1.4) blur(14px);
     border-bottom: 1px solid transparent;

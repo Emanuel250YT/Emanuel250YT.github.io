@@ -1,0 +1,278 @@
+---
+import HighlightCover from '@/components/achievements/HighlightCover.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { highlightUrl, localize, type Highlight } from '@/data/highlights';
+import { useTranslations } from '@/i18n';
+import type { Locale } from '@/i18n/locales';
+import { formatMonth } from '@/lib/format';
+
+/**
+ * A labelled grid of highlight cards (src/data/highlights.ts), laid out like the
+ * project cards: cover (drawn, or the certificate's official image), title,
+ * organisation and date, one line of detail and, when there is one, a link to the
+ * public source that makes the whole card clickable. A card with several credentials
+ * lists one link per credential; the first one is the card's own link. The list is
+ * named after its visible label.
+ */
+interface Props {
+  locale: Locale;
+  label: string;
+  /** id of the visible label, unique in the page. */
+  labelId: string;
+  items: Highlight[];
+}
+
+const { locale, label, labelId, items } = Astro.props;
+const t = useTranslations(locale);
+---
+
+<div class="highlights">
+  <p class="label" id={labelId}>{label}</p>
+  <ul class="grid" role="list" aria-labelledby={labelId} data-reveal-stagger>
+    {
+      items.map((item) => {
+        const title = localize(item.title, locale);
+        const url = highlightUrl(item);
+        return (
+          <li data-reveal>
+            <article class:list={['card', { 'card--linked': url }]} aria-labelledby={`highlight-${item.id}`}>
+              <div class="media">
+                <HighlightCover kind={item.kind} mark={item.mark} image={item.image} />
+                {url && (
+                  <span class="go" aria-hidden="true">
+                    <Icon name="arrow-up-right" size={16} />
+                  </span>
+                )}
+              </div>
+              <div class="body">
+                <h3 id={`highlight-${item.id}`} class="name">
+                  {title}
+                </h3>
+                <p class="meta">
+                  <span>{item.org}</span>
+                  <time datetime={item.date}>{formatMonth(item.date, locale)}</time>
+                </p>
+                <p class="desc">{item.detail ? item.detail[locale] : t.achievements.certification}</p>
+                {item.credentials && (
+                  <ul class="credentials" role="list">
+                    {item.credentials.map((credential, position) => (
+                      <li>
+                        <a
+                          class:list={['source', 'link-arrow', position === 0 ? 'stretched' : 'over']}
+                          href={credential.url}
+                          target="_blank"
+                          rel="noopener"
+                        >
+                          {credential.name}
+                          <span class="visually-hidden">
+                            : {title} {t.a11y.newTab}
+                          </span>
+                          <Icon name="arrow-up-right" size={14} />
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {item.url && (
+                  <a class="source link-arrow stretched" href={item.url} target="_blank" rel="noopener">
+                    {t.achievements.source}
+                    <span class="visually-hidden">
+                      : {title} {t.a11y.newTab}
+                    </span>
+                    <Icon name="arrow-up-right" size={14} />
+                  </a>
+                )}
+              </div>
+            </article>
+          </li>
+        );
+      })
+    }
+  </ul>
+</div>
+
+<style>
+  .label {
+    margin-bottom: 20px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: clamp(24px, 3vw, 36px) clamp(16px, 2.2vw, 28px);
+    margin: 0;
+  }
+
+  .card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .media {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .go {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: var(--shadow-card);
+    opacity: 0;
+    transform: translateY(-4px);
+    transition:
+      opacity 0.3s var(--ease),
+      transform 0.3s var(--ease);
+  }
+
+  .card--linked:hover .go,
+  .card--linked:focus-within .go {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .card--linked:hover .media :global(.art) {
+      scale: 1.06;
+    }
+  }
+
+  /* An official image takes its colours under the pointer or focus (HighlightCover). */
+  .card:hover,
+  .card:focus-within {
+    --shot-gray: 0;
+  }
+
+  .body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    margin-top: 16px;
+  }
+
+  .name {
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 2px 12px;
+    margin-top: 6px;
+    font-size: 0.75rem;
+    color: var(--ink-soft);
+  }
+
+  /* Stays on the right when a long organisation pushes it to a second line. */
+  .meta time {
+    margin-left: auto;
+    white-space: nowrap;
+  }
+
+  .desc {
+    margin-top: 10px;
+    font-size: 0.85rem;
+    line-height: 1.55;
+    color: var(--ink-soft);
+  }
+
+  /* Target size >= 24 px (WCAG 2.5.8): .link-arrow already sets min-height. */
+  .source {
+    align-self: flex-start;
+    gap: 4px;
+    margin-top: auto;
+    padding-top: 10px;
+    font-size: 0.8rem;
+  }
+
+  /* One link per credential, wrapping; they take the place of "See source". */
+  .credentials {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 14px;
+    margin: auto 0 0;
+    padding-top: 10px;
+  }
+
+  .credentials .source {
+    margin-top: 0;
+    padding-top: 0;
+  }
+
+  /* Every credential link but the first sits above the card's stretched link. */
+  .over {
+    position: relative;
+    z-index: 2;
+  }
+
+  /* The whole card is clickable without nesting content inside the <a>. */
+  .stretched::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+
+  .stretched:focus-visible {
+    outline: none;
+  }
+
+  .card:has(.stretched:focus-visible) {
+    outline: 2px solid var(--ink);
+    outline-offset: 6px;
+  }
+
+  @media (max-width: 960px) {
+    .grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  /* One column of compact rows: a square thumbnail beside the text. */
+  @media (max-width: 600px) {
+    .grid {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    .card {
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .media {
+      flex: none;
+      width: 88px;
+    }
+
+    .media :global(.hcover) {
+      aspect-ratio: 1;
+    }
+
+    .go {
+      display: none;
+    }
+
+    .body {
+      margin-top: 0;
+    }
+  }
+</style>

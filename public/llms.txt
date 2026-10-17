@@ -6,7 +6,7 @@ The site is available in Spanish (default), English, Portuguese, French, German,
 
 ## Pages
 
-- [Portfolio](https://emanuel250.dev.ar/en/): projects, achievements and contact (English)
+- [Portfolio](https://emanuel250.dev.ar/en/): services, projects, certifications, community and contact (English)
 - [CV (PDF)](https://emanuel250.dev.ar/en/cv/emanuel-guzman-cv.pdf): experience, education and certifications; Spanish at https://emanuel250.dev.ar/cv/emanuel-guzman-cv.pdf
 - [Privacy policy](https://emanuel250.dev.ar/en/privacy/)
 - Other languages: [Español](https://emanuel250.dev.ar/), [Português](https://emanuel250.dev.ar/pt/), [Français](https://emanuel250.dev.ar/fr/), [Deutsch](https://emanuel250.dev.ar/de/), [中文](https://emanuel250.dev.ar/zh/), [हिन्दी](https://emanuel250.dev.ar/hi/)
@@ -31,21 +31,27 @@ How a project runs: a 30-minute diagnosis call, a written proposal with scope, t
 
 ## Projects
 
+- [Stellar Snap](https://snap.cosmospay.lat/): open source MetaMask Snap that adds Stellar and Soroban accounts to MetaMask (send, receive, swap, sign; SEP-43 API for dApps). Code: https://github.com/CosmosPay/Stellar-Snap
 - [Cosmos Pay](https://cosmospay.lat): payment gateway for developers in Latin America (payment intents, webhooks, stablecoins, fiat ramps)
-- [Cosmos Pay Wallet](https://github.com/CosmosPay/CosmosPay-Wallet): non-custodial Stellar wallet (browser extension, Android, web, desktop)
-- BancaSDK: multi-bank TypeScript SDK, the evolution of MacroClickJS (2,586 npm downloads in its first week)
-- [SolaDB](https://github.com/Emanuel250YT/SolaDB) and [MonaDB](https://github.com/Emanuel250YT/MonaDB): private, replicated storage on Solana and Monad
-- [ASide](https://github.com/Emanuel250YT/ASide) and [ArkaCDN](https://github.com/Emanuel250YT/arka-cdn): SDKs to build on Arkiv (912 npm downloads in their first 3 days)
-- [StellarOrchestra](https://github.com/Emanuel250YT/StellarOrchestra): AI agent orchestrator with x402 payments on Stellar
+- [Cosmos Pay Wallet](https://cosmospay.lat/wallet/): non-custodial Stellar wallet (browser extension, Android, web, desktop). Code: https://github.com/CosmosPay/CosmosPay-Wallet
 
-## Achievements
+## Certifications
+
+- Checkout Pro, Mercado Libre (2025)
+- Verified by Talently: TypeScript, JavaScript, Node.js, Express.js, React, Python (2025)
+- NASA Open Science 101, NASA (2024)
+- Taller Alta Ciencia Abierta, MetaDocencia (2024)
+- Full Modern React, MindLuster (2023)
+- Python Essentials 1, Cisco Networking Academy (2023)
+- Introducción Java Back-end Developer Junior, UBA Económicas · Argentina Programa 4.0 (2023)
+
+## Community
 
 - Selected for the Scale Track of Código Alebrije 2026 (Mexico City) with Cosmos, by the Stellar Development Foundation and BAF
 - Builder at ImpactaBootcamp 2026: Soroban and trustless escrow, by Trustless Work and BAF
 - Speaker at Blockchain Salta 2025 (DESAFIA, SaltaDev)
 - Sponsor of Hackathon del Milagro 2025 with CloudyCoding: free hosting for the winning projects
 - Hacker at a global Ethereum hackathon and at ETH Argentina (2025)
-- NASA Open Science certificate (2024)
 
 Download numbers come from npm's public API; the home page shows the live total of every package he publishes or collaborates on: his own (https://www.npmjs.com/~emanuel250dev) and every package of the cosmosapp organization (https://www.npmjs.com/org/cosmosapp).
 

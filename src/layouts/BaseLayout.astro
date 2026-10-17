@@ -54,6 +54,14 @@ const alternateLocales = locales.filter((code) => code !== locale);
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <!-- Flags JS support before first paint so reveal animations never flash content. -->
     <script is:inline>document.documentElement.classList.add('js');</script>
+    <!-- A theme picked with the header toggle (src/scripts/theme.ts) applies before the first
+         paint, so the page never flashes in the other theme. Without one, CSS follows the system. -->
+    <script is:inline>
+      try {
+        const theme = localStorage.getItem('theme');
+        if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;
+      } catch {}
+    </script>
     <title>{title}</title>
     <meta name="description" content={description} />
     {!noindex && <link rel="canonical" href={canonical} />}
@@ -64,8 +72,9 @@ const alternateLocales = locales.filter((code) => code !== locale);
     <meta name="author" content={site.name} />
     <meta name="creator" content={site.name} />
     <meta name="keywords" content={t.meta.keywords.join(', ')} />
-    <meta name="theme-color" content="#f3f3f3" />
-    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#f3f3f3" media="(prefers-color-scheme: light)" data-theme-color />
+    <meta name="theme-color" content="#121212" media="(prefers-color-scheme: dark)" data-theme-color />
+    <meta name="color-scheme" content="light dark" />
     <meta name="format-detection" content="telephone=no" />
     <meta name="generator" content={Astro.generator} />
 
@@ -134,6 +143,7 @@ const alternateLocales = locales.filter((code) => code !== locale);
     <script>
       import '@/scripts/motion';
       import '@/scripts/typing';
+      import '@/scripts/theme';
       import '@/scripts/cursor';
     </script>
   </body>
@@ -147,7 +157,7 @@ const alternateLocales = locales.filter((code) => code !== locale);
     z-index: 100;
     padding: 10px 16px;
     background: var(--ink);
-    color: #fff;
+    color: var(--on-ink);
     font-weight: 500;
     text-decoration: none;
     transform: translateY(-200%);

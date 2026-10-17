@@ -10,9 +10,18 @@
   --muted: #858585;
   --line: rgb(17 17 17 / 0.14);
   --line-strong: rgb(17 17 17 / 0.85);
+  /* Text and icons on an --ink background (solid buttons, check boxes, numbers) */
+  --on-ink: #ffffff;
   /* Square block behind the hero portrait, for contrast */
   --backdrop: #d9d9d9;
+  --placeholder: #6b6b6b;
+  --error: #b91c1c;
+  --error-bg: #fef2f2;
+  --error-ink: #991b1b;
+  --photo-filter: none;
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.04), 0 8px 24px rgb(0 0 0 / 0.06);
 
+  /* Bands that stay dark in both themes (about, footer, consent banner) */
   --dark: #111111;
   --dark-2: #191919;
   --on-dark: #ffffff;
@@ -33,7 +42,6 @@
   --gutter: clamp(16px, 5vw, 64px);
   --header-h: 64px;
 
-  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.04), 0 8px 24px rgb(0 0 0 / 0.06);
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
 
   /* Display typography tokens, retuned per script below */
@@ -42,6 +50,56 @@
   --tracking-label: 0.12em;
   --leading-display: 1.12;
   --leading-hero: 1.08;
+}
+
+/* Dark theme: follows the system unless the visitor picked a theme with the header
+   toggle (`data-theme` on <html>, set before the first paint). Same monochrome
+   language, inverted; the dark bands go black so they still stand apart. Keep the
+   two blocks identical. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --bg: #121212;
+    --surface: #1c1c1c;
+    --ink: #f2f2f2;
+    --ink-2: #d9d9d9;
+    --ink-soft: #a6a6a6;
+    --muted: #7d7d7d;
+    --line: rgb(255 255 255 / 0.14);
+    --line-strong: rgb(255 255 255 / 0.85);
+    --on-ink: #111111;
+    --backdrop: #2a2a2a;
+    --placeholder: #8f8f8f;
+    --error: #f87171;
+    --error-bg: #3b1414;
+    --error-ink: #fecaca;
+    --photo-filter: brightness(0.88);
+    --shadow-card: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px rgb(0 0 0 / 0.45);
+    --dark: #000000;
+    --dark-2: #0c0c0c;
+  }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #121212;
+  --surface: #1c1c1c;
+  --ink: #f2f2f2;
+  --ink-2: #d9d9d9;
+  --ink-soft: #a6a6a6;
+  --muted: #7d7d7d;
+  --line: rgb(255 255 255 / 0.14);
+  --line-strong: rgb(255 255 255 / 0.85);
+  --on-ink: #111111;
+  --backdrop: #2a2a2a;
+  --placeholder: #8f8f8f;
+  --error: #f87171;
+  --error-bg: #3b1414;
+  --error-ink: #fecaca;
+  --photo-filter: brightness(0.88);
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px rgb(0 0 0 / 0.45);
+  --dark: #000000;
+  --dark-2: #0c0c0c;
 }
 
 /*
@@ -228,11 +286,11 @@ button {
 
 .btn--solid {
   background: var(--ink);
-  color: #fff;
+  color: var(--on-ink);
 }
 
 .btn--solid:hover {
-  background: #2d2d2d;
+  background: color-mix(in srgb, var(--ink) 86%, var(--bg));
 }
 
 .btn--frame {
@@ -312,7 +370,7 @@ button {
 
 .btn--light {
   background: #fff;
-  color: var(--ink);
+  color: #111111;
 }
 
 .btn--light:hover {
@@ -716,5 +774,22 @@ html.js [data-type]:not([data-type-ready]) {
   .cursor-pulse,
   .type-caret {
     display: none !important;
+  }
+}
+
+/* Theme switch (src/scripts/theme.ts): a plain cross-fade of the whole page, whatever
+   the motion preference (the page-navigation transition slides; this one never moves). */
+html.theme-switching::view-transition-old(root),
+html.theme-switching::view-transition-new(root) {
+  animation: vt-theme 0.35s var(--ease) both;
+}
+
+html.theme-switching::view-transition-old(root) {
+  animation-direction: reverse;
+}
+
+@keyframes vt-theme {
+  from {
+    opacity: 0;
   }
 }

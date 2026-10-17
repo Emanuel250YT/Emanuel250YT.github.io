@@ -205,8 +205,8 @@ const formatCount = new Intl.NumberFormat(localeMeta[locale].htmlLang);
     padding-block: clamp(28px, 4vw, 52px) 0;
     background-color: var(--bg);
     background-image:
-      linear-gradient(rgb(17 17 17 / 0.055) 1px, transparent 1px),
-      linear-gradient(90deg, rgb(17 17 17 / 0.055) 1px, transparent 1px);
+      linear-gradient(color-mix(in srgb, var(--ink) 5.5%, transparent) 1px, transparent 1px),
+      linear-gradient(90deg, color-mix(in srgb, var(--ink) 5.5%, transparent) 1px, transparent 1px);
     background-size: 28px 28px;
     background-position: -1px -1px;
     overflow: hidden;

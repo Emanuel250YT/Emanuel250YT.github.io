@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Generates the binary assets that are committed to the repository:
- *   - src/assets/portrait.png, src/assets/avatar.png  (black & white, from assets-src/portrait.png)
+ *   - src/assets/portrait.png                         (black & white, from assets-src/portrait.png)
  *   - src/assets/process/<step>.jpg                    (black & white, from assets-src/process)
  *   - public/favicon.ico, apple-touch-icon.png, icon-192/512.png, icon-maskable-512.png
  *   - public/og/og-<locale>.png                        (1200x630, one per locale)
@@ -66,16 +66,12 @@ function run(command, args, options = {}) {
   });
 }
 
-/** Black & white hero portrait and footer avatar, both keeping the transparent background. */
+/** Black & white hero portrait, keeping the transparent background. */
 async function portraits() {
   const source = path.join(root, 'assets-src', 'portrait.png');
   const bw = (image) => image.grayscale().linear(1.06, -6);
   const trimmed = await sharp(source).trim({ threshold: 1 }).toBuffer();
   await bw(sharp(trimmed)).png({ compressionLevel: 9 }).toFile(path.join(root, 'src/assets/portrait.png'));
-  await bw(sharp(source).extract({ left: 240, top: 35, width: 300, height: 300 }))
-    .resize(160, 160)
-    .png({ compressionLevel: 9 })
-    .toFile(path.join(root, 'src/assets/avatar.png'));
   console.log('✓ portraits');
 }
 

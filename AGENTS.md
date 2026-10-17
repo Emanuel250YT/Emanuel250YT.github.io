@@ -31,23 +31,31 @@ assets-src/process/       the four process photos (generated with Higgsfield; pr
 src/
   config/site.ts          identity, WhatsApp, contact form endpoint, GA4/GTM IDs, search-engine verification
   i18n/                   locales.ts (languages, URLs, flags), types.ts (Dictionary), one file per locale
-  data/                   services.ts, projects.ts, achievements.ts, resume.ts, contact.ts (form values),
+  assets/certifications/  official badge or certificate image per certification (<id>.png|jpg)
+  assets/community/       event photo per community card, from the owner's LinkedIn posts (<id>.jpg)
+  assets/projects/        screenshot of each project's live site (<id>.jpg, 4:3)
+  data/                   services.ts, projects.ts, resume.ts, contact.ts (form values),
+                          achievements.json, certifications.json, community.json (typed by highlights.ts),
                           technologies.ts (carousel: names + logo paths from Simple Icons / Devicon),
                           ecosystems.ts (ecosystems strip: names + logos),
                           npm.ts (packages and npm orgs whose downloads are counted),
                           experience.json (work experience, read through resume.ts)
   lib/                    schema.ts (JSON-LD), portrait.ts (JSON-LD image), npm.ts (npm registry + downloads API), fonts.ts (@font-face), format.ts (dates),
-                          cv.ts (uploaded PDF paths), whatsapp.ts (wa.me links), graphemes.ts (character splitting for typing)
-  scripts/                motion.ts (reveal + count-up), typing.ts (typed headings), cursor.ts (animated cursor), analytics.ts (consent + GA4 events)
+                          cv.ts (uploaded PDF paths), images.ts (asset images by file name), whatsapp.ts (wa.me links), graphemes.ts (character splitting for typing)
+  scripts/                motion.ts (reveal + count-up), typing.ts (typed headings), theme.ts (dark mode toggle),
+                          cursor.ts (animated cursor), analytics.ts (consent + GA4 events)
   layouts/BaseLayout.astro  full <head>, js flag, header/footer, floating actions, consent banner, motion + typing + cursor scripts
   components/
     sections/             Header, Hero, About, Services, Process, Projects, Achievements, Contact, Footer
     contact/ContactForm.astro    the lead form (email or WhatsApp, validation, AJAX, no-JS fallback)
     analytics/ConsentBanner.astro GA4 consent banner (rendered only when an ID is set)
-    projects/ProjectCover.astro  HTML/CSS illustrated covers (decorative)
+    projects/ProjectCover.astro  HTML/CSS illustrated covers (decorative), for a project without a screenshot
+    achievements/HighlightGrid.astro  labelled grid of highlight cards, laid out like the project cards
+    achievements/HighlightCover.astro HTML/CSS covers of those cards, one drawing per kind (decorative)
     pages/                HomePage, PrivacyPage: real pages, parameterised by locale
     ui/                   Icon, Flag, LanguageSwitcher, RichHeading, SectionHeader, FloatingActions,
-                          Marquee (infinite carousel), TechCarousel, BrandLogo (sprite symbol or PNG mask)
+                          Marquee (infinite carousel), TechCarousel, BrandLogo (sprite symbol or PNG mask),
+                          ThemeToggle (dark mode switch, sun and moon icons)
   pages/                  index, privacy, 404 (default locale), [lang]/{index,privacy} and logos.svg.ts
                           (logo sprite built from technologies.ts + ecosystems.ts)
   styles/global.css       tokens, reset, buttons, motion, cursor, per-script typography
@@ -82,6 +90,36 @@ honoured by Astro/Vite). Type imports too: `import type { Locale } from '@/i18n/
   hand; `resume.ts` types it as `Role[]`, so a missing field or language fails
   `npm run check`); give every company its `companyUrl` when it has a site. The home page, the JSON-LD and `llms.txt` derive from it:
   update it once.
+- **Highlights are split by kind**, three JSON files with one shape (`Highlight` in
+  `src/data/highlights.ts`: id, date, title, detail, org, mark, url, credentials):
+  `achievements.json` (milestones; empty since October 2026: the owner removed the npm
+  download records and moved the Scale Track selection to community), `certifications.json`
+  (certificates; a certificate keeps its official name as one string and reads
+  "Certification" without a detail; also the JSON-LD `hasCredential`) and `community.json`
+  (selections, talks, hackathons, bootcamps, sponsorships). The achievements section, laid
+  out like Projects, shows a grid of achievements + certifications (labelled
+  "Certifications" while `achievements.json` is empty; 4 → 2 columns, compact rows with
+  a square thumbnail ≤ 600 px), then the ecosystems strip, then the "Community" grid. Each
+  card has an HTML/CSS cover drawn from its kind (plate, certificate, event pass) and its
+  `mark`; a card with a `url` links to it as "See source" and is clickable as a whole.
+  **Certificates show their official image, never a drawn or generated one when it
+  exists**, saved as `src/assets/certifications/<id>.png|jpg` (picked up by file name): a
+  transparent PNG is the issuer's badge (Credly, the Mercado Pago badge kit), a JPG is the
+  certificate itself (a capture of its credential page when the issuer offers no image
+  file, or the owner's PDF). It is grey like the photos and takes its colours when the card
+  is pointed at or focused. Every certificate links to its credential page (`url`; the
+  Mercado Pago one asks for a login); one card for several credentials of the same issuer
+  (Talently) lists them in `credentials`, one link each, the first being the card's own
+  link, and the JSON-LD gets one `hasCredential` per credential. A certificate with no
+  public page links to its own copy in `public/certifications/<id>.jpg` (Java: the PDF
+  the owner sent, rendered). **Never publish a document with the DNI or any other ID
+  number**: remove that line from the PDF (true redaction, not a box over the image) before
+  rendering it. A certificate without an image keeps its drawn cover. **Community cards
+  show a photo of the event** from the owner's own LinkedIn post (`src/assets/community/
+  <id>.jpg`, filling the cover), linked from the card (`url`); an event he did not post
+  about keeps its drawn pass until the owner sends a photo or a link.
+  The strip has no visible label (owner's decision: it blurred the message); its name is
+  visually hidden for screen readers. Never mix the kinds in one file.
 - **Identity and integrations** (name, email, WhatsApp, socials, domain, form endpoint,
   GA4 ID, verification tokens) live in `src/config/site.ts`.
 - **Nothing made up.** Facts come from the owner's real sources (LinkedIn, GitHub,
@@ -107,9 +145,9 @@ honoured by Astro/Vite). Type imports too: `import type { Locale } from '@/i18n/
   from npm's public API at build time (the daily deploy refreshes it) and again in the
   browser for the same package list, embedded in the page (`src/lib/npm.ts`); the
   registry's org endpoint has no CORS, so the browser never lists orgs. Its detail line
-  says "every project I collaborate on", never a single package name. Past claims ("2,586
-  downloads in its first week") quote npm's own numbers and link their npm-stat chart
-  through `Achievement.url`. A new package under a listed org is picked up by itself; any
+  says "every project I collaborate on", never a single package name. A past claim ("2,586
+  downloads in its first week") quotes npm's own numbers and links its npm-stat chart
+  through the highlight's `url`. A new package under a listed org is picked up by itself; any
   other new package → add it to `npmPackages`.
 - After changing services, projects or roles: update `public/llms.txt` as well.
 - **No em or en dashes (— –)** in any copy, title, alt, structured data, `llms.txt` or the
@@ -120,6 +158,13 @@ honoured by Astro/Vite). Type imports too: `import type { Locale } from '@/i18n/
 
 Home sections, in this order (the number feeds the `01` eyebrow):
 **Hero → 01 About → 02 Services → 03 Process → 04 Projects → 05 Achievements → 06 Contact**.
+If `src/data/projects.ts` is ever empty, the Projects section, its menu link and its
+JSON-LD `ItemList` stay out and Achievements and Contact become 04 and 05
+(`HomePage.astro`); `verify-seo.mjs` checks that every same-page link (`href="#…"`) has
+its target. Projects today (owner, October 2026): Stellar Snap, Cosmos Pay (the payment
+gateway) and Cosmos Pay Wallet, each linking to its live site. A project card shows a
+screenshot of that site (`src/assets/projects/<id>.jpg`, 4:3, picked up by id), grey like
+the photos and in colour under the pointer; without one it keeps its drawn cover.
 About stays right after the hero because the cut-out portrait "stands" on its dark band.
 
 - Every section ends with (or contains) a call to action to `#contact`; the header
@@ -183,7 +228,8 @@ About stays right after the hero because the cut-out portrait "stands" on its da
   No GTM `<noscript>` iframe either (no consent is possible without JS).
 - GA4 and GTM load **only after the visitor accepts** (consent "basic" mode), with
   `consent default` pushed first. The banner renders only when an ID is set; reject and accept weigh the same;
-  the choice lives in `localStorage` (`consent.analytics`); "Cookie preferences" in the
+  the choice lives in `localStorage` (`consent.analytics`, next to the `theme` preference,
+  which the privacy page also mentions); "Cookie preferences" in the
   footer reopens it. Declining removes `_ga*` cookies.
 - Events: `cta_click` (with `location`), `select_service`, `contact_click` (with `method`:
   `email`, `whatsapp`, `linkedin`, `email_footer`, `whatsapp_footer`, `whatsapp_floating`),
@@ -231,7 +277,7 @@ Every indexable page has, and `scripts/verify-seo.mjs` enforces:
 - JSON-LD: one `@graph` from `src/lib/schema.ts` — `Person` (with `contactPoint`,
   `disambiguatingDescription` and, on home pages, `hasOfferCatalog`), `Organization`s,
   `WebSite`, `ProfilePage`/`WebPage` (with `dateCreated`/`dateModified` from git),
-  `BreadcrumbList`, an `ItemList` of projects and an `OfferCatalog` of services. `@id`s
+  `BreadcrumbList`, an `ItemList` of projects (while there are any) and an `OfferCatalog` of services. `@id`s
   are stable, and every `{ "@id" }` reference must be defined in the same graph.
 - Exactly one `<h1>`, no skipped heading levels, images with `alt` and dimensions,
   every form control with a `<label for>`, and on each home page all sections + the form.
@@ -307,7 +353,8 @@ Every indexable page has, and `scripts/verify-seo.mjs` enforces:
 - **Square design**: no `border-radius`, no circles, no radial "halo" shapes anywhere,
   covers and icons included (stroke icons use square caps and miter joins). Only flags,
   letterforms and third-party logos (WhatsApp, GitHub, the technology logos…) keep their
-  own curves. Technology and ecosystem logos are the official marks in one colour, in
+  own curves, and so does the moon of the theme toggle (owner's request; its sun keeps a
+  square core). Technology and ecosystem logos are the official marks in one colour, in
   the text colour (`ui/BrandLogo.astro`): vector paths in the /logos.svg sprite, taken
   from Simple Icons, Devicon (Java is the cup, never the OpenJDK mark) or the
   organisation's own site; logos that only exist as PNG go to `assets-src/logos/` and
@@ -320,7 +367,20 @@ Every indexable page has, and `scripts/verify-seo.mjs` enforces:
   and app icons draw a square "E." from straight strokes (`public/favicon.svg` and
   `scripts/generate-assets.mjs`, same drawing; `npm run assets` after changing it).
 - Tokens in `:root` of `global.css`; components use tokens (loose colours only in
-  `ProjectCover.astro` and the flags). Space Grotesk Variable (Latin subset preloaded);
+  `ProjectCover.astro` and the flags).
+- **Dark mode**: every token has a dark value, in two identical blocks of `global.css`
+  (`prefers-color-scheme: dark` when the visitor made no choice, and
+  `:root[data-theme="dark"]`). The header toggle (`ui/ThemeToggle.astro`,
+  `src/scripts/theme.ts`, `aria-pressed`) shows the current theme (sun in light, moon in
+  dark; they cross-fade, and also turn without reduced motion) and stores `theme` in `localStorage`; an inline
+  script in `BaseLayout` applies it before the first paint, and both `theme-color` metas
+  follow it. Rules that keep it working: text on an `--ink` background uses `--on-ink`
+  (never `#fff`); translucent ink is `color-mix(in srgb, var(--ink) N%, transparent)`
+  (never `rgb(17 17 17 / a)`); bands that stay dark in both themes (about, footer, consent
+  banner) use `--dark` and the `--on-dark*` tokens, and only there may `#fff`/`#000` appear.
+  Photos dim a little in dark (`--photo-filter`). The switch cross-fades
+  (`html.theme-switching` view transition) and moves nothing. Check both themes.
+- Footer channels: the email shows the mail icon (no photo), WhatsApp its logo. Space Grotesk Variable (Latin subset preloaded);
   Chinese and Devanagari use platform fonts via `:lang()`, which also reset the display
   tracking/leading tokens (`var(--tracking-*)`, `var(--leading-*)`).
 - Section headers use `SectionHeader` (numbered eyebrow "01 Services", with no line or
@@ -359,7 +419,7 @@ Every indexable page has, and `scripts/verify-seo.mjs` enforces:
   340/460/600/744); on mobile `es`/`hi` it is the hero lead paragraph, painted with FCP.
 - Space Grotesk loads with `font-display: optional` (`src/lib/fonts.ts`, same files and
   ranges as fontsource): with `swap` the late font forced a second full layout (~300 ms
-  of blocking on phones). Off-screen project covers use `content-visibility: auto`; never
+  of blocking on phones). Off-screen project and highlight covers use `content-visibility: auto`; never
   whole sections (anchor landings such as `#contact` end up in the wrong place).
 - No third-party script runs before consent; GA4 and GTM load async afterwards.
 

@@ -1,0 +1,74 @@
+[
+  {
+    "id": "checkout-pro",
+    "date": "2025-06",
+    "title": "Checkout Pro",
+    "org": "Mercado Libre",
+    "mark": "MELI",
+    "url": "https://www.mercadopago.com.ar/partners/developers/certifications/certificate/cert_75ec925e410111f0b7678ea6317b5348"
+  },
+  {
+    "id": "talently-fullstack",
+    "date": "2025-02",
+    "title": "Verified by Talently",
+    "org": "Talently",
+    "mark": "TAL",
+    "credentials": [
+      { "name": "TypeScript", "url": "https://talently.tech/certification/febd249c-1fd1-4950-bab4-c944e53e24ba" },
+      { "name": "JavaScript", "url": "https://talently.tech/certification/1ae1c76c-c240-447f-9e96-105e3635b57c" },
+      { "name": "Node.js", "url": "https://talently.tech/certification/ac9c495f-8dfa-4976-b263-cc8395a52faa" },
+      { "name": "Express.js", "url": "https://talently.tech/certification/a2350a18-7fb4-4da0-9d5c-e30070b50a2b" },
+      { "name": "React", "url": "https://talently.tech/certification/80aa45c1-1490-4ad1-b01a-bfe45f200c75" },
+      { "name": "Python", "url": "https://talently.tech/certification/cae61bee-eb99-4f01-8844-6dd1847e107b" }
+    ]
+  },
+  {
+    "id": "nasa-open-science",
+    "date": "2024-10",
+    "title": "NASA Open Science 101",
+    "detail": {
+      "es": "Principios y prácticas de ciencia abierta",
+      "en": "Open science principles and practices",
+      "pt": "Princípios e práticas de ciência aberta",
+      "fr": "Principes et pratiques de la science ouverte",
+      "de": "Prinzipien und Praxis offener Wissenschaft",
+      "zh": "开放科学的原则与实践",
+      "hi": "ओपन साइंस के सिद्धांत और तरीके"
+    },
+    "org": "NASA",
+    "mark": "NASA",
+    "url": "https://www.credly.com/badges/aa1bff1c-d384-4bed-851b-3279d86ebcec"
+  },
+  {
+    "id": "ciencia-abierta",
+    "date": "2024-08",
+    "title": "Taller Alta Ciencia Abierta",
+    "org": "MetaDocencia",
+    "mark": "MD",
+    "url": "https://drive.google.com/file/d/1QJgwblHbpNoUfXwydeCcSJEkC5QJG5tV/view"
+  },
+  {
+    "id": "full-modern-react",
+    "date": "2023-07",
+    "title": "Full Modern React",
+    "org": "MindLuster",
+    "mark": "MLS",
+    "url": "https://www.mindluster.com/student/certificate/6698895555"
+  },
+  {
+    "id": "python-essentials",
+    "date": "2023-07",
+    "title": "Python Essentials 1",
+    "org": "Cisco Networking Academy",
+    "mark": "CNA",
+    "url": "https://www.credly.com/badges/f509b1d2-845c-4453-8e04-2076c5e4e452"
+  },
+  {
+    "id": "java-developer-junior",
+    "date": "2023-03",
+    "title": "Introducción Java Back-end Developer Junior",
+    "org": "UBA Económicas · Argentina Programa 4.0",
+    "mark": "AP",
+    "url": "/certifications/java-developer-junior.jpg"
+  }
+]

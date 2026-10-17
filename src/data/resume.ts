@@ -65,22 +65,6 @@ export const education: Education[] = [
   },
 ];
 
-export interface Certification {
-  name: string;
-  issuer: string;
-  date: string;
-}
-
-export const certifications: Certification[] = [
-  { name: 'Checkout Pro', issuer: 'Mercado Libre', date: '2025-06' },
-  { name: 'TypeScript, JavaScript, Node.js, Express.js, React, Python', issuer: 'Talently', date: '2025-02' },
-  { name: 'NASA Open Science', issuer: 'NASA', date: '2024-10' },
-  { name: 'Taller Alta Ciencia Abierta', issuer: 'MetaDocencia', date: '2024-08' },
-  { name: 'Full Modern React', issuer: 'MindLuster', date: '2023-07' },
-  { name: 'Python Essentials 1', issuer: 'Cisco Networking Academy', date: '2023-07' },
-  { name: 'Java Developer Junior', issuer: 'Argentina Programa', date: '2023-03' },
-];
-
 export interface SkillGroup {
   label: Localized;
   items: string[];

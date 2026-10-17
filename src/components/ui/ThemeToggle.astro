@@ -1,0 +1,92 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import { useTranslations } from '@/i18n';
+import type { Locale } from '@/i18n/locales';
+
+/**
+ * Dark mode switch of the header (behaviour in src/scripts/theme.ts). Hidden without
+ * JS: then the page simply follows the system theme. `aria-pressed` = dark theme on.
+ */
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+---
+
+<button type="button" class="theme-toggle" data-theme-toggle aria-pressed="false" hidden>
+  <Icon name="sun" size={18} class="theme-icon theme-icon--sun" />
+  <Icon name="moon" size={18} class="theme-icon theme-icon--moon" />
+  <span class="visually-hidden">{t.a11y.darkMode}</span>
+</button>
+
+<style>
+  .theme-toggle {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--ink);
+    cursor: var(--cursor-pointer);
+    transition:
+      background-color 0.2s var(--ease),
+      color 0.2s var(--ease),
+      border-color 0.2s var(--ease);
+  }
+
+  .theme-toggle[hidden] {
+    display: none;
+  }
+
+  .theme-toggle:hover {
+    border-color: var(--ink);
+    background: var(--ink);
+    color: var(--on-ink);
+  }
+
+  .theme-toggle:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+
+  /* The icon shows the current theme: the sun in light mode, the moon in dark mode. */
+  .theme-toggle :global(.theme-icon) {
+    grid-area: 1 / 1;
+  }
+
+  .theme-toggle[aria-pressed='true'] :global(.theme-icon--sun),
+  .theme-toggle[aria-pressed='false'] :global(.theme-icon--moon) {
+    opacity: 0;
+  }
+
+  /* Reduced motion keeps only the cross-fade. */
+  @media (prefers-reduced-motion: reduce) {
+    .theme-toggle :global(.theme-icon) {
+      transition: opacity 0.3s var(--ease);
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .theme-toggle :global(.theme-icon) {
+      transition:
+        opacity 0.3s var(--ease),
+        rotate 0.45s var(--ease),
+        scale 0.45s var(--ease);
+    }
+
+    .theme-toggle[aria-pressed='true'] :global(.theme-icon--sun) {
+      rotate: 90deg;
+      scale: 0.5;
+    }
+
+    .theme-toggle[aria-pressed='false'] :global(.theme-icon--moon) {
+      rotate: -90deg;
+      scale: 0.5;
+    }
+  }
+</style>

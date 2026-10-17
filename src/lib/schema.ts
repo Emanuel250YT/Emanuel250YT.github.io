@@ -1,7 +1,7 @@
 import { site } from '@/config/site';
-import { achievements } from '@/data/achievements';
+import { achievements, certifications, community, localize } from '@/data/highlights';
 import { projects } from '@/data/projects';
-import { certifications, education, roles, skillGroups } from '@/data/resume';
+import { education, roles, skillGroups } from '@/data/resume';
 import { services } from '@/data/services';
 import { useTranslations } from '@/i18n';
 import { localeMeta, localePath, locales, type Locale } from '@/i18n/locales';
@@ -81,14 +81,21 @@ export function personNode(locale: Locale, image: ImageRef, { offers = false }: 
       name: role.title[locale],
       description: role.summary[locale],
     })),
-    hasCredential: certifications.map((cert) => ({
-      '@type': 'EducationalOccupationalCredential',
-      name: cert.name,
-      credentialCategory: 'certificate',
-      recognizedBy: { '@type': 'Organization', name: cert.issuer },
-      dateCreated: cert.date,
-    })),
-    award: achievements.map((item) => `${item.title[locale]}: ${item.detail[locale]}`),
+    // One credential per verifiable page: a card with several (Talently) yields one each.
+    hasCredential: certifications.flatMap((cert) => {
+      const title = localize(cert.title, locale);
+      return (cert.credentials ?? [{ name: '', url: cert.url }]).map((credential) => ({
+        '@type': 'EducationalOccupationalCredential',
+        name: credential.name ? `${credential.name} · ${title}` : title,
+        credentialCategory: 'certificate',
+        recognizedBy: { '@type': 'Organization', name: cert.org },
+        dateCreated: cert.date,
+        ...(credential.url && { url: abs(credential.url) }),
+      }));
+    }),
+    award: [...achievements, ...community].map(
+      (item) => `${localize(item.title, locale)}${item.detail ? `: ${item.detail[locale]}` : ''}`,
+    ),
     knowsAbout: [...new Set(skillGroups.flatMap((group) => group.items))],
     knowsLanguage: ['es', 'en'],
     sameAs: [site.socials.github, site.socials.linkedin, site.socials.npm],
